@@ -10,7 +10,7 @@ A Lean project that develops the basic theory of sums of squares in rings and fi
 
 ## Installation
 
-You can clone the project [using GitHub Desktop](x-github-client://openRepo/https://github.com/matematiflo/SumsOfSquares) or via the command line
+You can clone the project using [GitHub Desktop](https://docs.github.com/en/desktop/installing-and-authenticating-to-github-desktop/installing-github-desktop) or via the command line
 
 ```console
 git clone https://github.com/matematiflo/SumsOfSquares.git

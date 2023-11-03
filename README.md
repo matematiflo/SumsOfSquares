@@ -1,3 +1,3 @@
 # Sums of squares
 
-Summing squares in Lean.
+Summing squares using Lean.

@@ -7,6 +7,7 @@ Authors: Florent Schaffhauser
 ```lean
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.List.BigOperators.Basic
+import Mathlib.Data.Rat.Defs
 ```
 
 We introduce sums of squares and prove some of their basic properties.
@@ -70,10 +71,12 @@ In these examples, note that Lean is capable of recognizing that `[1, -2, 3]` is
 #eval SumSq [1, -2, 3] -- 14
 #eval SumSq ([] : List ℕ) -- 0
 
-example : SumSq [1, -2, 3] = 14 := rfl -- the two terms are definitionally equal
+example : SumSq [1, -2, 3] = 14 := by { rfl } -- the two terms are definitionally equal
 
 #eval SumSq (0 :: [1, -2, 3]) -- 14
 #eval SumSq (1 :: [1, -2, 3]) -- 15
+
+#eval SumSq ([1, -2, 3/4] : List ℚ)
 ```
 
 If `L1` and `L2` are lists, there is a concatenated list `L1 ++ L2`, and `SumSq (L1 ++ L2)` can be computed directly.
@@ -81,7 +84,7 @@ If `L1` and `L2` are lists, there is a concatenated list `L1 ++ L2`, and `SumSq 
 ```lean
 #eval SumSq ([1, -2, 3] ++ [1, 1, -2, 3]) -- 29
 
-example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := rfl
+example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := by { rfl }
 ```
 
 We will prove later a theorem that says the following:

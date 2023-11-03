@@ -1,8 +1,8 @@
 # Sums of squares
 
-A Lean project that develops the basic theory of sums of squares in rings and fields.
+A Lean package that develops the basic theory of sums of squares in rings and fields. Our ultimate goal is to define a function that sends an ordered field to its real closure.
 
-## Contents of the library
+## Libraries
 
 - [Definitions and examples](SumSq/Defs.md)
 - [Basic properties](SumSq/Ppties.md)

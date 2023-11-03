@@ -6,6 +6,7 @@ A Lean project that develops the basic theory of sums of squares in rings and fi
 
 - [Definitions and examples](SumSq/Defs.md)
 - [Basic properties](SumSq/Ppties.md)
+- Formally real fields
 
 ## Installation
 
@@ -15,7 +16,7 @@ You can clone the project [using GitHub Desktop](x-github-client://openRepo/http
 git clone https://github.com/matematiflo/SumsOfSquares.git
 ```
 
-If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the Mathlib binaries via the command line
+If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the [Mathlib](https://github.com/leanprover-community/mathlib4) binaries via the command line
 
 ```console
 lake exe cache get
@@ -25,7 +26,7 @@ If you need to install Lean, you can go to the [Lean Community](https://leanprov
 
 Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html).
 
-After installing Lean, it is recommended to download the Mathlib binaries via the command line `lake exe cache get`, for compiling the files locally takes quite a long time.
+After installing Lean, you will be able to download the Mathlib binaries via the command line `lake exe cache get`.
 
 ## Example file
 

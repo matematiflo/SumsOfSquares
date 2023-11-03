@@ -3,10 +3,10 @@
 import SumSq.Defs
 import SumSq.Ppties
 
--- #eval SumSq [1, -2, 3]
+-- -- #eval SumSq [1, -2, 3]
 
-theorem ProofOf : SumSq [1, -2, 3] = 14 := by { rfl }
+-- theorem ProofOf : SumSq [1, -2, 3] = 14 := by { rfl }
 
--- #check ProofOf
+-- -- #check ProofOf
 
-#print ProofOf
+-- #print ProofOf

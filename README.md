@@ -35,13 +35,13 @@ You can run `Example.lean` either with the following command line
 lake env lean Example.lean
 ```
 
-or by building the project
+or by building the project via
 
 ```console
 lake build
 ```
 
-and running the resulting binary file
+and running the resulting binary file via
 
 ```console
 ./build/bin/example

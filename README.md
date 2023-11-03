@@ -22,11 +22,9 @@ If you already have [Lean 4](https://lean-lang.org) installed on your machine, m
 lake exe cache get
 ```
 
-If you need to install Lean, you can go to the [Lean Community](https://leanprover-community.github.io/get_started.html) website and follow the instructions there, depending on your OS.
+If you need to install Lean, you can go to the [Lean Community](https://leanprover-community.github.io/get_started.html) website and follow the instructions there, depending on your OS. Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html).
 
-Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html).
-
-After installing Lean, you will be able to download the Mathlib binaries via the command line `lake exe cache get`.
+After installing Lean, you will be able to download the Mathlib binaries via the command line `lake exe cache get`, as indicated above.
 
 ## Example file
 

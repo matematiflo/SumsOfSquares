@@ -4,7 +4,7 @@
  [{"git":
    {"url": "https://github.com/leanprover-community/mathlib4.git",
     "subDir?": null,
-    "rev": "c539f36b466bcd71c8404dfd9a4dc66fa0664de5",
+    "rev": "a71794241fa0c7d10f3b1ef7c7e919cb07cfd06c",
     "opts": {},
     "name": "mathlib",
     "inputRev?": null,
@@ -49,4 +49,4 @@
     "name": "proofwidgets",
     "inputRev?": "v0.0.21",
     "inherited": true}}],
- "name": "RealAlgebra"}
+ "name": "SumSq"}

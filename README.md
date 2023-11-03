@@ -15,7 +15,7 @@ You can clone the project [using GitHub Desktop](x-github-client://openRepo/http
 git clone https://github.com/matematiflo/SumsOfSquares.git
 ```
 
-If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure download the Mathlib binaries via the command line
+If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the Mathlib binaries via the command line
 
 ```console
 lake exe cache get

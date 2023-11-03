@@ -178,8 +178,8 @@ We start with an easy lemma, which is of more general interest.
 -/
 
 lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
-  simp [SumSqAuxGen]  -- the left-hand side can be modified using the identity `SumSqAuxGen`
-  simp [SumSq]  -- we finish the proof by computing, using the fact that `SumSq [] = 0`
+  simp [SumSqAuxGen]  -- both terms of the equation can be modified, using the function `SumSqAuxGen` to get rid of `SumSqAux` everywhere (on the left, the function `SumSqAuxGen`  is applied to the lists `L` and `[]`, and on the right it is applied to `[]` and `L`)
+  simp [SumSq]  -- we finish the proof by computing, using the fact that `SumSq [] = 0` (by definition)
 
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- we compute

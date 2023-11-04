@@ -85,17 +85,13 @@ example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := by rfl  -- the two ter
 
 We will prove later a theorem that says the following:
 
-```lean
-∀ L1 L2 : List R, SumSq (L1 ++ L2) = SumSq L1 + SumSq L2
-```
+> `∀ L1 L2 : List R, SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
 ## Definition using the `sum` and `square` functions
 
 `SumSq L` can also be computed by squaring the members of the list and summing the resulting list. Pictorially:
 
-```lean
-[1, -2, 3] => [1 ^ 2, (-2) ^ 2, 3 ^ 2] => 1 ^ 2 + (-2) ^ 2 + 3 ^ 2
-```
+> `[1, -2, 3] => [1 ^ 2, (-2) ^ 2, 3 ^ 2] => 1 ^ 2 + (-2) ^ 2 + 3 ^ 2`
 
 The first function is `L => (L.map (. ^ 2))` and the second function is `L => L.sum`. They can be composed as follows.
 
@@ -154,9 +150,7 @@ This is computable and behaves as expected.
 
 We now want to prove that the two definitions agree, i.e. that
 
-```lean
-∀ L : List R, SumSqTR L = SumSq L
-```
+> `∀ L : List R, SumSqTR L = SumSq L`
 
 The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`.
 

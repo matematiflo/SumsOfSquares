@@ -149,7 +149,7 @@ We now want to prove that the two definitions agree, i.e. that
 The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`. This idea is formalised in the next result.
 -/
 
-theorem SumSqAuxGen [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
+theorem SumSqAuxWithSumSq [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with  -- we prove the result by induction on L1
   | nil => simp [SumSqAux, SumSq]  -- the nil case follows from the definitions of the functions involved
   | cons a l1 ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
@@ -160,13 +160,13 @@ theorem SumSqAuxGen [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumS
     rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
 
 /-!
-With the help of `SumSqAuxGen`, we can now prove that the tail-recursive version of the sum-of-squares function indeed returns the same value as the original function.
+With the help of `SumSqAuxWithSumSq`, we can now prove that the tail-recursive version of the sum-of-squares function indeed returns the same value as the original function.
 
 We start with an easy lemma, which is of more general interest.
 -/
 
 lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
-  simp [SumSqAuxGen]  -- both terms of the equation can be modified, using the function `SumSqAuxGen` to get rid of `SumSqAux` everywhere (on the left, the function `SumSqAuxGen`  is applied to the lists `L` and `[]`, and on the right it is applied to `[]` and `L`)
+  simp [SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function `SumSqAuxGen` to get rid of `SumSqAux` everywhere (on the left, the function `SumSqAuxGen`  is applied to the lists `L` and `[]`, and on the right it is applied to `[]` and `L`)
   simp [SumSq]  -- we finish the proof by computing, using the fact that `SumSq [] = 0` (by definition)
 
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by

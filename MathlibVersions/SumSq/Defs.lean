@@ -30,13 +30,13 @@ We now want to prove that the tail-recursuve definition agree with the original 
 
 The key is that, when `S = SumSq L2`, the term  `SumSqAux S L1` can be computed in terms of `SumSq L1` and `SumSq L2`.
 -/
-theorem SumSqAuxGen [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
+theorem SumSqAuxWithSumSq [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with
   | nil => simp [SumSqAux, SumSq]
   | cons a l1 ih => intro L; rw [SumSq, SumSqAux, add_comm _ (a ^2), ← SumSq,ih (a :: L), SumSq, add_comm (a ^ 2) _, add_assoc]
 
 -- We can now prove that `SumSqTR L = SumSq L`.
-lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by simp [SumSqAuxGen]; simp [SumSq]
+lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by simp [SumSqAuxWithSumSq]; simp [SumSq]
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]
 

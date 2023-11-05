@@ -36,11 +36,8 @@ lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSq
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]
 
--- A sum-of-squares function on `List R` can also be defined as the composition of the function `L => (L.map (. ^ 2))` with `L => L.sum`.
-def SumSq2 [Semiring R] (L : List R) : R := (L.map (. ^ 2)).sum
-
--- We show that the two definitions agree.
-theorem squaring_and_summing [Semiring R] (L : List R) : SumSq2 L = SumSq L := by
+-- A sum-of-squares function on `List R` can also be defined as the composition of the function `L => (L.map (. ^ 2))` with `L => L.sum`. We show that the two definitions agree.
+theorem squaring_and_summing2 [Semiring R] (L : List R) : SumSq L = (L.map (. ^ 2)).sum := by
   induction L with
   | nil => rfl
-  | cons a l ih => dsimp [SumSq2,SumSq]; dsimp [SumSq2] at ih; simp [ih]
+  | cons a l ih => simp [SumSq,ih]

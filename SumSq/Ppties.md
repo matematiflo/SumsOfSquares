@@ -17,15 +17,25 @@ The sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1`
 
 > `SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
+We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined in the following way:
+
 ```lean
-theorem SumSq_concat {R : Type} [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
+protected def append : (xs ys : List α) → List α
+  | [],    bs => bs
+  | a::as, bs => a :: List.append as bs
+```
+
+See Init.Data.List.Basic for details.
+
+```lean
+theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
     simp [SumSq] -- [] ++ L2 = L2 so everything follows by definition of SumSq
   | cons a L ih => -- case when L1 = (a :: L)
     simp [SumSq] -- (a :: L) ++ L2 = a :: (L ++ L2) and SumSq (a :: (L ++ L2)) = a ^ 2  + SumSq (L ++ L2)
-    rw [ih] -- ih : SumSq (L ++ L2) = SumSq L + SumSq L2
-    rw [add_assoc] -- the two terms are now equal up to associativity of addition
+    simp [ih] -- ih : SumSq (L ++ L2) = SumSq L + SumSq L2
+    simp [add_assoc] -- the two terms are now equal up to associativity of addition
 ```
 
 ## Permuted lists

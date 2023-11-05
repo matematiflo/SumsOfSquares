@@ -25,11 +25,15 @@ def SumSqTR [Semiring R] : List R → R
 -- The following property holds by definition. It will be used in the proof of the equality `SumSqTR L = SumSq L`.
 theorem SumSqAuxZero [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rfl
 
--- We now want to prove that the two definitions agree, i.e. that `∀ L : List R, SumSqTR L = SumSq L`. The key to the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`. This is formalised in the next result.
-theorem SumSqAuxGen [Semiring R] (L : List R) : ∀ L' : List R, SumSqAux (SumSq L') L  = SumSq L' + SumSq L := by
-  induction L with
+/-
+We now want to prove that the tail-recursuve definition agree with the original one: `∀ L : List R, SumSqTR L = SumSq L`.
+
+The key is that, when `S = SumSq L2`, the term  `SumSqAux S L1` can be computed in terms of `SumSq L1` and `SumSq L2`.
+-/
+theorem SumSqAuxGen [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
+  induction L1 with
   | nil => simp [SumSqAux, SumSq]
-  | cons a l ih => intro L''; rw [SumSq, SumSqAux, add_comm _ (a ^2), ← SumSq,ih (a :: L''), SumSq, add_comm (a ^ 2) _, add_assoc]
+  | cons a l1 ih => intro L; rw [SumSq, SumSqAux, add_comm _ (a ^2), ← SumSq,ih (a :: L), SumSq, add_comm (a ^ 2) _, add_assoc]
 
 -- We can now prove that `SumSqTR L = SumSq L`.
 lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by simp [SumSqAuxGen]; simp [SumSq]

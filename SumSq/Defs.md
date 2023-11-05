@@ -10,12 +10,6 @@ import Mathlib.Data.List.BigOperators.Basic
 import Mathlib.Data.Rat.Defs
 ```
 
-We introduce sums of squares and prove some of their basic properties.
-
-The basic setup is that of a general semiring `R`. For example, we can consider sums of squares of natural numbers (`R = ℕ`).
-
-For some results, we specialize to rings or fields.
-
 > **Convention.** In proofs by induction, the notation `ih` is meant to signify *induction hypothesis*.
 
 ## Definition by pattern matching
@@ -152,7 +146,7 @@ We now want to prove that the two definitions agree, i.e. that
 
 > `∀ L : List R, SumSqTR L = SumSq L`
 
-The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`.
+The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`. This idea is formalised in the next result.
 
 ```lean
 theorem SumSqAuxGen [Semiring R] (L : List R) : ∀ L' : List R, SumSqAux (SumSq L') L  = SumSq L' + SumSq L := by

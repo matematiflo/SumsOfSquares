@@ -31,7 +31,7 @@ protected def append : (xs ys : List α) → List α
 See Init.Data.List.Basic for details.
 -/
 
-theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
+theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1.append  L2) = SumSq L1 + SumSq L2 := by
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
     simp [SumSq] -- [] ++ L2 = L2 so everything follows by definition of SumSq

@@ -4,8 +4,6 @@
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Florent Schaffhauser
-
-**SEE GOLFED PROOFS AGAIN?**
 -/
 
 import Mathlib.Algebra.Ring.Defs
@@ -38,7 +36,7 @@ lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSq
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]
 
--- A sum-of-squares function on `List R` can also be defined as the function `L => (L.map (. ^ 2))`.
+-- A sum-of-squares function on `List R` can also be defined as the composition of the function `L => (L.map (. ^ 2))` with `L => L.sum`.
 def SumSq2 [Semiring R] (L : List R) : R := (L.map (. ^ 2)).sum
 
 -- We show that the two definitions agree.

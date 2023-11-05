@@ -149,14 +149,14 @@ We now want to prove that the two definitions agree, i.e. that
 The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`. This idea is formalised in the next result.
 -/
 
-theorem SumSqAuxGen [Semiring R] (L : List R) : ∀ L' : List R, SumSqAux (SumSq L') L  = SumSq L' + SumSq L := by
-  induction L with  -- we prove the result by induction on L
+theorem SumSqAuxGen [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
+  induction L1 with  -- we prove the result by induction on L1
   | nil => simp [SumSqAux, SumSq]  -- the nil case follows from the definitions of the functions involved
-  | cons a l ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
-    intro L''  -- we introduce a new variable L''
+  | cons a l1 ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
+    intro L  -- we introduce a new variable L
     rw [SumSq, SumSqAux]  -- we compute
     rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of `SumSq`
-    rw [ih (a :: L'')]  -- we apply the induction hypothesis with `L' = (a :: L'')`
+    rw [ih (a :: L)]  -- we apply the induction hypothesis with `L' = (a :: L'')`
     rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
 
 /-!

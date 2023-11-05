@@ -26,9 +26,7 @@ def SumSqTR [Add R] [Zero R] [Pow R ℕ] : List R → R
 theorem SumSqAuxZero [Add R] [Zero R] [Pow R ℕ] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rfl
 
 /-
-We now want to prove that the tail-recursuve definition agree with the original one: `∀ L : List R, SumSqTR L = SumSq L`.
-
-The key is that, when `S = SumSq L2`, the term  `SumSqAux S L1` can be computed in terms of `SumSq L1` and `SumSq L2`.
+We now want to prove that the tail-recursuve definition agree with the original one: `∀ L : List R, SumSqTR L = SumSq L`. The key is that, when `S = SumSq L2`, the term  `SumSqAux S L1` can be computed in terms of `SumSq L1` and `SumSq L2`.
 -/
 theorem SumSqAuxWithSumSq [AddCommMonoid R] [Pow R ℕ] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with

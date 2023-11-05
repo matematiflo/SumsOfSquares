@@ -10,7 +10,7 @@ import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.List.BigOperators.Basic
 import Mathlib.Data.Rat.Defs
 
--- Given a semiring `R`, we define a sum-of-squares function on `List R`.
+-- Given a type `R` with an addition map, a zero and powers by a natural number, we define a sum-of-squares function on `List R`.
 def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
   | [] => 0
   | a :: l => a ^ 2 + SumSq l

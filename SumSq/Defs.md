@@ -14,7 +14,7 @@ import Mathlib.Data.Rat.Defs
 
 ## Definition by pattern matching
 
-Let `R` be a type. As soon as `R` is endowed with an addition function and a square function, we can define sums of squares as a function `SumSq` going from `List R` to `R`. However, in what follows, we will restrict to the case when `R` is a semiring.
+Let `R` be a type. As soon as `R` is endowed with an addition function, a zero and a square function, we can define sums of squares as a function `SumSq` going from `List R` to `R`. However, in what follows, we will restrict to the case when `R` is a semiring.
 
 Recall that `List R` is the type defined inductively and recursively by
 

@@ -30,9 +30,19 @@ In Lean, the empty list can be denoted by `[]` and the list `cons a l` can be de
 Sums of squares are then defined by pattern matching, with respect to terms of type `List R`. This means by giving the value of the function in each of the two possible cases `[]` and `a :: l`.
 -/
 
-def SumSq {R : Type} [Semiring R] : List R → R
+def SumSq {R : Type} [Semiring R] : (List R → R)
   | [] => 0
   | a :: l => a ^ 2 + SumSq l
+
+/-!
+Alternate syntax for patter matching:
+
+```lean
+def SumSq {R : Type} [Semiring R] (L : List R) : R := match L with
+  | [] => 0
+  | a :: l => a ^ 2 + SumSq l
+```
+-/
 
 /-!
 The command `#check @SumSq` will return the type of the function `SumSq`. The complete definition can be viewed using the command `#print SumSq`.

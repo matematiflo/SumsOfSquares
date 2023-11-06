@@ -114,9 +114,9 @@ theorem squaring_and_summing [Semiring R] (L : List R) : SumSq2 L = SumSq L := b
   induction L with -- we prove the result by induction on the list L (the type `List R` is an inductive type)
   | nil => rfl -- case when L is the empty list, the two terms are definitionally equal
   | cons a l ih => -- case when L = (a :: l), the two terms reduce to equal ones after some simplifications
-    dsimp [SumSq2, SumSq]
-    dsimp [SumSq2] at ih
-    simp [ih]
+    dsimp [SumSq2, SumSq] -- we simplify using the definitions of `SumSq2` and `SumSq`
+    dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of `SumSq2`
+    simp [ih]  -- we use the induction hypothesis
 ```
 
 ## Tail-recursive definition

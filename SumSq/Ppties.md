@@ -11,7 +11,7 @@ import Mathlib.Data.List.Perm
 
 **CHECK OLD FILES FIRST!!!**
 
-## Concatenated lists
+## Appended lists
 
 The sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1` plus the sum of squares of `L2`.
 

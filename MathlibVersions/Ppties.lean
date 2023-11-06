@@ -6,7 +6,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Florent Schaffhauser
 -/
 
-import SumSq.MathlibVersions.MathlibDefs
+import MathlibVersions.Defs
 import Mathlib.Data.List.Perm
 
 namespace MathlibSumSq

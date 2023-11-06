@@ -10,6 +10,9 @@ require mathlib from git
 lean_lib SumSq where
   -- add library configuration options here
 
+lean_lib MathlibVersions where
+  -- add library configuration options here
+
 @[default_target]
 lean_exe «example» where
   root := `Example

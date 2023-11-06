@@ -37,7 +37,8 @@ def SumSq {R : Type} [Semiring R] : (List R → R)
 Alternate syntax for pattern matching:
 
 ```lean
-def SumSq {R : Type} [Semiring R] (L : List R) : R := match L with
+def SumSq {R : Type} [Semiring R] (L : List R) : R :=
+  match L with
   | [] => 0
   | a :: l => a ^ 2 + SumSq l
 ```

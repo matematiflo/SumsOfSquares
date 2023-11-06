@@ -50,7 +50,7 @@ The command `#check @SumSq` will return the type of the function `SumSq`. The co
 #print SumSq
 ```
 
-In the declaration of the function `SumSq, one can dispense with the (implicit) variable `{R : Type}` and simply write the following:
+In the declaration of the function `SumSq`, one can dispense with the (implicit) variable `{R : Type}` and simply write the following:
 
 ```lean
 def SumSq [Semiring R] : List R → R

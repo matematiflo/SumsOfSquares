@@ -11,4 +11,7 @@ import Mathlib.Data.List.Perm
 
 namespace MathlibSumSq
 
+universe u
+variable {R : Type u}
+
 end MathlibSumSq

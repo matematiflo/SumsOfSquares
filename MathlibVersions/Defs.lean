@@ -12,6 +12,9 @@ import Mathlib.Data.Rat.Defs
 
 namespace MathlibSumSq
 
+universe u
+variable {R : Type u}
+
 -- Given a type `R` with an addition map, a zero and powers by a natural number, we define a sum-of-squares function on `List R`.
 def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
   | [] => 0

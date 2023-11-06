@@ -10,3 +10,5 @@ import MathlibVersions.Defs
 import Mathlib.Data.List.Perm
 
 namespace MathlibSumSq
+
+end MathlibSumSq

@@ -2,6 +2,7 @@
 -- Import modules here that should be built as part of the library.
 import SumSq.Defs
 import SumSq.Ppties
+import SumSq.MathlibVersions.MathlibDefs
 
 -- -- #eval SumSq [1, -2, 3]
 

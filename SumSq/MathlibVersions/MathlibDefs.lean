@@ -10,6 +10,8 @@ import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.List.BigOperators.Basic
 import Mathlib.Data.Rat.Defs
 
+namespace MathlibSumSq
+
 -- Given a type `R` with an addition map, a zero and powers by a natural number, we define a sum-of-squares function on `List R`.
 def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
   | [] => 0
@@ -39,7 +41,9 @@ theorem def_TR_ok [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqTR L = SumSq
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]
 
 -- A sum-of-squares function on `List R` can also be defined as the composition of the function `L => (L.map (. ^ 2))` with `L => L.sum`. We show that the two definitions agree.
-theorem squaring_and_summing2 [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSq L = (L.map (. ^ 2)).sum := by
+theorem squaring_and_summing [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSq L = (L.map (. ^ 2)).sum := by
   induction L with
   | nil => rfl
   | cons a l ih => simp [SumSq,ih]
+
+end MathlibSumSq

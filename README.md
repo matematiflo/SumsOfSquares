@@ -12,13 +12,13 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 You can clone the project using [GitHub Desktop](https://docs.github.com/en/desktop/installing-and-authenticating-to-github-desktop/installing-github-desktop) or via the command line
 
-```console
+```bash
 git clone https://github.com/matematiflo/SumsOfSquares.git
 ```
 
 If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the compiled [Mathlib](https://github.com/leanprover-community/mathlib4) libraries via the command line
 
-```console
+```bash
 lake exe cache get
 ```
 
@@ -30,18 +30,18 @@ After installing Lean, you will be able to download the compiled Mathlib librari
 
 You can run `Example.lean` either with the following command line
 
-```console
+```bash
 lake env lean Example.lean
 ```
 
 or by building the project via
 
-```console
+```bash
 lake build
 ```
 
 and running the resulting binary file via
 
-```console
+```bash
 ./build/bin/example
 ```

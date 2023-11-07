@@ -165,7 +165,7 @@ theorem SumSqAuxWithSumSq [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux
   | nil => simp [SumSqAux, SumSq]  -- the nil case follows from the definitions of the functions involved
   | cons a l1 ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
     intro L  -- we introduce a new variable L
-    rw [SumSq, SumSqAux]  -- we compute
+    dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of `SumSq` and `SumSqAux`
     rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of `SumSq`
     rw [ih (a :: L)]  -- we apply the induction hypothesis with `L' = (a :: L'')`
     rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
@@ -181,4 +181,4 @@ lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSq
   simp [SumSq]  -- we finish the proof by computing, using the fact that `SumSq [] = 0` (by definition)
 
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
-  simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- we compute
+  simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- the proof is by direct computation

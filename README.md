@@ -6,6 +6,7 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 - [Definitions and examples](SumSq/Defs.md)
 - [Basic properties](SumSq/Ppties.md)
+- [Cones](SumSq/Cones.md)
 - Formally real fields
 
 ## Installation

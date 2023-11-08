@@ -9,7 +9,6 @@ Authors: Florent Schaffhauser
 import SumSq.Defs
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
-import Mathlib.Algebra.Module.Basic
 
 /-!
 ## Appended lists

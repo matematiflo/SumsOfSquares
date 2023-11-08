@@ -14,4 +14,5 @@ For some results, we specialize to rings or fields.
 
 - [Definitions and examples](SumSq/Defs.html)
 - [Basic properties](SumSq/Ppties.html)
+- Cones
 - Formally real fields

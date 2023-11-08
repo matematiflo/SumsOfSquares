@@ -7,6 +7,7 @@ Authors: Florent Schaffhauser
 ```lean
 import SumSq.Defs
 import Mathlib.Data.List.Perm
+import Mathlib.Tactic.FieldSimp
 ```
 
 **CHECK OLD FILES AGAIN!!!**
@@ -100,4 +101,84 @@ theorem SumSq_erase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R)
   change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
   have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a))
   rw [SumSq_permut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+```
+
+## More computations
+
+The next result formalizes a property that one would like to denote by `(c • L).sum = c * L.sum`, meaning that the sum of the list ontained by multiplying each member of `L` by `c` is equal to `c` times the sum of `L`.
+
+**--> DEFINE THE LIST `c • L` SOMEWHERE AND PROVE `mul_sum` USING THIS NOTATION!!!**
+
+*This needs to be done in the following way: if `R` has a `mul`, then `List R` has an `smul`.
+
+```lean
+theorem mul_sum {R : Type} [Semiring R] (L : List R) (c : R) : List.sum (List.map (c * .) L) = c * List.sum L
+  := by
+    induction L with -- the proof is by induction on `L`
+    | nil => simp -- the case of the empty list reduces to `0 = 0`
+    | cons _ _ ih => simp [mul_add, ih] -- the case `L = (a :: l) follows from `c * (a + l.sum) = c * a + c * l.sum` and the induction hypothesis
+    done
+```
+
+Combining `squaring_and_summing` and `mul_sum`, we can prove the following property, which says that `SumSq (c • L) = c ^ 2 * SumSq L`.
+
+CHECK FILE AGAIN
+
+This will be proven again in the section on [Multiplicative properties](#multiplicative-properties). There, we will present a proof by induction, more similar to the proof of `mul_sum` above.
+
+CHECK FILE AGAIN
+
+Note that for this result we assume that `R` is a *commutative* semiring (so that we can use [`mul_pow`]()).
+
+```lean
+theorem mul_sum_sq {R : Type} [CommSemiring R] (L : List R) (c : R) :
+SumSq (L.map (c * .)) = c ^ 2 * SumSq L
+  := by
+    simp [← squaring_and_summing, ← mul_sum] -- we reduce the statement to an equality between two sums of lists
+    have aux : ((fun x => x ^ 2) ∘ fun x => c * x) = ((fun x => c ^ 2 * x) ∘ fun x => x ^ 2)
+      := by simp [Function.funext_iff, mul_pow] -- we prove an auxiliary result that implies that the two lists are in fact equal
+    --rw [SumSq2, SumSq2, ← mul_sum]
+    dsimp [SumSq2]
+    rw [← mul_sum]
+    simp [aux] -- by incorporating `aux`, the result is proved: the sums of two equal lists are equal
+    done
+```
+
+## Multiplicative properties
+
+The first result says that if you multiply every member of a list `L : List R` by a constant `c : R`, then the sum of squares of the new list is equal to `c ^ 2 * SumSq L`.
+
+In order to be able to apply lemmas such as `mul_pow` in the proof, we assume here that the semiring `R` is commutative.
+
+We take a look at a few examples first.
+
+```lean
+#eval SumSq [2 * 1, 2 * ( -2), 2 * 3] -- 56
+#eval 4 * SumSq [1, -2, 3] -- 56
+
+example : SumSq [2 * 1, 2 * ( -2), 2 * 3] = 4 * SumSq [1, -2, 3] := rfl
+
+example (a x y : ℚ) : SumSq [a * x, a * y] = a ^ 2 * SumSq [x, y]
+  := by simp [SumSq, mul_pow, mul_add]
+```
+
+REPROOF OF `mul_sum_sq` (by induction)
+
+```lean
+theorem mul_sum_sq2 {R : Type} [CommSemiring R]
+  (L : List R) (c : R) : SumSq (L.map (c * .)) = c ^ 2 * SumSq L
+    := by
+      induction L with -- again an induction on L
+      | nil => simp [SumSq] -- the case of the empty list is trivial
+      | cons a _ ih => simp [SumSq, ih, mul_add, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis
+      done
+
+theorem SumSq_of_list_div {F : Type} [Semifield F]
+  (L : List F) (c : F) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L
+    := by -- this will be an application of SumSq_of_list_mul, using the fact that . / c = . * c⁻¹
+      have aux : (fun x => x / c) = (fun x => c⁻¹ * x)
+        := by field_simp
+      -- simp [aux, mul_sum_sq]
+      simp [aux, mul_sum_sq2]
+      done
 ```

@@ -22,7 +22,7 @@ Recall that `List R` is the type defined inductively and recursively by
 ```lean
 inductive List (R : Type u) where
   | nil : List R -- the empty list
-  | cons (a : R) (l : List R) : List R -- the list constructed from a term `a : R` and an already constructed list `l : List R`.
+  | cons (a : R) (l : List R) : List R -- the list constructed from a term a : R and an already constructed list l : List R.
 ```
 
 In Lean, the empty list can be denoted by `[]` and the list `cons a l` can be denoted by `a :: l`.
@@ -118,8 +118,8 @@ theorem squaring_and_summing [Semiring R] (L : List R) : SumSq2 L = SumSq L := b
   induction L with -- we prove the result by induction on the list L (the type `List R` is an inductive type)
   | nil => rfl -- case when L is the empty list, the two terms are definitionally equal
   | cons a l ih => -- case when L = (a :: l), the two terms reduce to equal ones after some simplifications
-    dsimp [SumSq2, SumSq] -- we simplify using the definitions of `SumSq2` and `SumSq`
-    dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of `SumSq2`
+    dsimp [SumSq2, SumSq] -- we simplify using the definitions of SumSq2 and SumSq
+    dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of SumSq2
     simp [ih]  -- we use the induction hypothesis
 
 /-!
@@ -163,11 +163,11 @@ The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L`
 theorem SumSqAuxWithSumSq [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with  -- we prove the result by induction on L1
   | nil => simp [SumSqAux, SumSq]  -- the nil case follows from the definitions of the functions involved
-  | cons a l1 ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
+  | cons a l1 ih =>  -- note that the induction hypothesis is for l fixed but for arbitrary L' : List R
     intro L  -- we introduce a new variable L
-    dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of `SumSq` and `SumSqAux`
-    rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of `SumSq`
-    rw [ih (a :: L)]  -- we apply the induction hypothesis with `L' = (a :: L'')`
+    dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of SumSq and SumSqAux
+    rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of SumSq
+    rw [ih (a :: L)]  -- we apply the induction hypothesis with L' = (a :: L'')
     rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
 
 /-!
@@ -177,8 +177,8 @@ We start with an easy lemma, which is of more general interest.
 -/
 
 lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
-  simp [SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function `SumSqAuxGen` to get rid of `SumSqAux` everywhere (on the left, the function `SumSqAuxGen`  is applied to the lists `L` and `[]`, and on the right it is applied to `[]` and `L`)
-  simp [SumSq]  -- we finish the proof by computing, using the fact that `SumSq [] = 0` (by definition)
+  simp [SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function SumSqAuxGen to get rid of SumSqAux everywhere (on the left, the function SumSqAuxGen is applied to the lists L and [], and on the right it is applied to [] and L)
+  simp [SumSq]  -- we finish the proof by computing, using the fact that SumSq [] = 0 (by definition)
 
 theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- the proof is by direct computation

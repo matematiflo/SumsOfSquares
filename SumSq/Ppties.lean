@@ -9,6 +9,8 @@ Authors: Florent Schaffhauser
 import SumSq.Defs
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
+import Mathlib.Algebra.Module.Basic
+-- import Mathlib.GroupTheory.GroupAction.BigOperators
 
 /-!
 ## Appended lists
@@ -30,10 +32,10 @@ We now prove that the sum of squares of the list `L1 ++ L2` is equal to the sum 
 theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
-    simp [SumSq] -- [] ++ L2 = L2 so everything follows by definition of SumSq
+    simp [SumSq] -- since [] ++ L2 = L2 by definition of ++, the result follows by definition of SumSq
   | cons a l1 ih => -- case when L1 = (a :: L)
-    simp [SumSq] -- (a :: L) ++ L2 = a :: (L ++ L2) and SumSq (a :: (L ++ L2)) = a ^ 2  + SumSq (L ++ L2)
-    rw [ih] -- ih : SumSq (L ++ L2) = SumSq L + SumSq L2
+    simp [SumSq] -- by [`List.cons_append](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.cons_append) (a :: L) ++ L2 = a :: (L ++ L2), so SumSq (a :: (L ++ L2)) = a ^ 2  + SumSq (L ++ L2)
+    rw [ih] -- recall that ih : SumSq (L ++ L2) = SumSq L + SumSq L2
     rw [add_assoc] -- the two terms are now equal up to associativity of addition
 
 /-!
@@ -49,15 +51,17 @@ inductive Perm : List R → List R → Prop
   | trans {L₁ L₂ L₃ : List R} : Perm L₁ L₂ → Perm L₂ L₃ → Perm L₁ L₃
 ```
 
+ So we wee that `List.Perm` is an inductive type: `L2` is a permutation of `L1` if and only if one of four cases occurs.
+
 We can now prove that a sum of squares is invariant under permutations:
 
 > `L1 ~ L2 → SumSq L1 = SumSq L2`
 
-Note that, since `List.Perm` uses implicit variables for the constructors `cons` and `trans`, we choose to write the proof by indution with a slighty different syntax (using `case`), to make the Lean infoview rendering more readable.
+Note that, since `List.Perm` uses implicit variables for the constructors `cons` and `trans`, we choose to write the proof by indution with a slighty different syntax (using `case`), to make the Lean infoview rendering more readable (for more on this, see Exercise 1 [below](#exercises)).
 -/
 
-theorem SumSq_permut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
-  induction H -- we prove the result by induction on ~ (recall that `List.Perm` is an inductive type: L2 is a permutation of L1 if and only if one of four cases occurs)
+theorem SumSqPermut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
+  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed an inductive type)
   · case nil => -- case when L1 L2 are both empty
     rfl -- equality holds by definition
   · case cons x l1 l2 Hl Sum12 => -- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2
@@ -70,9 +74,9 @@ theorem SumSq_permut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : Su
     rw [Sum1, Sum2] -- by induction SumSq L1 = SumSq L and SumSq L = SumSq L2
 
 /-!
-## Erasing a member
+## Erasing an entry
 
-The function `List.erase` can erase a member of a list. It is defined as follows.
+The function `List.erase` can erase an entry of a list. It is defined as follows.
 
 ```lean
 def List.erase {R : Type} [BEq α] : List R → R → List R
@@ -90,7 +94,7 @@ def List.erase' {R : Type} [DecidableEq R] : List R → R → List R
   | a::l, b => if a = b then l else List.erase' l b
 ```
 
-Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function `List.perm_cons_erase`, also used below).
+Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function [`List.perm_cons_erase`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.perm_cons_erase), also used below).
 
 We now prove that, if a term `a : R` is a member of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)`. More precisely:
 
@@ -98,95 +102,111 @@ We now prove that, if a term `a : R` is a member of a list `L : List R`, then we
 
 -/
 
-theorem SumSq_erase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
+theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
   change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
-  have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a))
-  rw [SumSq_permut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+  have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a)), see also the exercises section below
+  rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+
+/-!
+## Multiplicatition by a scalar
+
+Let `L` be a list with entries in a semiring `R`. If `c` is a term of type `R`, we can multiply each enrty of `L` by `c` to define a new list, that we shall denote `c • L`.
+
+> `c • L := List.map (c * .) L`
+
+Let us define this formally and take a look at a few examples. As we shall see, one has to be precise in the notation, in order for Lean to interpret the command correctly.
+-/
+
+def ListSmul [Semiring R] (c : R) : List R → List R
+  | [] => []
+  | a :: l => (c * a) :: ListSmul c l
+
+infixl:50 " • " => ListSmul
+
+theorem ListSmulMap [Semiring R] (c : R) (L : List R) : (c • L) = L.map (c * .) := by
+  induction L with
+  | nil => simp [ListSmul]  -- the case of the empty list is trivial
+  | cons a l ih =>  simp [ListSmul, ih]  -- the case of a list of the form (a :: l) reduces immediately to the induction hypothesis
+
+#eval ListSmul 2 [1, -2, 3]  --[2, -4, 6]
+#eval ((2 : ℤ) • [1, -2, 3])
+
+example : ListSmul 2 [1, -2, 3] = [2, -4, 6] := by rfl
+
+#eval SumSq (ListSmul 2 [1, -2, 3])  -- 56
+#eval SumSq ((2 : ℤ) • [1, -2, 3])  -- 56
+
+example : SumSq (ListSmul 2 [1, -2, 3]) = 4 * SumSq [1, -2, 3] := by rfl
+
+#eval SumSq [2, -4, 6]
+#eval 4 * SumSq [1, -2, 3]  -- 56
+
+example (a x y : ℚ) : (ListSmul a [x, y]) = [a * x, a * y] := by rfl
+example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add]
+
+/-!
+The result we expect is then the following:
+
+> `SumSq (c • L) = c ^ 2 * SumSq L`
+
+We will see below that this result holds when `R` is a *commutative* semiring.
+
+Indeed, in order to be able to apply lemmas such as [`mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow) in the proof, we need to assume that the semiring `R` is commutative.
+
+Before proving the result that is relevant result, we prove an easier one, of possibly greater general interest, with `SumSq` replaced by `List.sum`.
+-/
+
+theorem SumSmul {R : Type} [Semiring R] (c : R) (L : List R) : List.sum (c • L) = c • (List.sum L) := by
+  induction L with
+  | nil => simp [ListSmul]
+  | cons a l ih => simp [ListSmul, mul_add, ih]
+
+theorem SumSqSmul {R : Type} [CommSemiring R] (c : R) (L : List R) : SumSq (c • L) = c ^ 2 * SumSq L := by
+    induction L with -- we prove the result by induction on L
+    | nil => simp [SumSq] -- the case of the empty list is trivial
+    | cons a _ ih => simp [SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis
+
+/-!
+If we assume that the semiring `R` is in fact a semifield, then we can also consider the list from `L` obtained by dividing each entry by a term `c` such that `c ≠ 0'.
+-/
+
+theorem SumSqDiv {F : Type} [Semifield F]
+  (L : List F) (c : F) (hc : c ≠ 0) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L := by
+    -- this will be an application of mul_sum_sq2, using the fact that . / c = . * c⁻¹
+    have aux : (fun x => x / c) = (fun x => c⁻¹ * x) := by field_simp
+    simp [aux, ← ListSmulMap, SumSqSmul]
+
+/-!
+Note that the assumption `(hc : c ≠ 0)` has not been used because Lean gives a value to division by `c` in `F` even if `c = 0` and that the equality remains true in this case.
+-/
+
+example [Semifield F] (x : F) : x / 0 = 0 := by field_simp
 
 /-!
 ## More computations
 
-The next result formalizes a property that one would like to denote by `(c • L).sum = c * L.sum`, meaning that the sum of the list ontained by multiplying each member of `L` by `c` is equal to `c` times the sum of `L`.
+Before moving on to the exercises, we give another proof of `theorem SumSqSmul`, seen in the section on [Multiplicatition by a scalar](#multiplication-by-a-scalar).
 
-**--> DEFINE THE LIST `c • L` SOMEWHERE AND PROVE `mul_sum` USING THIS NOTATION!!!**
-
-*This needs to be done in the following way: if `R` has a `mul`, then `List R` has an `smul`.
+It is a direct, more computational proof, harder to follow than the original proof (by induction).
 -/
 
-theorem mul_sum {R : Type} [Semiring R] (L : List R) (c : R) : List.sum (List.map (c * .) L) = c * List.sum L
-  := by
-    induction L with -- the proof is by induction on `L`
-    | nil => simp -- the case of the empty list reduces to `0 = 0`
-    | cons _ _ ih => simp [mul_add, ih] -- the case `L = (a :: l) follows from `c * (a + l.sum) = c * a + c * l.sum` and the induction hypothesis
-    done
+lemma SumSmul2 [Semiring R]  (c : R) (L : List R) : (L.map (c * .)).sum = c * L.sum := by
+  induction L with
+  | nil => simp
+  | cons a l ih => simp [mul_add, ih]
 
-/-!
-Combining `squaring_and_summing` and `mul_sum`, we can prove the following property, which says that `SumSq (c • L) = c ^ 2 * SumSq L`.
-
-CHECK FILE AGAIN
-
-This will be proven again in the section on [Multiplicative properties](#multiplicative-properties). There, we will present a proof by induction, more similar to the proof of `mul_sum` above.
-
-CHECK FILE AGAIN
-
-Note that for this result we assume that `R` is a *commutative* semiring (so that we can use [`mul_pow`]()).
--/
-
-theorem mul_sum_sq {R : Type} [CommSemiring R] (L : List R) (c : R) :
-SumSq (L.map (c * .)) = c ^ 2 * SumSq L
-  := by
-    simp [← squaring_and_summing, ← mul_sum] -- we reduce the statement to an equality between two sums of lists
+theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c * .)).map (. ^2)).sum = c ^ 2 * (L.map (. ^ 2)).sum := by
+    simp [mul_add, mul_pow, ← SumSmul2]  -- we simplify the statement
     have aux : ((fun x => x ^ 2) ∘ fun x => c * x) = ((fun x => c ^ 2 * x) ∘ fun x => x ^ 2)
-      := by simp [Function.funext_iff, mul_pow] -- we prove an auxiliary result that implies that the two lists are in fact equal
-    --rw [SumSq2, SumSq2, ← mul_sum]
-    dsimp [SumSq2]
-    rw [← mul_sum]
-    simp [aux] -- by incorporating `aux`, the result is proved: the sums of two equal lists are equal
-    done
-
-/-!
-## Multiplicative properties
-
-The first result says that if you multiply every member of a list `L : List R` by a constant `c : R`, then the sum of squares of the new list is equal to `c ^ 2 * SumSq L`.
-
-In order to be able to apply lemmas such as `mul_pow` in the proof, we assume here that the semiring `R` is commutative.
-
-We take a look at a few examples first.
--/
-
-#eval SumSq [2 * 1, 2 * ( -2), 2 * 3] -- 56
-#eval 4 * SumSq [1, -2, 3] -- 56
-
-example : SumSq [2 * 1, 2 * ( -2), 2 * 3] = 4 * SumSq [1, -2, 3] := rfl
-
-example (a x y : ℚ) : SumSq [a * x, a * y] = a ^ 2 * SumSq [x, y]
-  := by simp [SumSq, mul_pow, mul_add]
-
-/-!
-REPROOF OF `mul_sum_sq` (by induction)
--/
-
-theorem mul_sum_sq2 {R : Type} [CommSemiring R]
-  (L : List R) (c : R) : SumSq (L.map (c * .)) = c ^ 2 * SumSq L
-    := by
-      induction L with -- again an induction on L
-      | nil => simp [SumSq] -- the case of the empty list is trivial
-      | cons a _ ih => simp [SumSq, ih, mul_add, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis
-      done
-
-theorem SumSq_of_list_div {F : Type} [Semifield F]
-  (L : List F) (c : F) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L
-    := by -- this will be an application of SumSq_of_list_mul, using the fact that . / c = . * c⁻¹
-      have aux : (fun x => x / c) = (fun x => c⁻¹ * x)
-        := by field_simp
-      -- simp [aux, mul_sum_sq]
-      simp [aux, mul_sum_sq2]
-      done
+      := by simp [Function.funext_iff, mul_pow]  -- we prove an auxiliary result in order to incorporate it in the goal
+    rw [aux]
 
 /-!
 ## Exercises
 
-1. Modify the syntax of the `induction` tactic in [`sum_of_squares_permut`](#permuted-lists) to make it look more similar to that of [`sum_of_squares_concat`](#concatenated-lists) (meaning, in `sum_of_squares_permut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that).
+1. Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
 
-2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if [`a ∈ L`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem), then the list [`a :: L.erase a`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase) is a [permutation](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm) of `L` (we have used this standard result [here](#erasing-a-member)). *Indication:* As usual, focus first on the statement, then write the proof.
+2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if [`a ∈ L`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem), then the list [`a :: L.erase a`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase) is a [permutation](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm) of `L` (we have used this standard result [here](#erasing-an-entry)).
+
+3. Prove that the statement of `theorem SumSqSmul2` is indeed equivalent to the statement of `theorem SumSqSmul`.
 -/

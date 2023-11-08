@@ -24,6 +24,7 @@ def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
 def SumSqAux [Add R] [Zero R] [Pow R ℕ] : R → List R → R
   | SoFar, [] => SoFar
   | SoFar, (a :: l) => SumSqAux (SoFar + a ^ 2) l
+
 def SumSqTR [Add R] [Zero R] [Pow R ℕ] : List R → R
   | L => SumSqAux 0 L
 
@@ -40,6 +41,7 @@ theorem SumSqAuxWithSumSq [AddCommMonoid R] [Pow R ℕ] (L1 : List R) : ∀ L2 :
 
 -- We can now prove that `SumSqTR L = SumSq L`.
 lemma SumSqAuxEmptyList [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by simp [SumSqAuxWithSumSq]; simp [SumSq]
+
 theorem def_TR_ok [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]
 

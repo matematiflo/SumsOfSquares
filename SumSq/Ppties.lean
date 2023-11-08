@@ -10,7 +10,7 @@ import SumSq.Defs
 import Mathlib.Data.List.Perm
 
 /-!
-**CHECK OLD FILES FIRST!!!**
+**CHECK OLD FILES AGAIN!!!**
 -/
 
 /-!
@@ -20,12 +20,12 @@ The sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1`
 
 > `SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
-We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined in the following way:
+We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows by pattern matching on `L1`.
 
 ```lean
-protected def append : (xs ys : List α) → List α
-  | [],    bs => bs
-  | a::as, bs => a :: List.append as bs
+def List.append : (L1 L2 : List R) → List R
+  | [], L2 => L2
+  | a::l1, L2 => a :: List.append l1 L2
 ```
 
 See Init.Data.List.Basic for details.
@@ -43,33 +43,66 @@ theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 
 /-!
 ## Permuted lists
 
-A sum of squares is invariant under permutations:
+Recall that the relation `L1 ~ L2` (which is notation for `List.Perm L1 L2`) is defined inductively using pairwise swaps.
+
+```lean
+inductive Perm : List R → List R → Prop
+  | nil : Perm [] []
+  | cons (a : R) {l₁ l₂ : List R} : Perm l₁ l₂ → Perm (a :: l₁) (a :: l₂)
+  | swap (a₁ a₂ : R) (l : List R) : Perm (a₂ :: a₁ :: l) (a₁ :: a₂ :: l)
+  | trans {L₁ L₂ L₃ : List R} : Perm L₁ L₂ → Perm L₂ L₃ → Perm L₁ L₃
+```
+
+We can now prove that a sum of squares is invariant under permutations:
 
 > `L1 ~ L2 → SumSq L1 = SumSq L2`
+
+Note that, since `List.Perm` uses implicit variables for the constructors `cons` and `trans`, we choose to write the proof by indution with a slighty different syntax (using `case`), to make the Lean infoview rendering more readable.
 -/
 
 theorem SumSq_permut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
-  induction H -- we prove the result by induction on ~ (recall that the permutation type is an inductive type: L2 is a permutation of L1 if and only if one of four cases occurs)
+  induction H -- we prove the result by induction on ~ (recall that `List.Perm` is an inductive type: L2 is a permutation of L1 if and only if one of four cases occurs)
   · case nil => -- case when L1 L2 are both empty
     rfl -- equality holds by definition
   · case cons x l1 l2 Hl Sum12 => -- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2
     simp [SumSq] -- by definition, SumSq (x :: lj) = x ^ 2  + SumSq lj for j = 1, 2
     rw [Sum12] -- by induction, SumSq l1 = SumSq l2
-  · case swap x y L => -- case when L1 = (y :: (x :: L)) and L2 = (x :: (y :: L))
-    simp [SumSq] -- by definition, SumSq (y :: (x :: L)) = y ^ 2  + (x ^ 2  + SumSq L)
-    rw [← add_assoc, ← add_assoc, add_comm (y ^ 2) (x ^ 2)] -- the two expressions are equal in R
-  · case trans l1 L l2 H1 H2 Sum1 Sum2 => -- case when L1 ~ L and L ~ L2
+  · case swap a b L => -- case when L1 = (b :: (a :: L)) and L2 = (a :: (b :: L))
+    simp [SumSq] -- by definition, SumSq (b :: (a :: L)) = b ^ 2  + (a ^ 2  + SumSq L)
+    rw [← add_assoc, ← add_assoc, add_comm (b ^ 2) (a ^ 2)] -- the two expressions are equal in R
+  · case trans L1 L L2 H1 H2 Sum1 Sum2 => -- case when L1 ~ L and L ~ L2
     rw [Sum1, Sum2] -- by induction SumSq L1 = SumSq L and SumSq L = SumSq L2
 
 /-!
 ## Erasing a member
 
-If a term `a : R` is a member of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)` in the following way.
+The function `List.erase` can erase a member of a list. It is defined as follows.
 
-In order to be able to use the function `List.erase`, we assume that the semiring `R` has decidable equality. Recall that `L.erase a` can be used as notation for `List.erase L a`.
+```lean
+def List.erase {R : Type} [BEq α] : List R → R → List R
+  | [], _ => []
+  | a::l, b => match a == b with
+    | true  => l
+    | false => a :: List.erase l b
+```
+
+Note that this declaration uses Boolean equality. It could be written using decidable equality, in the following way.
+
+```lean
+def List.erase' {R : Type} [DecidableEq R] : List R → R → List R
+  | [], _ => []
+  | a::l, b => if a = b then l else List.erase' l b
+```
+
+Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function `List.perm_cons_erase`, also used below).
+
+We now prove that, if a term `a : R` is a member of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)`. More precisely:
+
+> `a ∈ L → SumSq L = a ^ 2 + SumSq (L.erase a)`
+
 -/
 
 theorem SumSq_erase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
   change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
-  have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that L ~ (a :: (L.erase a))
-  rw [SumSq_permut H] -- since we ha ve a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+  have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a))
+  rw [SumSq_permut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal

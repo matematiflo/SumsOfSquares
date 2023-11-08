@@ -14,6 +14,11 @@ namespace MathlibSumSq
 universe u
 variable {R : Type u}
 
+theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
+  induction L1 with
+  | nil =>  simp [SumSq]
+  | cons a L ih => simp [SumSq]; rw[ih, add_assoc]
+
 -- A sum of squares is invariant under permutations: `L1 ~ L2 → SumSq L1 = SumSq L2`.
 theorem SumSq_permut {R : Type} [AddCommMonoid R] [Pow R ℕ] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
   induction H with

@@ -11,10 +11,6 @@ import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
 
 /-!
-**CHECK OLD FILES AGAIN!!!**
--/
-
-/-!
 ## Appended lists
 
 We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows, by pattern matching on `L1` (see Init.Data.List.Basic for details).
@@ -35,10 +31,10 @@ theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
     simp [SumSq] -- [] ++ L2 = L2 so everything follows by definition of SumSq
-  | cons a L ih => -- case when L1 = (a :: L)
+  | cons a l1 ih => -- case when L1 = (a :: L)
     simp [SumSq] -- (a :: L) ++ L2 = a :: (L ++ L2) and SumSq (a :: (L ++ L2)) = a ^ 2  + SumSq (L ++ L2)
-    simp [ih] -- ih : SumSq (L ++ L2) = SumSq L + SumSq L2
-    simp [add_assoc] -- the two terms are now equal up to associativity of addition
+    rw [ih] -- ih : SumSq (L ++ L2) = SumSq L + SumSq L2
+    rw [add_assoc] -- the two terms are now equal up to associativity of addition
 
 /-!
 ## Permuted lists
@@ -186,3 +182,11 @@ theorem SumSq_of_list_div {F : Type} [Semifield F]
       -- simp [aux, mul_sum_sq]
       simp [aux, mul_sum_sq2]
       done
+
+/-!
+## Exercises
+
+1. Modify the syntax of the `induction` tactic in [`sum_of_squares_permut`](#permuted-lists) to make it look more similar to that of [`sum_of_squares_concat`](#concatenated-lists) (meaning, in `sum_of_squares_permut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that).
+
+2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if [`a ∈ L`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem), then the list [`a :: L.erase a`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase) is a [permutation](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm) of `L` (we have used this standard result [here](#erasing-a-member)). *Indication:* As usual, focus first on the statement, then write the proof.
+-/

@@ -1,19 +1,16 @@
-/-
 # Sums of squares - Definitions and examples
 
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Florent Schaffhauser
--/
 
+```lean
 import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
+```
 
-/-!
 We defines precones, etc. and show that sums of squares form a precone (check again)).
--/
 
-/-!
 ANOTHER FILE:
 
 semireal ring if -1 is not a sum of squares
@@ -31,14 +28,12 @@ in **rings**: def of precones, cones, examples, support of a cone , prime cone (
 NEXT:
 
 real ideals (in rings...)
--/
 
-/-!
 ## Being a sum of squares (inductive)
 
 Let us write an inductive definition of what it means to be a sum of squares.
--/
 
+```lean
 inductive ind_sum_of_squares [Semiring R] : R → Prop :=
     | zero : ind_sum_of_squares (0 : R)
     | add (a S : R) (hS : ind_sum_of_squares S) : ind_sum_of_squares (a ^ 2 + S)
@@ -95,9 +90,56 @@ theorem ind_sum_of_squares_from_mul {R : Type} [CommSemiring R] {S1 S2 : R} (h1 
       · exact ind_mul_by_sq_sum_of_squares h2 _
       · exact ih
     done
+```
 
-/-!
+## Being a sum of squares (existential)
+
+If `R` is a semiring, we can define what it means for a term `x` of type `R` to be a sum of squares.
+
+The definition means that `x : R` is a sum of squares if we can prove that there exists a list `L : List R` such that the sum of squares of members of that list is equal to `x`.
+
+```lean
+def is_sum_of_squares {R : Type} [Semiring R] (x : R) : Prop := ∃ L : List R, SumSq L = x
+```
+
 The inductive definition is very convenient in order to write proofs of certain basic facts (by induction!). For instance, we have proven in this way that the sum `S1 + S2` and the product `S1 * S2` of two sums of squares `S1` and `S2` are again sums of squares.
 
 Now we want to check that the [inductive definition](#being-a-sum-of-squares-inductive) coincides with the [existential definition](#being-a-sum-of-squares-existential).
--/
+
+```lean
+lemma exist_to_ind {R : Type} [Semiring R] (S : R) (H : is_sum_of_squares S) : ind_sum_of_squares S
+  := by
+    rcases H with ⟨L, hL⟩
+    induction L generalizing S with
+    | nil =>
+      simp [SumSq] at hL
+      rw [← hL]
+      exact ind_sum_of_squares.zero
+    | cons a L ih =>
+      rw [← hL]
+      simp [SumSq]
+      specialize ih (SumSq L) (Eq.refl (SumSq L))
+      exact ind_sum_of_squares.add a (SumSq L) ih
+    done
+
+lemma ind_to_exist {R : Type} [Semiring R] (S : R) (H : ind_sum_of_squares S) : is_sum_of_squares S
+  := by
+    simp [is_sum_of_squares]
+    induction H with
+    | zero =>
+      use []
+      rfl
+    | add a S' _ ih =>
+      rcases ih with ⟨L', hL'⟩
+      rw [← hL']
+      use (a :: L')
+      rfl
+    done
+
+theorem equiv_defs {R : Type} [Semiring R] (S : R) : is_sum_of_squares S ↔ ind_sum_of_squares S
+  := by
+    constructor
+    · apply exist_to_ind
+    · apply ind_to_exist
+    done
+```

@@ -4,7 +4,7 @@ Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Florent Schaffhauser
 
-```lean
+```haskell
 import SumSq.Defs
 import Mathlib.Data.List.Perm
 ```
@@ -19,7 +19,7 @@ The sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1`
 
 We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined in the following way:
 
-```lean
+```haskell
 protected def append : (xs ys : List α) → List α
   | [],    bs => bs
   | a::as, bs => a :: List.append as bs
@@ -27,7 +27,7 @@ protected def append : (xs ys : List α) → List α
 
 See Init.Data.List.Basic for details.
 
-```lean
+```haskell
 theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
@@ -44,7 +44,7 @@ A sum of squares is invariant under permutations:
 
 > `L1 ~ L2 → SumSq L1 = SumSq L2`
 
-```lean
+```haskell
 theorem SumSq_permut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
   induction H -- we prove the result by induction on ~ (recall that the permutation type is an inductive type: L2 is a permutation of L1 if and only if one of four cases occurs)
   · case nil => -- case when L1 L2 are both empty
@@ -65,7 +65,7 @@ If a term `a : R` is a member of a list `L : List R`, then we can compute `SumSq
 
 In order to be able to use the function `List.erase`, we assume that the semiring `R` has decidable equality. Recall that `L.erase a` can be used as notation for `List.erase L a`.
 
-```lean
+```haskell
 theorem SumSq_erase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
   change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
   have H : L ~ (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that L ~ (a :: (L.erase a))

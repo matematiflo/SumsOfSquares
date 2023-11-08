@@ -9,7 +9,6 @@ import SumSq.Defs
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Algebra.Module.Basic
--- import Mathlib.GroupTheory.GroupAction.BigOperators
 ```
 
 ## Appended lists

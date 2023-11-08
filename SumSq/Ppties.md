@@ -14,7 +14,7 @@ import Mathlib.Algebra.Module.Basic
 
 ## Appended lists
 
-We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows, by pattern matching on `L1` (see Init.Data.List.Basic for details).
+Recall from [#List.append](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.append) that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows, by pattern matching on `L1` (see Init.Data.List.Basic for details).
 
 ```lean
 def List.append : (L1 L2 : List R) → List R
@@ -39,7 +39,7 @@ theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 
 
 ## Permuted lists
 
-Recall that the relation `L1 ~ L2` (which is notation for `List.Perm L1 L2`) is defined inductively using pairwise swaps.
+Recall from [#List.Perm](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm) that the relation `L1 ~ L2` (which is notation for `List.Perm L1 L2`) is defined inductively using pairwise swaps.
 
 ```lean
 inductive Perm : List R → List R → Prop
@@ -74,10 +74,10 @@ theorem SumSqPermut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : Sum
 
 ## Erasing an entry
 
-The function `List.erase` can erase an entry of a list. It is defined as follows.
+The function `List.erase` can erase an entry of a list. It is defined as follows in [#List.erase](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase).
 
 ```lean
-def List.erase {R : Type} [BEq α] : List R → R → List R
+def List.erase {R : Type} [BEq R] : List R → R → List R
   | [], _ => []
   | a::l, b => match a == b with
     | true  => l
@@ -94,9 +94,11 @@ def List.erase' {R : Type} [DecidableEq R] : List R → R → List R
 
 Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function [`List.perm_cons_erase`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.perm_cons_erase), also used below).
 
-We now prove that, if a term `a : R` is a member of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)`. More precisely:
+We now prove that, if a term `a : R` is an entry of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)`. More precisely:
 
 > `a ∈ L → SumSq L = a ^ 2 + SumSq (L.erase a)`
+
+The type `a ∈ L` is defined in [#List.Mem](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem). It is an inductive type: a term `a : R` belongs to a list `L : List R` if and only if `L = (a :: l)` or `L = (b :: l)` with `b ∈ l`.
 
 ```lean
 theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
@@ -105,7 +107,7 @@ theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) 
   rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
 ```
 
-## Multiplicatition by a scalar
+## Multiplication by a scalar
 
 Let `L` be a list with entries in a semiring `R`. If `c` is a term of type `R`, we can multiply each enrty of `L` by `c` to define a new list, that we shall denote `c • L`.
 
@@ -182,7 +184,7 @@ example [Semifield F] (x : F) : x / 0 = 0 := by field_simp
 
 ## More computations
 
-Before moving on to the exercises, we give another proof of `theorem SumSqSmul`, seen in the section on [Multiplicatition by a scalar](#multiplication-by-a-scalar).
+Before moving on to the exercises, we give another proof of `theorem SumSqSmul`, seen in the section on [Multiplication by a scalar](#multiplication-by-a-scalar).
 
 It is a direct, more computational proof, harder to follow than the original proof (by induction).
 
@@ -201,8 +203,8 @@ theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c
 
 ## Exercises
 
-1. Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
+1. Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
 
-2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if [`a ∈ L`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem), then the list [`a :: L.erase a`](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase) is a [permutation](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm) of `L` (we have used this standard result [here](#erasing-an-entry)).
+2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if `a ∈ L`, then the list `a :: L.erase a` is a permutation of `L` (we have used this standard result [here](#erasing-an-entry)).
 
-3. Prove that the statement of `theorem SumSqSmul2` is indeed equivalent to the statement of `theorem SumSqSmul`.
+3. Prove that the statement of [`theorem SumSqSmul2`](#more-computations) is indeed equivalent to the statement of [`theorem SumSqSmul`](#multiplication-by-a-scalar).

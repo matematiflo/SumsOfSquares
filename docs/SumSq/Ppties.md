@@ -107,9 +107,9 @@ theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) 
 
 ## Multiplication by a scalar
 
-Let `L` be a list with entries in a semiring `R`. If `c` is a term of type `R`, we can multiply each enrty of `L` by `c` to define a new list, that we shall denote `c • L`.
+Let `L` be a list with entries in a semiring `R`. If `c` is a term of type `R`, we can multiply each entry of `L` by `c` to define a new list, that we shall denote `c • L`. For instance, if `L = [x, y, z]`, we should have:
 
-> `c • L := List.map (c * .) L`
+> `c • [x, y, z] = [c * x, c * y, c * z]`
 
 Let us define this formally and take a look at a few examples. As we shall see, one has to be precise in the notation, in order for Lean to interpret the command correctly.
 

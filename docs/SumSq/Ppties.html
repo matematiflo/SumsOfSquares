@@ -156,9 +156,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="multiplication-by-a-scalar" class="level2">
 <h2 class="anchored" data-anchor-id="multiplication-by-a-scalar">Multiplication by a scalar</h2>
-<p>Let <code>L</code> be a list with entries in a semiring <code>R</code>. If <code>c</code> is a term of type <code>R</code>, we can multiply each enrty of <code>L</code> by <code>c</code> to define a new list, that we shall denote <code>c • L</code>.</p>
+<p>Let <code>L</code> be a list with entries in a semiring <code>R</code>. If <code>c</code> is a term of type <code>R</code>, we can multiply each entry of <code>L</code> by <code>c</code> to define a new list, that we shall denote <code>c • L</code>. For instance, if <code>L = [x, y, z]</code>, we should have:</p>
 <blockquote class="blockquote">
-<p><code>c • L := List.map (c * .) L</code></p>
+<p><code>c • [x, y, z] = [c * x, c * y, c * z]</code></p>
 </blockquote>
 <p>Let us define this formally and take a look at a few examples. As we shall see, one has to be precise in the notation, in order for Lean to interpret the command correctly.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>def <span class="dt">ListSmul</span> [<span class="dt">Semiring</span> <span class="dt">R</span>] (c <span class="op">:</span> <span class="dt">R</span>) <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span> → <span class="dt">List</span> <span class="dt">R</span></span>

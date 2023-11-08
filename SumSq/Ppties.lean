@@ -92,7 +92,7 @@ def List.erase' {R : Type} [DecidableEq R] : List R → R → List R
   | a::l, b => if a = b then l else List.erase' l b
 ```
 
-Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function [`List.perm_cons_erase`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.perm_cons_erase), also used below).
+Whichever definition of `erase` we choose, we need to assume that the type `R` has decidable equality in order to be able to use it (and the same goes for the function [`#List.perm_cons_erase`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.perm_cons_erase), also used below).
 
 We now prove that, if a term `a : R` is an entry of a list `L : List R`, then we can compute `SumSq L` from `a` and `SumSq (L.erase a)`. More precisely:
 
@@ -150,7 +150,7 @@ The result we expect is then the following:
 
 We will see below that this result holds when `R` is a *commutative* semiring.
 
-Indeed, in order to be able to apply lemmas such as [`mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow) in the proof, we need to assume that the semiring `R` is commutative.
+Indeed, in order to be able to apply lemmas such as [`#mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow) in the proof, we need to assume that the semiring `R` is commutative.
 
 Before proving the result that is relevant result, we prove an easier one, of possibly greater general interest, with `SumSq` replaced by `List.sum`.
 -/

@@ -4,8 +4,8 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 ## Libraries
 
-- [Definitions and examples](docs/Defs.md)
-- [Basic properties](docs/Ppties.md)
+- [Definitions and examples](SumSq/Defs.md)
+- [Basic properties](SumSq/Ppties.md)
 - Formally real fields
 
 ## Installation

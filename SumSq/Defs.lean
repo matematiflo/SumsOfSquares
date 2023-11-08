@@ -95,7 +95,7 @@ We will prove later a theorem that says the following:
 
 ## Definition using the `sum` and `square` functions
 
-`SumSq L` can also be computed by squaring the members of the list and summing the resulting list. Pictorially:
+`SumSq L` can also be computed by squaring the entries of the list and summing the resulting list. Pictorially:
 
 > `[1, -2, 3] => [1 ^ 2, (-2) ^ 2, 3 ^ 2] => 1 ^ 2 + (-2) ^ 2 + 3 ^ 2`
 

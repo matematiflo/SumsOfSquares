@@ -171,13 +171,13 @@ If we assume that the semiring `R` is in fact a semifield, then we can also cons
 -/
 
 theorem SumSqDiv {F : Type} [Semifield F]
-  (L : List F) (c : F) (hc : c ≠ 0) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L := by
+  (L : List F) (c : F) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L := by
     -- this will be an application of mul_sum_sq2, using the fact that . / c = . * c⁻¹
     have aux : (fun x => x / c) = (fun x => c⁻¹ * x) := by field_simp
     simp [aux, ← ListSmulMap, SumSqSmul]
 
 /-!
-Note that the assumption `(hc : c ≠ 0)` has not been used because Lean gives a value to division by `c` in `F` even if `c = 0` and that the equality remains true in this case.
+Note that no assumption `(hc : c ≠ 0)` has been used because Lean gives a value to division by `c` in `F` even if `c = 0` and that the equality remains true in this case.
 -/
 
 example [Semifield F] (x : F) : x / 0 = 0 := by field_simp

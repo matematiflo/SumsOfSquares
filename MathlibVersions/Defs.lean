@@ -21,7 +21,7 @@ def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
   | a :: l => a ^ 2 + SumSq l
 
 -- Tail-recursive version of `List.SumSq`.
-def SumSqAux [Add R] [Zero R] [Pow R ℕ] : R → List R → R
+def SumSqAux [Add R] [Pow R ℕ] : R → List R → R
   | SoFar, [] => SoFar
   | SoFar, (a :: l) => SumSqAux (SoFar + a ^ 2) l
 
@@ -52,3 +52,5 @@ theorem squaring_and_summing [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSq 
   | cons a l ih => simp [SumSq,ih]
 
 end MathlibSumSq
+
+-- #lint

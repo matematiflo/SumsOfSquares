@@ -12,7 +12,7 @@ import Mathlib.Data.Rat.Defs
 
 -- Some things should be added to `simp`, it will make the proofs shorter
 
-namespace MathlibSumSq
+namespace MathlibSumSq2
 
 universe u
 variable {R : Type u}
@@ -24,8 +24,7 @@ def SumSq [Add R] [Zero R] [Pow R ℕ] : List R → R
   | a :: l => a ^ 2 + SumSq l
 
 -- Tail-recursive version of `List.SumSq`.
-@[simp]
-def SumSqAux [Add R] [Zero R] [Pow R ℕ] : R → List R → R
+def SumSqAux [Add R] [Pow R ℕ] : R → List R → R
   | SoFar, [] => SoFar
   | SoFar, (a :: l) => SumSqAux (SoFar + a ^ 2) l
 
@@ -42,14 +41,13 @@ We now want to prove that the tail-recursuve definition agree with the original 
 -/
 theorem SumSqAuxWithSumSq [AddCommMonoid R] [Pow R ℕ] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with
-  | nil => simp
-  | cons a l1 ih => intro L; simp; rw [add_comm _ (a ^2), ← SumSq,ih (a :: L), SumSq, add_comm (a ^ 2) _, add_assoc]
+  | nil => simp [SumSqAux]
+  | cons a l1 ih => intro L; simp [SumSqAux]; rw [add_comm _ (a ^2), ← SumSq,ih (a :: L), SumSq, add_comm (a ^ 2) _, add_assoc]
 
 -- We can now prove that `SumSqTR L = SumSq L`.
-@[simp]
-lemma SumSqAuxEmptyList [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by rw [SumSqAuxWithSumSq]; simp
+lemma SumSqAuxEmptyList [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by rw [SumSqAuxWithSumSq]; simp [SumSqAux]
 
-theorem def_TR_ok [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqTR L = SumSq L := by simp
+theorem def_TR_ok [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSqTR L = SumSq L := by simp [SumSqAuxEmptyList, SumSqAux]
 
 -- A sum-of-squares function on `List R` can also be defined as the composition of the function `L => (L.map (. ^ 2))` with `L => L.sum`. We show that the two definitions agree.
 theorem squaring_and_summing [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSq L = (L.map (. ^ 2)).sum := by
@@ -57,4 +55,6 @@ theorem squaring_and_summing [AddCommMonoid R] [Pow R ℕ] (L : List R) : SumSq 
   | nil => rfl
   | cons a l ih => simp [ih]
 
-end MathlibSumSq
+end MathlibSumSq2
+
+#lint

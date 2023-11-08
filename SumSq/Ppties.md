@@ -13,11 +13,7 @@ import Mathlib.Data.List.Perm
 
 ## Appended lists
 
-The sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1` plus the sum of squares of `L2`.
-
-> `SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
-
-We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows by pattern matching on `L1`.
+We recall that `L1 ++ L2` (which is notation for `List.append L1 L2`) is defined as follows, by pattern matching on `L1` (see Init.Data.List.Basic for details).
 
 ```lean
 def List.append : (L1 L2 : List R) → List R
@@ -25,7 +21,9 @@ def List.append : (L1 L2 : List R) → List R
   | a::l1, L2 => a :: List.append l1 L2
 ```
 
-See Init.Data.List.Basic for details.
+We now prove that the sum of squares of the list `L1 ++ L2` is equal to the sum of squares of `L1` plus the sum of squares of `L2`.
+
+> `SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
 ```lean
 theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by

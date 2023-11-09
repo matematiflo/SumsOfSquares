@@ -23,9 +23,15 @@ If you already have [Lean 4](https://lean-lang.org) installed on your machine, m
 lake exe cache get
 ```
 
+and then build the project by running the command line
+
+```bash
+lake build
+```
+
 If you need to install Lean, you can go to the [Lean Community](https://leanprover-community.github.io/get_started.html) website and follow the instructions there, depending on your OS. Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html).
 
-After installing Lean, you will be able to download the compiled Mathlib libraries via the command line `lake exe cache get`, as indicated above.
+After installing Lean, you will be able to run the command line `lake exe cache get` and `lake build` indicated above.
 
 ## Example file
 
@@ -35,13 +41,13 @@ You can run `Example.lean` either with the following command line
 lake env lean Example.lean
 ```
 
-or by building the project via
+or, if you have already built the project (via `lake build`), by running the command line
 
 ```bash
 lake build
 ```
 
-and running the resulting binary file via
+then executing the resulting binary file via
 
 ```bash
 ./build/bin/example

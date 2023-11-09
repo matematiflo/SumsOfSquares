@@ -53,11 +53,11 @@ Alternately, if you have already built the project (using `lake build`), you can
 
 ## Codespaces
 
-If you wish to work on this project online and without installing anything, you can do do by opening a Codespace (GitHub account required). Just click on the button below and wait for *a few* minutes.
+If you wish to work on this project online and without installing anything, you can do do by opening a Codespace (GitHub account required). Just click on the button below and wait for *a few minutes*.
 
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
 
-> **Warning:** It takes up to 5 minutes to set up.
+> **Warning:** It can take as much as 5 to 7 minutes to set up.
 
 Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository (possibly slower, though).
 

@@ -59,7 +59,7 @@ If you wish to work on this project online and without installing anything, you 
 
 It takes a few minutes to set up!
 
-Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository.
+Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository (possibly slower, though).
 
 If you commit any modified file from within your Codespace, the repo will be forked to your GitHub account and your work will be saved there.
 

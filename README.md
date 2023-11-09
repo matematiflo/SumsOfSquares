@@ -55,7 +55,7 @@ Alternately, if you have already built the project (using `lake build`), you can
 
 If you wish to work on this project online and without installing anything, you can do do by opening a Codespace (GitHub account required). Just click on the button below and wait a few minutes.
 
-[![Open in Codespaces](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
 
 It takes a few minutes to set up!
 

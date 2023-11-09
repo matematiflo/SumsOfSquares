@@ -5,7 +5,7 @@
       "dockerfile": "Dockerfile"
     },
 
-    "onCreateCommand": "echo \"Installing Lean 4 and setting up a project with Mathlib dependency...\" && lake exe cache get! && echo \"Finished setup! Open the README file and follow the instructions there :-)\"",  
+    "onCreateCommand": "echo \"Installing Lean 4 and setting up a project with Mathlib dependency... please be patient, this may take a few minutes!\" && lake exe cache get! && echo \"The project is now set up! Open the README file and follow the instructions there :-)\"",  
 
     "customizations": {
       "vscode" : {

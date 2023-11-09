@@ -41,13 +41,7 @@ You can run `Example.lean` either with the following command line
 lake env lean Example.lean
 ```
 
-or, if you have already built the project (via `lake build`), by running the command line
-
-```bash
-lake build
-```
-
-then executing the resulting binary file via
+Alternately, if you have already built the project (using `lake build`), you can simply execute the `example` binary file via
 
 ```bash
 ./build/bin/example

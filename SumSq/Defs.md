@@ -2,7 +2,7 @@
 
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Florent Schaffhauser
+Authors: Florent Schaffhauser.
 
 ```lean
 import Mathlib.Algebra.Ring.Defs
@@ -14,7 +14,7 @@ import Mathlib.Data.Rat.Defs
 
 ## Definition by pattern matching
 
-Let `R` be a type. As soon as `R` is endowed with an addition function, a zero and a square function, we can define sums of squares as a function `SumSq` going from `List R` to `R`. However, in what follows, we will restrict to the case when `R` is a semiring.
+Let `R` be a type. As soon as `R` is endowed with an addition function, a zero and a square function, we can define sums of squares as a function `SumSq` going from `List R` to `R`. However, in what follows, we will restrict to the case when `R` is a `Semiring`.
 
 Recall that `List R` is the type defined inductively and recursively by
 
@@ -26,7 +26,7 @@ inductive List (R : Type u) where
 
 In Lean, the empty list can be denoted by `[]` and the list `cons a l` can be denoted by `a :: l`.
 
-Sums of squares are then defined by pattern matching, with respect to terms of type `List R`. This means by giving the value of the function in each of the two possible cases `[]` and `a :: l`.
+Sums of squares can thus be defined by pattern matching, with respect to terms of type `List R`. This means by giving the return value of the function in each of the two possible cases `[]` and `a :: l`.
 
 ```lean
 def SumSq {R : Type} [Semiring R] : (List R → R)
@@ -86,13 +86,13 @@ example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := by rfl  -- the two ter
 #eval SumSq (1 :: [1, -2, 3])  -- 15
 ```
 
-We will prove later a theorem that says the following:
+We will later prove a theorem that says the following:
 
 > `∀ L1 L2 : List R, SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
 ## Definition using the `sum` and `square` functions
 
-`SumSq L` can also be computed by squaring the entries of the list and summing the resulting list. Pictorially:
+`SumSq L` can also be computed by squaring the entries of the list and summing the resulting list:
 
 > `[1, -2, 3] => [1 ^ 2, (-2) ^ 2, 3 ^ 2] => 1 ^ 2 + (-2) ^ 2 + 3 ^ 2`
 

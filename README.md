@@ -17,9 +17,9 @@ You can clone the project using [GitHub Desktop](https://docs.github.com/en/desk
 git clone https://github.com/matematiflo/SumsOfSquares.git
 ```
 
-Alternately, just click on the Code button of the current repository.
+Alternately, just click on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository.
 
-[![Opening a Codespace](img/Clone.png)](https://github.com/matematiflo/SumsOfSquares)
+![Code Button](img/Code.png)
 
 If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the compiled [Mathlib](https://github.com/leanprover-community/mathlib4) libraries via the command line
 
@@ -59,9 +59,7 @@ If you wish to work on this project online and without installing anything, you 
 
 It takes a few minutes to set up!
 
-Alternately, you can open a Codespace by clicking on the Code button of the current repository.
-
-[![Opening a Codespace](img/Codespace.png)](https://github.com/matematiflo/SumsOfSquares)
+Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository.
 
 If you commit any modified file from within your Codespace, the repo will be forked to your GitHub account and your work will be saved there.
 

@@ -74,13 +74,15 @@ Alternately, if you have already built the project (using `lake build`), you can
 
 ## Codespaces
 
-If you wish to work on this project online and without installing anything, you can do so by opening a Codespace (**GitHub account required**). Just click on the button below and wait for *a few minutes*.
+If you wish to work on this project online and without installing anything, you can do so by opening a Codespace (**GitHub account required**). Just click on the button below and follow the instructions underneath it.
 
-[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/matematiflo/SumOfSquares)
 
-> **Warning:** Codespaces can take as much as 5 to 7 minutes to launch the first time you use it within a given project.
-
-Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository (possibly slower, though).
+- Set the Machine type to `4-core`, and then press `Create codespace`.
+- Wait for Codespaces to launch (it can take up to 5 minutes the first time).
+- Once it is done, you should see a VS Code interface in your browser, wait 2 more minutes until the program is done configuring the Codespace.
+  
+Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/LeanPackage) of the current repository (possibly slower, though).
 
 If you commit any modified file from within your Codespace, the repo will be forked to your GitHub account and your work will be saved there.
 
@@ -90,4 +92,8 @@ To leave a Codespace, it is recommended that you stop it before closing the brow
 2. Choose `Stop current Codespace` from the list of options.
 3. Wait until the Codespace has stopped to close your browser tab.
 
-To go back to a Codespace that you have created, just go to [https://github.com/codespaces](https://github.com/codespaces) or access them directly from the Code button of the relevant repository (no setup required this time!).
+To access a Codespace that you have previously created, just go to
+
+> [https://github.com/codespaces](https://github.com/codespaces)
+
+or launch them directly from the Code button of the relevant repository (no setup required this time!).

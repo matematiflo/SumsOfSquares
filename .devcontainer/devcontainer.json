@@ -9,7 +9,7 @@
 
     "customizations": {
       "vscode" : {
-        "extensions" : [ "leanprover.lean4" ]
+        "extensions" : [ "leanprover.lean4", "usernamehw.errorlens", "DavidAnson.vscode-markdownlint" ]
       }
     }
   }

@@ -11,7 +11,9 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 ## Quickstart
 
-You can clone the project using [GitHub Desktop](https://docs.github.com/en/desktop/installing-and-authenticating-to-github-desktop/installing-github-desktop) or via the command line
+### Clone the repository
+
+You can clone the repo using [GitHub Desktop](https://docs.github.com/en/desktop/installing-and-authenticating-to-github-desktop/installing-github-desktop) or via the command line
 
 ```bash
 git clone https://github.com/matematiflo/SumsOfSquares.git
@@ -21,7 +23,9 @@ Alternately, just click on the Code button of the current repository.
 
 [![Code Button](img/Code_small.png)](https://github.com/matematiflo/SumsOfSquares)
 
-If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the compiled [Mathlib](https://github.com/leanprover-community/mathlib4) libraries via the command line
+### If you have Lean 4
+
+If you already have [Lean 4](https://lean-lang.org) installed on your machine, just download the compiled [Mathlib files](https://github.com/leanprover-community/mathlib4) via the command line
 
 ```bash
 lake exe cache get
@@ -33,9 +37,26 @@ and then build the project by running the command line
 lake build
 ```
 
-If you need to install Lean, you can go to the [Lean Community](https://leanprover-community.github.io/get_started.html) website and follow the instructions there, depending on your OS. Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html).
+### If you do not have Lean 4
 
-After installing Lean, you will be able to run the command line `lake exe cache get` and `lake build` indicated above.
+If you need to install Lean, you can go to the [Lean Community portal](https://leanprover-community.github.io/get_started.html) and follow the instructions there, depending on your OS. Alternately, you can also look at the [Lean Manual](https://lean-lang.org/lean4/doc/quickstart.html) or at [this repo](https://github.com/matematiflo/LeanPackage).
+
+After installing Lean, you will be able to run the command lines `lake exe cache get` and `lake build` indicated above.
+
+### Troubleshooting
+
+If either `lake exe cache get` or `lake build` are not recongnized, try
+
+```bash
+curl https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain```
+
+and then
+
+```bash
+lake update
+```
+
+before trying `lake exe cache get` and `lake build` again.
 
 ## Example file
 

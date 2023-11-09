@@ -67,6 +67,6 @@ Before you leave a Codespace, it is recommend that you stop it before closing th
 
 1. Click on the Codespace name at the bottom-left of the VS Code interface.
 2. Choose `Stop current Codespace` from the list of options.
-3. When until the Codepsace has stopped.
+3. Wait until the Codespace has stopped.
 
 You can later come back to the Codespaces that you have created by going to [https://github.com/codespaces](https://github.com/codespaces).

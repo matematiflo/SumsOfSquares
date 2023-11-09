@@ -19,7 +19,7 @@ git clone https://github.com/matematiflo/SumsOfSquares.git
 
 Alternately, just click on the Code button of [the current repository](https://github.com/matematiflo/SumsOfSquares).
 
-![Opening a Codespace](img/Clone.png)
+![Opening a Codespace](img/Clone_small.png)
 
 If you already have [Lean 4](https://lean-lang.org) installed on your machine, make sure to download the compiled [Mathlib](https://github.com/leanprover-community/mathlib4) libraries via the command line
 

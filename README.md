@@ -78,7 +78,7 @@ If you wish to work on this project online and without installing anything, you 
 
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
 
-> **Warning:** It can take as much as 5 to 7 minutes to set it up.
+> **Warning:** Codespaces can take as much as 5 to 7 minutes to launch the first time you use it within a given project.
 
 Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository (possibly slower, though).
 

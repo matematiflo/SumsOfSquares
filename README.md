@@ -65,8 +65,8 @@ If you commit any modified file from within your Codespace, the repo will be for
 
 Before you leave a Codespace, it is recommend that you stop it before closing the browser windiw:
 
-1. Click on the Codespace name at the bottom-left of the VS Code interface.
+1. Click on your Codespace name at the bottom-left of the VS Code interface.
 2. Choose `Stop current Codespace` from the list of options.
-3. Wait until the Codespace has stopped.
+3. Wait until the Codespace has stopped to close your browser tab.
 
 To go back to any Codespace that you have created, just go to [https://github.com/codespaces](https://github.com/codespaces) or access them directly from the Code button (no setup required this time!).

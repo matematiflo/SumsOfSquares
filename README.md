@@ -69,4 +69,4 @@ Before you leave a Codespace, it is recommend that you stop it before closing th
 2. Choose `Stop current Codespace` from the list of options.
 3. Wait until the Codespace has stopped.
 
-You can later come back to the Codespaces that you have created by going to [https://github.com/codespaces](https://github.com/codespaces).
+To go back to any Codespace that you have created, just go to [https://github.com/codespaces](https://github.com/codespaces) or access them directly from the Code button (no setup required this time!).

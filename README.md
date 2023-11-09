@@ -53,16 +53,20 @@ Alternately, if you have already built the project (using `lake build`), you can
 
 ## Codespaces
 
-If you wish to work on this project online and without installing anything, you can do do by opening a Codespace (GitHub account required). Just click on the button below and wait a few minutes.
+If you wish to work on this project online and without installing anything, you can do do by opening a Codespace (GitHub account required). Just click on the button below and wait for *a few* minutes.
 
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?skip_quickstart=true&machine=standardLinux32gb&repo=713890550&ref=main&geo=EuropeWest)
 
-It takes a few minutes to set up!
+> **Warning:** It takes up to 5 minutes to set up.
 
 Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/SumsOfSquares) of the current repository (possibly slower, though).
 
 If you commit any modified file from within your Codespace, the repo will be forked to your GitHub account and your work will be saved there.
 
-You can access the Codespaces that you have created directly from within your GitHub account:
+Before you leave a Codespace, it is recommend that you stop it before closing the browser windiw:
 
-[https://github.com/codespaces](https://github.com/codespaces)
+1. Click on the Codespace name at the bottom-left of the VS Code interface.
+2. Choose `Stop current Codespace` from the list of options.
+3. When until the Codepsace has stopped.
+
+You can later come back to the Codespaces that you have created by going to [https://github.com/codespaces](https://github.com/codespaces).

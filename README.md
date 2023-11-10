@@ -76,7 +76,7 @@ Alternately, if you have already built the project (using `lake build`), you can
 
 If you wish to work on this project online and without installing anything, you can do so by opening a Codespace. Just follow the link below and click on `Create new codespace` (**GitHub account required**).
 
-[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/matematiflo/SumOfSquares)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/matematiflo/SumsOfSquares)
   
 Alternately, you can open a Codespace by clicking on the [Code button](https://github.com/matematiflo/LeanPackage) of the current repository (possibly slower, though).
 

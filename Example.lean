@@ -1,25 +1,16 @@
 import SumSq
 
-def  main : IO Unit :=
-  IO.println s!"The sum of squares of the list of rational numbers {([1, -2, 3/4] : List ℚ)} is {SumSq ([1, -2, 3/4] : List ℚ)}."
+-- def  main : IO Unit :=
+--   IO.println s!"The sum of squares of the list of rational numbers {([1, -2, 3/4] : List ℚ)} is {SumSq ([1, -2, 3/4] : List ℚ)}."
 
-#eval main
-
-/-
 def main : IO Unit := do
+
   let stdin ← IO.getStdin
   let stdout ← IO.getStdout
 
-  stdout.putStrLn "You will be asked to enter a list of integers.
-First, please enter the lentgh of your list:"
+  stdout.putStrLn "Please enter a list of integers in the form 1, -2, 3:"
+
   let input ← stdin.getLine
-  let length := (input.dropRightWhile Char.isWhitespace).toNat!
+  let list := input.splitOn "," |> List.map (fun s => s.trim.toInt!)
 
-  stdout.putStrLn s!"The length of your list is {length}."
-
-  -- stdout.putStrLn "Please enter a rational number p/q (with p in ℤ and q in ℕ):"
-  -- let input ← stdin.getLine
-  -- let elem := (input.dropRightWhile Char.isWhitespace).toInt!
-
-  -- stdout.putStrLn s!"The sum of the list of rational numbers {[elem]} is {SumSq ([elem])}."
- -/
+  stdout.putStrLn s!"The list you entered is {list}. Its sum of squares is {SumSq list}."

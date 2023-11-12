@@ -9,7 +9,8 @@
 
     "customizations": {
       "vscode" : {
-        "extensions" : [ "leanprover.lean4", "usernamehw.errorlens", "DavidAnson.vscode-markdownlint" ]
+        "extensions" : [ "leanprover.lean4", "usernamehw.errorlens", "DavidAnson.vscode-markdownlint", "GitHub.copilot", "GitHub.copilot-chat" ],
+        "settings": { "github.copilot.editor.enableAutoCompletions": false }      
       }
     }
   }

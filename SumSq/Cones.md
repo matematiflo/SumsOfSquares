@@ -9,7 +9,7 @@ import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
 ```
 
-We defines precones, etc. and show that sums of squares form a precone (check again)).
+We defines precones, etc. and show that sums of squares form a precone.
 
 ANOTHER FILE:
 

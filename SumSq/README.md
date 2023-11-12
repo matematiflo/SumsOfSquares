@@ -9,3 +9,10 @@ We introduce sums of squares and prove some of their basic properties.
 The basic setup is that of a general semiring `R`. For example, we can consider sums of squares of natural numbers (`R = ℕ`).
 
 For some results, we specialize to rings or fields.
+
+## Contents
+
+- [Definitions and examples](Defs.md)
+- [Basic properties](Ppties.md)
+- [Cones](Cones.md)
+- Formally real fields

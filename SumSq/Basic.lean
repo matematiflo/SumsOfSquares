@@ -172,5 +172,12 @@ This suggests that, in order to prove an implication of the form
 
 > (∃ x, y = P x) → Q y
 
-it suffices to prove the prposition `forall x, Q (P x)`. Can you formalise this statement and prove it?
+it suffices to prove the proposition `forall x, Q (P x)`. Can you formalise this statement and prove it?
+
+intro hy
+rcases hy with x, hx
+rw hx
+apply hQP
+
+
 -/

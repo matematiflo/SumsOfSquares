@@ -142,7 +142,7 @@ theorem IsSumSq.Prod [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumS
 
 TO COMPLETE
 
-ALSO: explain the proofs, and add a link pointing to the definition of a set in mathlib.
+ALSO: explain the proofs and add a link pointing to the definition of a set in mathlib.
 -/
 
 /-!

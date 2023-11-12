@@ -10,7 +10,7 @@ import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
 
 /-!
-We defines precones, etc. and show that sums of squares form a precone (check again)).
+We defines precones, etc. and show that sums of squares form a precone.
 
 in a ring: precone, **cone**, support of a precone, support of a precone is an additive subgroup, support of a cone is an ideal, prime cones
 

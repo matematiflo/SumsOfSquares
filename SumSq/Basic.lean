@@ -168,9 +168,9 @@ Let Let `R` be a semiring and let `S` be a term in `R`. Write a proof of the imp
 
 and notice that having an existential quantifier in the assumption is not very convenient. Instead, use Lemma `SumSqIsSumSq` and the second implication of the equivalence `IsSumSq.Char` to prove the result. You can then see that the approach there is to first prove `IsSumSq (SumSq L)` and from this deduce a proof of the implication.
 
-This suggests that a general approach to proving an implication of the form
+This suggests that, in order to prove an implication of the form
 
 > (∃ x, y = P x) → Q y
 
-is to first prove `forall x, Q (P x)` and then use this to prove the implication. This is the approach we used in the proof of the implication `IsSumSqToExistList` in [the second section](#using-an-existential-predicate).
+it suffices to prove the prposition `forall x, Q (P x)`. Can you formalise this statement and prove it?
 -/

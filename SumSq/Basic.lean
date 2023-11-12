@@ -150,7 +150,7 @@ ALSO: explain the proofs and add a link pointing to the definition of a set in m
 
 ### Exercise 1
 
-Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSumSq S` is equivalent to the proposition `IsSumSq' S` defined inductively by
+Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSumSq S` is equivalent to Proposition `IsSumSq' S`, where `IsSumSq'` is the predicate defined inductively as follows:
 
 ```lean
 inductive IsSumSq' [Semiring R] : R → Prop where

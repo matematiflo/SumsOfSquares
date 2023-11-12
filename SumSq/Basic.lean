@@ -170,7 +170,7 @@ and notice that having an existential quantifier in the assumption is not very c
 
 This suggests that a general approach to proving an implication of the form
 
-> (∃ x, P x = y) → Q y
+> (∃ x, y = P x) → Q y
 
-is to first prove `Q (P x)` and then use this to prove the implication. This is the approach we used in the proof of the implication `IsSumSqToExistList` in [the second section](#using-an-existential-predicate).
+is to first prove `forall x, Q (P x)` and then use this to prove the implication. This is the approach we used in the proof of the implication `IsSumSqToExistList` in [the second section](#using-an-existential-predicate).
 -/

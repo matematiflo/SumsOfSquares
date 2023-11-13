@@ -166,18 +166,22 @@ Let Let `R` be a semiring and let `S` be a term in `R`. Write a proof of the imp
 
 > (∃ L : List R, SumSq L = S) → IsSumSq S
 
-and notice that having an existential quantifier in the assumption is not very convenient. Instead, use Lemma `SumSqIsSumSq` and the second implication of the equivalence `IsSumSq.Char` to prove the result. You can then see that the approach there is to first prove `IsSumSq (SumSq L)` and from this deduce a proof of the implication.
+and notice that having an existential quantifier in the assumption is not very convenient. Instead, use Lemma `SumSqIsSumSq` and the second implication of the equivalence `IsSumSq.Char` to prove the result. You can then see that the approach there is to first prove `IsSumSq (SumSq L)` and from this deduce a proof of the implication. A formalisation of this is statement is suggested in [Exercise 3](#exercise-3).
 
-This suggests that, in order to prove an implication of the form
+### Exercise 3
 
-> (∃ x, y = P x) → Q y
-
-it suffices to prove the proposition `forall x, Q (P x)`. Can you formalise this statement and prove it?
-
-intro hy
-rcases hy with x, hx
-rw hx
-apply hQP
-
-
+Let `S T` be types. Let `P : T → Prop` be a predicate on `T` and let `f : S → T` be a function from `S` to `T`. Assume that the proposition `∀ x : S, P (f x)` has a proof and that the proposition `∀ y : T, ∃ x : S, y = f x` has a proof. Show that the proposition `∀ y : T, P y` has a proof.
 -/
+
+example {S T : Type} (P : T → Prop) (f : S → T) (hPf : (∀ x : S, P (f x))) (y : T) : (∃ x : S, y = f x) → P y := by
+  intro hy
+  rcases hy with ⟨x, hx⟩
+  rw [hx]
+  apply hPf
+
+example {S T : Type} (P : T → Prop) (f : S → T) (hPf : (∀ x : S, P (f x))) (h : ∀ y : T, ∃ x : S, y = f x) : ∀ y : T, P y := by
+  intro y
+  specialize h y
+  rcases h with ⟨x, hx⟩
+  rw [hx]
+  apply hPf

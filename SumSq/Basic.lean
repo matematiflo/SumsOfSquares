@@ -148,6 +148,8 @@ ALSO: explain the proofs and add a link pointing to the definition of a set in m
 /-!
 ## Exercises
 
+The solutions to these exercises are available in the file [SumSq.Solutions](Solutions.md).
+
 ### Exercise 1
 
 Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSumSq S` is equivalent to Proposition `IsSumSq' S`, where `IsSumSq'` is the predicate defined inductively as follows:

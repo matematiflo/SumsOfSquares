@@ -2,4 +2,5 @@
 -- Import modules here that should be built as part of the library.
 import SumSq.Defs
 import SumSq.Props
+import SumSq.Basic
 import MathlibVersions.Defs

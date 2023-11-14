@@ -90,7 +90,7 @@ theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq
 
 ## As a set
 
-To the predicate `IsSumSq : R → Prop`, there is associated the set `{S : R | IsSumSq S}`, which consists of terms `S : R` such that `IsSumSq S` has a proof. Again, since `IsSumSq S` is defined inductively, we can use induction to prove certain properties of this set. For instance:
+To the predicate `IsSumSq : R → Prop`, there is associated the [set](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) `{S : R | IsSumSq S}`, which consists of terms `S : R` such that `IsSumSq S` has a proof. Again, since `IsSumSq S` is defined inductively, we can use induction to prove certain properties of this set. For instance:
 
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 + S2)
 
@@ -141,7 +141,7 @@ theorem IsSumSq.Prod [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumS
 
 TO COMPLETE
 
-ALSO: explain the proofs and add a link pointing to the definition of a set in mathlib.
+ALSO: explain the proofs!
 
 ## Exercises
 

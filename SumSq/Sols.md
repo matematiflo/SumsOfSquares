@@ -20,7 +20,7 @@ import SumSq.Defs
 
 ### Basic.2
 
-### [Basic.3](Basic.lean#exercise-3)
+### [Basic.3](Basic.md#exercise-3)
 
 ```lean
 example {S T : Type} (P : T → Prop) (f : S → T) (hPf : (∀ x : S, P (f x))) (y : T) : (∃ x : S, y = f x) → P y := by

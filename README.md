@@ -49,7 +49,8 @@ After installing Lean, you will be able to run the command lines `lake exe cache
 If either `lake exe cache get` or `lake build` are not recongnized, try
 
 ```bash
-curl https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain```
+curl https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+```
 
 and then
 

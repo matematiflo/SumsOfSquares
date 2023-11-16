@@ -8,9 +8,9 @@ def main : IO Unit := do
   let stdin ← IO.getStdin
   let stdout ← IO.getStdout
 
-  stdout.putStrLn "Please enter a list of integers in the form 1, -2, 3:"
+  stdout.putStrLn "Please enter a list of integers in the form 1, -2, 3 (as many integers as you want, seperated by a comma)."
 
   let input ← stdin.getLine
   let list := input.splitOn "," |> List.map (fun s => s.trim.toInt!)
 
-  stdout.putStrLn s!"The list you entered is {list}. Its sum of squares is {SumSq list}."
+  stdout.putStrLn s!"The list you entered is {list}. Its sum of squares is {SumSqTR list}."

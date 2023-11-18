@@ -22,7 +22,7 @@ Recall that `List R` is the type defined inductively and recursively by
 ```lean
 inductive List (R : Type u) where
   | nil : List R -- the empty list
-  | cons (a : R) (l : List R) : List R -- the list constructed from a term a : R and an already constructed list l : List R.
+  | cons (a : R) (l : List R) : List R -- the list constructed from a term (a : R) and an already constructed list (l : List R).
 ```
 
 In Lean, the empty list can be denoted by `[]` and the list `cons a l` can be denoted by `a :: l`.

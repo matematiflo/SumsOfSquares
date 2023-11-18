@@ -27,6 +27,32 @@ in a field: **cones in F ↔ orderings on F**
 
 in a ring: prime cones with support P in R ↔ orderings of Frac(R/P)
 
+```lean
+structure Cone' (R : Type) [Ring R] :=
+  (P : Set R)  -- I guess here it could be a sub-type? Would it just change the way the axioms are written? (no ∈)
+  (zero : 0 ∈ P)
+  (add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P)
+  -- etc
+
+#check @Cone'
+
+def test [Ring R] (P : Cone' R) : P = P := rfl
+
+-- WE NEED A CLASS!
+
+class Cone (R : Type) [Ring R] : Type :=
+  P : Set R   -- I guess here it could be a sub-type? Would it just change the way the axioms are written? (no ∈)
+  zero : 0 ∈ P
+  add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
+  -- etc
+
+#check @Cone
+
+def ConeRefl [Ring R] [P : Cone R] : P = P := rfl
+
+-- If I want to prove that the sum of sqaures is a cone, is it better with structure or with class?
+```
+
 **ANOTHER FILE: Formally real**
 
 semireal ring if -1 is not a sum of squares *see Zulip discussion about semirings again*

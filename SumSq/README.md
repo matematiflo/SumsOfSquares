@@ -13,6 +13,7 @@ For some results, we specialize to rings or fields.
 ## Contents
 
 - [Definitions and examples](Defs.md)
-- [Basic properties](Ppties.md)
-- [Cones](Cones.md)
+- [Basic properties for lists](List.md)
+- [The type of sums of squares](Basic.md)
+- [Precones and cones](Cones.md)
 - Formally real fields

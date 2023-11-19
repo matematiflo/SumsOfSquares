@@ -8,41 +8,37 @@ Authors: Florent Schaffhauser.
 
 import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
-import Mathlib.Tactic.Ring
 
 /-!
 Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function `SumSq : List R → R` that computes the sum of squares of the entries of a list:
 
 > SumSq [a, b, c] = a ^ 2 + b ^ 2 + c ^ 2
 
-In the present file, we declare a predicate `IsSumSq : R → Prop` that characterizes the elements of `R` that are return values of the function `SumSq`. We then use this to declare sums of squares in `R` as a subtype of `R`.
+In the present file, we declare a predicate `IsSumSq : R → Prop` that characterizes the elements of `R` that are return values of the function `SumSq`. We then discuss how to use such a predicate to declare sums of squares in `R` either as a subset or as a subtype of `R`.
 
 ## As an inductive predicate
 
-Using a predicate to define sums of squares means defining the notion of *being a sum of squares in `R`* to mean being a term `S : R` such that the proposition `IsSumSq S` has a proof.
+Using a predicate on `R` (i.e. a function `IsSumSq : R → Prop`) to define sums of squares in `R` means the following: a term `S : R` will be called a sum of squares if the proposition `IsSumSq S` has a proof.
+
+Below, the predicate `IsSumSq` is defined inductively, but it could be defined [existentially](#as-an-existential-predicate).
 -/
 
 inductive IsSumSq {R : Type} [Semiring R] : R → Prop :=
   | zero : IsSumSq (0 : R)
   | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)
 
-#check @IsSumSq
-#check IsSumSq.rec
-
-structure Triple (X : Type) :=
-  x : X
-  y : X
-  z : X
-
-example {X : Type} (P : Triple X) : P = P := rfl
-
-#check @Triple
-
 /-!
-In other words, `0 : R` is a sum of squares, and if `S : R` is a sum of squares and `x : R`, then `x ^ 2 + S` is a sum of squares. We can use this to prove that, for all list `L : List R`, the term `SumSq L : R` is a sum of squares.
+Since `IsSumSq` is declared as an inductive type, it automatically generates a recursion principle.accesible via `IsSumSq.rec`. This means that if we want to prove a result for all sums of squares in a semiring `R'`, it suffices to prove it for `0 : R'` and to prove it for all terms of the form `x ^ 2 + S` under the assumption that the term `S` is a sum of squares in `R'`, for which the result has already been proved.
 -/
 
-lemma SumSqIsSumSq [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
+variable {R' : Type} [Semiring R']
+#check @IsSumSq.rec R' _
+
+/-!
+By definition of `IsSumSq`, the term `0 : R` is a sum of squares, and if `S : R` is a sum of squares and `x : R`, then `x ^ 2 + S` is a sum of squares. We can use this to prove that, for all list `L : List R`, the term `SumSq L : R` is a sum of squares.
+-/
+
+lemma SumSqListIsSumSq [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
   induction L with
   | nil =>
     exact IsSumSq.zero
@@ -51,7 +47,7 @@ lemma SumSqIsSumSq [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
     exact IsSumSq.add a (SumSq l) ih
 
 /-!
-Let us give three simple examples of proofs that a term `S : R` is a sum of squares. Namely, we prove that `0`, `1` and all squares in `R` are sums of squares.
+Let us give three simple examples of proofs that a term `S : R` is a sum of squares. Namely, we prove that `0 : R`, `1 : R` and all squares in `R` are sums of squares.
 -/
 
 lemma zeroIsSumSq [Semiring R] : IsSumSq (0 : R) := by
@@ -62,12 +58,12 @@ lemma oneIsSumSq [Semiring R] : IsSumSq (1 : R) := by
   rw [aux]
   exact IsSumSq.add 1 0 IsSumSq.zero
 
-lemma aSquareIsSumSq [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
+lemma SquareIsSumSq [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
   rw [← add_zero (x ^2)]
   exact IsSumSq.add x 0 IsSumSq.zero
 
 /-!
-For more on this, see [Exercise 1](#exercise-1). And for more on Lemma `SumSqIsSumSq`, see [Exercise 2](#exercise-2).
+For more on this, see [Exercise 1](#exercise-1). And for more on Lemma `SumSqListIsSumSq`, see [Exercise 2](#exercise-2).
 
 ## As an existential predicate
 
@@ -90,7 +86,7 @@ lemma IsSumSqToExistList [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R
     rfl
 
 /-!
-From this and Lemma `SumSqIsSumSq` proved in [the first section](##using-an-inductive-predicate), we can prove the equivalence that we wanted.
+From this and Lemma `SumSqListIsSumSq` proved in [the first section](##using-an-inductive-predicate), we can prove the equivalence that we wanted.
 -/
 
 theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq L = S) := by
@@ -99,16 +95,15 @@ theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq
   · intro h
     rcases h with ⟨L, hL⟩
     rw [← hL]
-    exact SumSqIsSumSq L
+    exact SumSqListIsSumSq L
 
 /-!
 ## As a set
 
-To the predicate `IsSumSq : R → Prop`, there is associated the [set](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) `{S : R | IsSumSq S}`, which consists of terms `S : R` such that `IsSumSq S` has a proof. Again, since `IsSumSq S` is defined inductively, we can use induction to prove certain properties of this set. For instance:
+To the predicate `IsSumSq : R → Prop`, there is associated the [set](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) `{S : R | IsSumSq S}`, which consists of terms `S : R` such that `IsSumSq S` has a proof. Since `IsSumSq S` is defined inductively, we can use induction to prove certain properties of this set, which we first write without using set-theoretic notation. For instance, to say that set of sums of squares in a semiring `R` is closed under addition, we write:
 
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 + S2)
 
-In other words, if `R`is a semiring, the set of sums of squares in `R` is closed under addition.
 -/
 
 theorem IsSumSq.Sum [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
@@ -155,6 +150,8 @@ theorem IsSumSq.Prod [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumS
 
 def SumSqSet (R : Type) [Semiring R] : Set R := {a : R | IsSumSq a}
 
+-- Obs: SumSqSet could also be defined inductively
+
 #check SumSqSet ℤ
 #check (0: ℤ) ∈ SumSqSet ℤ
 
@@ -173,18 +170,15 @@ TO COMPLETE
 ALSO: explain the proofs!
 -/
 
-
 structure Cone' (R : Type) [Ring R] :=
-  (P : Set R)  -- I guess here it could also be a sub-type or a predicate? Would it just change the way the axioms are written? (no ∈)
-  (zero : 0 ∈ P)
-  (add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P)
+  P : Set R  -- I guess here it could also be a sub-type or a predicate? Would it just change the way the axioms are written? (no ∈)
+  zero : 0 ∈ P
+  add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
   -- etc
 
 #check @Cone'
 
 def test [Ring R] (P : Cone' R) : P = P := rfl
-
--- WE NEED A CLASS!
 
 class Cone (R : Type) [Ring R] : Type :=
   P : Set R   -- I guess here it could also be a sub-type or a predicate? Would it just change the way the axioms are written? (no ∈)
@@ -208,7 +202,7 @@ def SumSqCone (R : Type) [Ring R] : Type := { a : R // IsSumSq a}
 
 #check (⟨(0 : ℤ), IsSumSq.zero⟩ : SumSqCone ℤ)
 
--- #check (0 : ℤ) ∈ IsSumSq -- !!! WORKS IF IsSumSq IS OF TYPE Set R !!!  -- i.e. SumSqCone could be defined inductively like that (in Section #as-a-set)
+-- #check (0 : ℤ) ∈ IsSumSq -- !!! WORKS IF IsSumSq IS DECLARED AS TYPE Set R !!!  -- i.e. SumSqCone could be defined inductively like that (in Section #as-a-set)
 
 -- #check (0 : ℤ) ∈ (SumSqCone ℤ) -- voici ce que l'on voudrait? bof... IsSumSq (0 : ℤ) seems very good... (see below)
 
@@ -245,7 +239,7 @@ Let Let `R` be a semiring and let `S` be a term in `R`. Write a (direct) proof o
 
 > (∃ L : List R, SumSq L = S) → IsSumSq S
 
-and ask yourself whether having an existential quantifier in the assumption makes things complicated. Try using instead Lemma `SumSqIsSumSq` and the second implication of the equivalence `IsSumSq.Char` to prove the result. You can then see that the approach there is to first prove `IsSumSq (SumSq L)` and from this deduce a proof of the implication. A formalisation of this is statement is suggested in [Exercise 3](#exercise-3).
+and ask yourself whether having an existential quantifier in the assumption makes things complicated. Try using instead Lemma `SumSqListIsSumSq` and the second implication of the equivalence `IsSumSq.Char` to prove the result. You can then see that the approach there is to first prove `IsSumSq (SumSq L)` and from this deduce a proof of the implication. A formalisation of this is statement is suggested in [Exercise 3](#exercise-3).
 
 ### Exercise 3
 

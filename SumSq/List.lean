@@ -49,7 +49,7 @@ inductive Perm : List R → List R → Prop
   | trans {L₁ L₂ L₃ : List R} : Perm L₁ L₂ → Perm L₂ L₃ → Perm L₁ L₃
 ```
 
- So we wee that `List.Perm` is an inductive type: `L2` is a permutation of `L1` if and only if one of four cases occurs.
+ So we wee that `List.Perm` is an inductive type: a list `L2` is a permutation of the list `L1` if and only if one of four cases occurs.
 
 We can now prove that a sum of squares is invariant under permutations:
 
@@ -59,7 +59,7 @@ Note that, since `List.Perm` uses implicit variables for the constructors `cons`
 -/
 
 theorem SumSqPermut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
-  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed an inductive type)
+  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed inductively defined)
   · case nil => -- case when L1 L2 are both empty
     rfl -- equality holds by definition
   · case cons x l1 l2 Hl Sum12 => -- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2

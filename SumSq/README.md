@@ -17,3 +17,4 @@ For some results, we specialize to rings or fields.
 - [The type of sums of squares](Basic.md)
 - [Precones and cones](Cones.md)
 - Formally real fields
+- [Solutions to the exercises](Sols.md)

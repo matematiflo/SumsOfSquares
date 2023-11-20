@@ -4,11 +4,12 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 ## Libraries
 
-- [Definitions and examples](Defs.md)
-- [Basic properties for lists](List.md)
-- [The type of sums of squares](Basic.md)
-- [Precones and cones](Cones.md)
+- [Definitions and examples](SumSq/Defs.md)
+- [Basic properties for lists](SumSq/List.md)
+- [The type of sums of squares](SumSq/Basic.md)
+- [Precones and cones](SumSq/Cones.md)
 - Formally real fields
+- [Solutions to the exercises](SumSq/Sols.md)
 
 ## Quickstart
 

@@ -201,8 +201,16 @@ theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c
 
 ## Exercises
 
-1. Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
+The solutions to some of these exercises are discussed in the file [SumSq.Sols](Sols.md).
 
-2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if `a ∈ L`, then the list `a :: L.erase a` is a permutation of `L` (we have used this standard result [here](#erasing-an-entry)).
+### Exercise 1
 
-3. Prove that the statement of [`theorem SumSqSmul2`](#more-computations) is indeed equivalent to the statement of [`theorem SumSqSmul`](#multiplication-by-a-scalar).
+Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
+
+### Exercise 2
+
+Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if `a ∈ L`, then the list `a :: L.erase a` is a permutation of `L` (we have used this standard result [here](#erasing-an-entry)).
+
+### Exercise 3
+
+Prove that the statement of [`theorem SumSqSmul2`](#more-computations) is indeed equivalent to the statement of [`theorem SumSqSmul`](#multiplication-by-a-scalar).

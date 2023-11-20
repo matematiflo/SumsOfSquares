@@ -265,8 +265,6 @@ def SumSqType' (R : Type) [Ring R] : Type := Subtype (IsSumSqExpl R)
 
 ## Exercises
 
-The solutions to some of these exercises are discussed in the file [SumSq.Sols](Sols.md).
-
 ### Exercise 1
 
 Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSumSq S` is equivalent to Proposition `IsSumSq' S`, where `IsSumSq'` is the predicate defined inductively as follows:

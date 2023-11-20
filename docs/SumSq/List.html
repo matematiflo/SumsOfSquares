@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ppties</title>
+<title>list</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,16 +57,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="Ppties_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Ppties_files/libs/quarto-html/quarto.js"></script>
-<script src="Ppties_files/libs/quarto-html/popper.min.js"></script>
-<script src="Ppties_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Ppties_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Ppties_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Ppties_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Ppties_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Ppties_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Ppties_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="List_files/libs/clipboard/clipboard.min.js"></script>
+<script src="List_files/libs/quarto-html/quarto.js"></script>
+<script src="List_files/libs/quarto-html/popper.min.js"></script>
+<script src="List_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="List_files/libs/quarto-html/anchor.min.js"></script>
+<link href="List_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="List_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="List_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="List_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="List_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="sums-of-squares---basic-properties" class="level1">
 <h1>Sums of squares - Basic properties</h1>
-<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser</p>
+<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">SumSq.Defs</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Mathlib.Data.List.Perm</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Mathlib.Tactic.FieldSimp</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -112,14 +112,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> cons (a <span class="op">:</span> <span class="dt">R</span>) {l₁ l₂ <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>} <span class="op">:</span> <span class="dt">Perm</span> l₁ l₂ → <span class="dt">Perm</span> (<span class="ot">a ::</span> l₁) (<span class="ot">a ::</span> l₂)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> swap (a₁ a₂ <span class="op">:</span> <span class="dt">R</span>) (l <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>) <span class="op">:</span> <span class="dt">Perm</span> (a₂<span class="ot"> ::</span> a₁<span class="ot"> ::</span> l) (a₁<span class="ot"> ::</span> a₂<span class="ot"> ::</span> l)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> trans {<span class="dt">L</span>₁ <span class="dt">L</span>₂ <span class="dt">L</span>₃ <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>} <span class="op">:</span> <span class="dt">Perm</span> <span class="dt">L</span>₁ <span class="dt">L</span>₂ → <span class="dt">Perm</span> <span class="dt">L</span>₂ <span class="dt">L</span>₃ → <span class="dt">Perm</span> <span class="dt">L</span>₁ <span class="dt">L</span>₃</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>So we wee that <code>List.Perm</code> is an inductive type: <code>L2</code> is a permutation of <code>L1</code> if and only if one of four cases occurs.</p>
+<p>So we wee that <code>List.Perm</code> is an inductive type: a list <code>L2</code> is a permutation of the list <code>L1</code> if and only if one of four cases occurs.</p>
 <p>We can now prove that a sum of squares is invariant under permutations:</p>
 <blockquote class="blockquote">
 <p><code>L1 ~ L2 → SumSq L1 = SumSq L2</code></p>
 </blockquote>
 <p>Note that, since <code>List.Perm</code> uses implicit variables for the constructors <code>cons</code> and <code>trans</code>, we choose to write the proof by indution with a slighty different syntax (using <code>case</code>), to make the Lean infoview rendering more readable (for more on this, see Exercise 1 <a href="#exercises">below</a>).</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>theorem <span class="dt">SumSqPermut</span> {<span class="dt">R</span> <span class="op">:</span> <span class="dt">Type</span>} [<span class="dt">Semiring</span> <span class="dt">R</span>] {<span class="dt">L1</span> <span class="dt">L2</span> <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>} (<span class="dt">H</span> <span class="op">:</span> <span class="dt">L1</span> <span class="op">~</span> <span class="dt">L2</span>) <span class="op">:</span> <span class="dt">SumSq</span> <span class="dt">L1</span> <span class="ot">=</span> <span class="dt">SumSq</span> <span class="dt">L2</span> <span class="op">:=</span> by</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  induction <span class="dt">H</span> <span class="co">-- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed an inductive type)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  induction <span class="dt">H</span> <span class="co">-- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed inductively defined)</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  · <span class="kw">case</span> nil <span class="ot">=&gt;</span> <span class="co">-- case when L1 L2 are both empty</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    rfl <span class="co">-- equality holds by definition</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  · <span class="kw">case</span> cons x l1 l2 <span class="dt">Hl</span> <span class="dt">Sum12</span> <span class="ot">=&gt;</span> <span class="co">-- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2</span></span>
@@ -229,11 +229,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="exercises" class="level2">
 <h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
-<ol type="1">
-<li><p>Modify the syntax of the <code>induction</code> tactic in <a href="#permuted-lists"><code>SumSqPermut</code></a> to make it look more similar to that of <a href="#appended-lists"><code>SumSqAppend</code></a>. This means: in <code>SumSqPermut</code>, replace <code>induction H</code> by <code>induction H with</code> and make the proof syntactically correct after that (start by changing <code>⬝ case nil</code> to <code>| nil</code>).</p></li>
-<li><p>Let <code>R</code> be a type with decidable equality. Let <code>a</code> be a term of type <code>R</code> and let <code>L</code> be a term of type <code>List R</code>. Prove that, if <code>a ∈ L</code>, then the list <code>a :: L.erase a</code> is a permutation of <code>L</code> (we have used this standard result <a href="#erasing-an-entry">here</a>).</p></li>
-<li><p>Prove that the statement of <a href="#more-computations"><code>theorem SumSqSmul2</code></a> is indeed equivalent to the statement of <a href="#multiplication-by-a-scalar"><code>theorem SumSqSmul</code></a>.</p></li>
-</ol>
+<p>The solutions to some of these exercises are discussed in the file <a href="Sols.md">SumSq.Sols</a>.</p>
+<section id="exercise-1" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1">Exercise 1</h3>
+<p>Modify the syntax of the <code>induction</code> tactic in <a href="#permuted-lists"><code>SumSqPermut</code></a> to make it look more similar to that of <a href="#appended-lists"><code>SumSqAppend</code></a>. This means: in <code>SumSqPermut</code>, replace <code>induction H</code> by <code>induction H with</code> and make the proof syntactically correct after that (start by changing <code>⬝ case nil</code> to <code>| nil</code>).</p>
+</section>
+<section id="exercise-2" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2">Exercise 2</h3>
+<p>Let <code>R</code> be a type with decidable equality. Let <code>a</code> be a term of type <code>R</code> and let <code>L</code> be a term of type <code>List R</code>. Prove that, if <code>a ∈ L</code>, then the list <code>a :: L.erase a</code> is a permutation of <code>L</code> (we have used this standard result <a href="#erasing-an-entry">here</a>).</p>
+</section>
+<section id="exercise-3" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3">Exercise 3</h3>
+<p>Prove that the statement of <a href="#more-computations"><code>theorem SumSqSmul2</code></a> is indeed equivalent to the statement of <a href="#multiplication-by-a-scalar"><code>theorem SumSqSmul</code></a>.</p>
+</section>
 </section>
 </section>
 

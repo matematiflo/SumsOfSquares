@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="sums-of-squares---definitions-and-examples" class="level1">
 <h1>Sums of squares - Definitions and examples</h1>
-<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser</p>
+<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Mathlib.Algebra.Ring.Defs</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Mathlib.Data.List.BigOperators.Basic</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Mathlib.Data.Rat.Defs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -90,13 +90,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <section id="definition-by-pattern-matching" class="level2">
 <h2 class="anchored" data-anchor-id="definition-by-pattern-matching">Definition by pattern matching</h2>
-<p>Let <code>R</code> be a type. As soon as <code>R</code> is endowed with an addition function, a zero and a square function, we can define sums of squares as a function <code>SumSq</code> going from <code>List R</code> to <code>R</code>. However, in what follows, we will restrict to the case when <code>R</code> is a semiring.</p>
+<p>Let <code>R</code> be a type. As soon as <code>R</code> is endowed with an addition function, a zero and a square function, we can define sums of squares as a function <code>SumSq</code> going from <code>List R</code> to <code>R</code>. However, in what follows, we will restrict to the case when <code>R</code> is a <code>Semiring</code>.</p>
 <p>Recall that <code>List R</code> is the type defined inductively and recursively by</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>inductive <span class="dt">List</span> (<span class="dt">R</span> <span class="op">:</span> <span class="dt">Type</span> u) <span class="kw">where</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> nil <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span> <span class="co">-- the empty list</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> cons (a <span class="op">:</span> <span class="dt">R</span>) (l <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>) <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span> <span class="co">-- the list constructed from a term a : R and an already constructed list l : List R.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> cons (a <span class="op">:</span> <span class="dt">R</span>) (l <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span>) <span class="op">:</span> <span class="dt">List</span> <span class="dt">R</span> <span class="co">-- the list constructed from a term (a : R) and an already constructed list (l : List R).</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In Lean, the empty list can be denoted by <code>[]</code> and the list <code>cons a l</code> can be denoted by <code>a :: l</code>.</p>
-<p>Sums of squares are then defined by pattern matching, with respect to terms of type <code>List R</code>. This means by giving the value of the function in each of the two possible cases <code>[]</code> and <code>a :: l</code>.</p>
+<p>Sums of squares can thus be defined by pattern matching, with respect to terms of type <code>List R</code>. This means by giving the return value of the function in each of the two possible cases <code>[]</code> and <code>a :: l</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode haskell code-with-copy"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>def <span class="dt">SumSq</span> {<span class="dt">R</span> <span class="op">:</span> <span class="dt">Type</span>} [<span class="dt">Semiring</span> <span class="dt">R</span>] <span class="op">:</span> (<span class="dt">List</span> <span class="dt">R</span> → <span class="dt">R</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> [] <span class="ot">=&gt;</span> <span class="dv">0</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span><span class="ot"> a ::</span> l <span class="ot">=&gt;</span> a <span class="op">^</span> <span class="dv">2</span> <span class="op">+</span> <span class="dt">SumSq</span> l</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -127,14 +127,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#eval SumSq (0 :: [1, -2, 3])  -- 14</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#eval SumSq (1 :: [1, -2, 3])  -- 15</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>We will prove later a theorem that says the following:</p>
+<p>We will later prove a theorem that says the following:</p>
 <blockquote class="blockquote">
 <p><code>∀ L1 L2 : List R, SumSq (L1 ++ L2) = SumSq L1 + SumSq L2</code></p>
 </blockquote>
 </section>
 <section id="definition-using-the-sum-and-square-functions" class="level2">
 <h2 class="anchored" data-anchor-id="definition-using-the-sum-and-square-functions">Definition using the <code>sum</code> and <code>square</code> functions</h2>
-<p><code>SumSq L</code> can also be computed by squaring the entries of the list and summing the resulting list. Pictorially:</p>
+<p><code>SumSq L</code> can also be computed by squaring the entries of the list and summing the resulting list:</p>
 <blockquote class="blockquote">
 <p><code>[1, -2, 3] =&gt; [1 ^ 2, (-2) ^ 2, 3 ^ 2] =&gt; 1 ^ 2 + (-2) ^ 2 + 3 ^ 2</code></p>
 </blockquote>

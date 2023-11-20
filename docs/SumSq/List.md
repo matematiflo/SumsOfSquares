@@ -2,7 +2,7 @@
 
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Florent Schaffhauser
+Authors: Florent Schaffhauser.
 
 ```haskell
 import SumSq.Defs
@@ -47,7 +47,7 @@ inductive Perm : List R → List R → Prop
   | trans {L₁ L₂ L₃ : List R} : Perm L₁ L₂ → Perm L₂ L₃ → Perm L₁ L₃
 ```
 
- So we wee that `List.Perm` is an inductive type: `L2` is a permutation of `L1` if and only if one of four cases occurs.
+ So we wee that `List.Perm` is an inductive type: a list `L2` is a permutation of the list `L1` if and only if one of four cases occurs.
 
 We can now prove that a sum of squares is invariant under permutations:
 
@@ -57,7 +57,7 @@ Note that, since `List.Perm` uses implicit variables for the constructors `cons`
 
 ```haskell
 theorem SumSqPermut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1 ~ L2) : SumSq L1 = SumSq L2 := by
-  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed an inductive type)
+  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed inductively defined)
   · case nil => -- case when L1 L2 are both empty
     rfl -- equality holds by definition
   · case cons x l1 l2 Hl Sum12 => -- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2
@@ -201,8 +201,16 @@ theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c
 
 ## Exercises
 
-1. Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
+The solutions to some of these exercises are discussed in the file [SumSq.Sols](Sols.md).
 
-2. Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if `a ∈ L`, then the list `a :: L.erase a` is a permutation of `L` (we have used this standard result [here](#erasing-an-entry)).
+### Exercise 1
 
-3. Prove that the statement of [`theorem SumSqSmul2`](#more-computations) is indeed equivalent to the statement of [`theorem SumSqSmul`](#multiplication-by-a-scalar).
+Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).
+
+### Exercise 2
+
+Let `R` be a type with decidable equality. Let `a` be a term of type `R` and let `L` be a term of type `List R`. Prove that, if `a ∈ L`, then the list `a :: L.erase a` is a permutation of `L` (we have used this standard result [here](#erasing-an-entry)).
+
+### Exercise 3
+
+Prove that the statement of [`theorem SumSqSmul2`](#more-computations) is indeed equivalent to the statement of [`theorem SumSqSmul`](#multiplication-by-a-scalar).

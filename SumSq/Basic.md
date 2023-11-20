@@ -22,7 +22,7 @@ Using a predicate on `R` (i.e. a function `IsSumSq : R → Prop`) to characteriz
 Below, the predicate `IsSumSq` is defined inductively, but later we will show that we can also define it [existentially](#using-an-existential-predicate).
 
 ```lean
-inductive IsSumSq {R : Type} [hR : Semiring R] : R → Prop :=
+inductive IsSumSq {R : Type} [Semiring R] : R → Prop :=
   | zero : IsSumSq (0 : R)
   | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)
 ```

@@ -23,7 +23,7 @@ Using a predicate on `R` (i.e. a function `IsSumSq : R → Prop`) to characteriz
 Below, the predicate `IsSumSq` is defined inductively, but later we will show that we can also define it [existentially](#using-an-existential-predicate).
 -/
 
-inductive IsSumSq {R : Type} [hR : Semiring R] : R → Prop :=
+inductive IsSumSq {R : Type} [Semiring R] : R → Prop :=
   | zero : IsSumSq (0 : R)
   | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)
 
@@ -67,22 +67,19 @@ For instance, `IsSumSq ℤ 0` is the formalized version of the statement `0 is a
 #check IsSumSq (0 : ℤ)  -- IsSumSq 0 : Prop
 
 /-!
-Implementing class instance parameters is useful to *automatically* give meaning to expressions `(0 : R)` and `x ^ 2 + S` (since `R` is a semiring), via a process called [*typeclass resolution*](https://lean-lang.org/theorem_proving_in_lean4/type_classes.html).
-
-And we can use this to present the above checks differently. Note that we have to do it with a type that has already been declared and instantiated as a semiring, for instance `ℤ`.
+Implementing class instance parameters is useful to *automatically* give meaning to expressions `(0 : R)` and `x ^ 2 + S` (since `R` is a semiring), via a process called [*typeclass resolution*](https://lean-lang.org/theorem_proving_in_lean4/type_classes.html). We can then use this to present the above checks differently. Note that we have to do it with a type that has already been declared and instantiated as a semiring, for instance `ℤ`.
 -/
 
 #check @IsSumSq ℤ _  -- IsSumSq : ℤ → Prop
 #check @IsSumSq ℤ _ 0  -- IsSumSq 0 : Prop
 
 /-!
-Since `IsSumSq` is declared as an inductive type, it automatically generates an induction principle.accesible via `IsSumSq.rec`. This means that if we want to prove a result for all sums of squares in a semiring `R'`, it suffices to prove it for `0 : R'` and to prove it for all terms of the form `x ^ 2 + S` under the assumption that the term `S` is a sum of squares in `R'`, for which the result has already been proved.
+Since `IsSumSq` is declared as an inductive type, it automatically generates an induction principle accesible via `IsSumSq.rec`. This means that if we want to prove a result for all sums of squares in a semiring `R'`, it suffices to prove it for `0 : R'` and to prove it for all terms of the form `x ^ 2 + S` under the assumption that the term `S` is a sum of squares in `R'`, for which the result has already been proved.
 
 To see how it works, we can either use a concrete example of a semiring, like `ℤ`, or declare  a variable to play that role (note that we do not call it `R`, in order to avoid conflicts in future declarations).
 -/
 
 variable {R' : Type} [hR' : Semiring R']
-
 #check @IsSumSq.rec R' _
 
 /-!
@@ -95,9 +92,7 @@ The induction principle for `IsSumSq` is reproduced below. There, the `Prop`-val
       ∀ {a : R'} (t : IsSumSq a), motive a t
 ```
 
--/
-/-!
-Let us now use induction to prove certain properties of sums of squares in a semiring `R`. For instance, to say that set of sums of squares in a semiring `R` is closed under addition, we write:
+Let us now see how to use induction to prove certain properties of sums of squares in a semiring `R`. For instance, to say that the sum of two sums of squares is itself a sum of squares, we write:
 
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 + S2)
 
@@ -126,7 +121,7 @@ lemma IsSumSq.ProdBySumSq [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsS
     exact IsSumSq.add (x * a) (x ^ 2 * s) ih
 
 /-!
-We can now prove that the set of sums of squares in a commutative semiring `R` is closed under multiplication:
+We can now prove that a product of sums of squares is a sum of squares:
 
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 * S2)
 -/
@@ -178,15 +173,19 @@ theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq
 /-!
 ## As a set
 
-Recall that, given a type `R`, a term of type [Set R](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) is by definition a predicate `R → Prop`. For instance, to the predicate `IsSumSq : R → Prop`, there is associated the set `{S : R | IsSumSq S}`, which consists of terms `S : R` such that `IsSumSq S` has a proof.
+Recall that, given a type `R`, a term of type [Set R](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) is by definition a predicate `R → Prop`. For instance, to the predicate `IsSumSq : R → Prop`, there is associated the set `{S : R | IsSumSq S}`, which we can think of as *consisting of terms `S : R` such that `IsSumSq S` has a proof*. More concretely, `(0 : R) ∈ {{S : R | IsSumSq S}}` is definitionally equal to the proposition `IsSumSq 0` (see example below).
 
 The upshot of using the type `Set R` is that it gives access to type-theoretic notation, most prominently the symbol `∈`. Note that it is convenient, in the definition of the function `SumSqSet : R → Set R`, to make the variable `R` explicit.
 -/
 
-def SumSqSet (R : Type) [Semiring R] : Set R := {a : R | IsSumSq a}
+def SumSqSet (R : Type) [Semiring R] : Set R := {S : R | IsSumSq S}
 
 #check SumSqSet ℤ  -- SumSqSet ℤ : Set ℤ
 #check 0 ∈ SumSqSet ℤ  -- 0 ∈ SumSqSet ℤ : Prop
+
+/-!
+Here is a proof that `(0 : R) ∈ {{S : R | IsSumSq S}}`. As we see, it uses the fact that this is definitionally equal to the proposition `IsSumSq 0`.
+-/
 
 example [Semiring R] : 0 ∈ SumSqSet R := by  -- the goal is 0 ∈ SumSqSet R
   dsimp [SumSqSet]  -- simplifies the goal to 0 ∈ {a | IsSumSq a}, using the definition of SumSqSet

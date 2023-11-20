@@ -31,7 +31,7 @@ inductive IsSumSq {R : Type} [Semiring R] : R → Prop :=
 By definition of `IsSumSq`, the term `0 : R` is a sum of squares, and if `S : R` is a sum of squares and `x : R`, then `x ^ 2 + S` is a sum of squares. We can use this to prove that, for all list `L : List R`, the term `SumSq L : R` is a sum of squares.
 -/
 
-lemma SumSqListIsSumSq [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
+lemma SumSqListIsSumSq {R : Type} [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
   induction L with
   | nil =>
     exact IsSumSq.zero
@@ -45,15 +45,15 @@ Let us give three more examples of simple proofs that a term `S : R` is a sum of
 For more on this, see [Exercise 1](#exercise-1). And for more on Lemma `SumSqListIsSumSq`, see [Exercise 2](#exercise-2).
 -/
 
-lemma zeroIsSumSq [Semiring R] : IsSumSq (0 : R) := by
+lemma zeroIsSumSq {R : Type} [Semiring R] : IsSumSq (0 : R) := by
   exact IsSumSq.zero
 
-lemma oneIsSumSq [Semiring R] : IsSumSq (1 : R) := by
+lemma oneIsSumSq {R : Type} [Semiring R] : IsSumSq (1 : R) := by
   have aux : (1 : R) = (1 ^ 2 + 0) := by simp
   rw [aux]
   exact IsSumSq.add 1 0 IsSumSq.zero
 
-lemma SquareIsSumSq [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
+lemma SquareIsSumSq {R : Type} [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
   rw [← add_zero (x ^2)]
   exact IsSumSq.add x 0 IsSumSq.zero
 
@@ -63,7 +63,7 @@ Based on its declaration, the type `IsSumSq` behaves like a `Prop`-valued functi
 - the fact that the variable `R : Type` is implicit (between brackets of the form `{}`).
 - the fact that the assumption that `R` is a semiring is implemented using a class instance (between brackets of the form `[]`).
 
-For instance, `IsSumSq ℤ 0` is the formalized version of the statement `0 is a sum of squares in ℤ`.
+For example, `IsSumSq ℤ 0` is the formalized version of the statement `0 is a sum of squares in ℤ`.
 -/
 
 #check @IsSumSq  -- @IsSumSq : {R : Type} → [hR : Semiring R] → R → Prop
@@ -97,13 +97,13 @@ Since it is a bit long, the induction principle for `IsSumSq` is reproduced belo
       ∀ {a : R'} (t : IsSumSq a), motive a t
 ```
 
-Let us now see how to use induction on the type `IsSumSq` to prove certain properties of sums of squares in a semiring `R`. For instance, to say that the sum of two sums of squares is itself a sum of squares, we write:
+Let us now see how to use induction on the type `IsSumSq` to prove certain properties of sums of squares in a semiring `R`. For example, to say that the sum of two sums of squares is itself a sum of squares, we write:
 
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 + S2)
 
 -/
 
-theorem IsSumSq.Sum [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
+theorem IsSumSq.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
   induction h1 with
   | zero =>
     simp
@@ -116,7 +116,7 @@ theorem IsSumSq.Sum [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2)
 Likewise, if the semiring `R` is commutative, a product of sums of squares is a sum of squares. As we shall see, the assumption that `R` is commutative is used in our proof when applying [`mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow). We make this apparent via a separate lemma.
 -/
 
-lemma IsSumSq.ProdBySumSq [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
+lemma IsSumSq.ProdBySumSq {R : Type} [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
   induction h with
   | zero =>
     rw [mul_zero]
@@ -131,7 +131,7 @@ We can now prove that, indeed, a product of sums of squares is a sum of squares:
 > IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 * S2)
 -/
 
-theorem IsSumSq.Prod [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 * S2) := by
+theorem IsSumSq.Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 * S2) := by
   induction h1 with
   | zero =>
     rw [zero_mul]
@@ -152,7 +152,7 @@ We now show that we could also define `IsSumSq S` by asking that it be a return 
 We start with the first implication: starting from `S : R` such that `IsSumSq S` has a proof, we want to construct a list `L : List R` such that `SumSq L = S`. Since `IsSumSq S`is defined inductively, we can do this by induction on the proof of the proposition `IsSumSq S`.
 -/
 
-lemma IsSumSqToExistList [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
+lemma IsSumSqToExistList {R : Type} [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
   induction hS with
   | zero => -- exact ⟨[], rfl⟩
     use []
@@ -167,7 +167,7 @@ lemma IsSumSqToExistList [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R
 From this and Lemma `SumSqListIsSumSq` proved in [the first section](#using-an-inductive-predicate), we can prove the equivalence that we wanted.
 -/
 
-theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq L = S) := by
+theorem IsSumSq.Char {R : Type} [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq L = S) := by
   constructor
   · apply IsSumSqToExistList
   · intro h
@@ -180,15 +180,26 @@ theorem IsSumSq.Char [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq
 
 Recall that, given a type `R`, a term of type [`Set R`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html) is by definition a predicate `R → Prop`. But it comes with a series of extra functions, such as [`Set.Mem`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html#Set.Mem) to define membership in a set. And Lean provides a way to define sets from predicates, with a syntax that is familiar to mathematicians.
 
-For instance, to the predicate `IsSumSq : R → Prop`, there is associated the set `{S : R | IsSumSq S}`, which we can think of as *consisting of terms `S : R` such that `IsSumSq S` has a proof*. More concretely, `(0 : R) ∈ {S : R | IsSumSq S}` is definitionally equal to the proposition `IsSumSq 0` (see example below).
+For example, to the predicate `IsSumSq : R → Prop`, there is associated the set `{S : R | IsSumSq S}`, which we can think of as *consisting of terms `S : R` such that `IsSumSq S` has a proof*. More concretely, `(0 : R) ∈ {S : R | IsSumSq S}` is definitionally equal to the proposition `IsSumSq 0` (see example below).
 
 The upshot of using the type `Set R` is that it gives access to type-theoretic notation (the symbols `∈`, `∩`, `∪` *etc*). Note that it is convenient, in the definition of the function `SumSqSet : R → Set R`, to now make the variable `R` explicit.
 -/
 
 def SumSqSet (R : Type) [Semiring R] : Set R := {S : R | IsSumSq S}
 
+#check @SumSqSet  -- SumSqSet : (R : Type) → [inst : Semiring R] → Set R
 #check SumSqSet ℤ  -- SumSqSet ℤ : Set ℤ
 #check 0 ∈ SumSqSet ℤ  -- 0 ∈ SumSqSet ℤ : Prop
+
+/-
+Alternately, the set of sums of squares can be obtained from the predicate `IsSumSq` using the function [`setOf`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html#setOf).
+-/
+
+def SumSqSet' (R : Type) [Semiring R] : Set R := setOf IsSumSq
+
+#check @SumSqSet' -- SumSqSet' : (R : Type) → [inst : Semiring R] → Set R
+#check SumSqSet' ℤ  -- SumSqSet' ℤ : Set ℤ
+#check 0 ∈ SumSqSet' ℤ  -- 0 ∈ SumSqSet' ℤ : Prop
 
 /-!
 We could have used the set-theoretic notation earlier if we had declared `IsSumSq` in the following way, replacing `R → Prop` with `Set R`:
@@ -204,7 +215,7 @@ However, it is not clear that this is a better option. Indeed, if we do that, th
 Here is a proof that `(0 : R) ∈ SumSq R`. As we can see, it uses the fact that this is definitionally equal to the proposition `IsSumSq (0 : R)`.
 -/
 
-example [Semiring R] : 0 ∈ SumSqSet R := by  -- the goal is 0 ∈ SumSqSet R (note that Lean identifies the term 0 as being of type R)
+example {R : Type} [Semiring R] : 0 ∈ SumSqSet R := by  -- the goal is 0 ∈ SumSqSet R (note that Lean identifies the term 0 as being of type R)
   dsimp [SumSqSet]  -- simplifies the goal to 0 ∈ {a | IsSumSq a}, using the definition of SumSqSet
   change IsSumSq 0  -- changes the goal to IsSumSq 0, which is definitionally equal to 0 ∈ {a | IsSumSq a}
   exact IsSumSq.zero  -- this closes the goal because IsSumSq.zero is the proof that 0 is a sum of squares in R
@@ -213,13 +224,13 @@ example [Semiring R] : 0 ∈ SumSqSet R := by  -- the goal is 0 ∈ SumSqSet R (
 We can now rewrite the theorems above in set-theoretic notation. All of them have already been proved, so we close the goal with an `exact` tactic every time.
 -/
 
-theorem SumSqSet.Sum [Semiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) : (S1 + S2) ∈ SumSqSet R  := by
+theorem SumSqSet.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) : (S1 + S2) ∈ SumSqSet R  := by
   exact IsSumSq.Sum h1 h2
 
-lemma SumSqSet.ProdBySumSq [CommSemiring R] {S : R} (h : S ∈ SumSqSet R) {x : R} : (x ^2 * S) ∈ SumSqSet R := by
+lemma SumSqSet.ProdBySumSq {R : Type} [CommSemiring R] {S : R} (h : S ∈ SumSqSet R) {x : R} : (x ^2 * S) ∈ SumSqSet R := by
   exact IsSumSq.ProdBySumSq h
 
-theorem SumSqSet.Prod [CommSemiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) :(S1 * S2) ∈ SumSqSet R := by
+theorem SumSqSet.Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) :(S1 * S2) ∈ SumSqSet R := by
   exact IsSumSq.Prod h1 h2
 
 /-!
@@ -243,23 +254,47 @@ def SumSqType (R : Type) [Semiring R] : Type := {S : R // IsSumSq S}
 #check @SumSqType
 
 /-!
-*By definition of the subtype associated to the predicate `IsSumSq`*, a term `S : SumSqType R` is a pair consisting of a term `S.val : R` and a term `S.property : IsSumSq S` (meaning a proof of the proposition `IsSumSq S`). In particular, to declare such a term `S`, we need to specify both `S.val` and `S.property`.
+By definition of the subtype associated to the predicate `IsSumSq`, a term `S : SumSqType R` is a pair `⟨S.val, S.property⟩` consisting of a term `S.val : R` and a term `S.property : IsSumSq S` (meaning a proof of the proposition `IsSumSq S`). In particular, to declare such a term `S`, we need to specify both `S.val` and `S.property`.
 -/
 
 #check (⟨0, IsSumSq.zero⟩ : SumSqType ℤ)
   -- { val := 0, property := (_ : IsSumSq 0) } : { S // IsSumSq S }
 
 /-!
-It seems reasonable to imagine that, when it comes to formalising proofs about sums of squares in `R`, it will be more complicated to work with the subtype `IsSumSqType R` than with the set `IsSumSqSet R`. For instance, to say that *the sum of two sums of squares is a sum of squares* boils down to *declaring a function* `SumSqType R → SumSqType R → SumSqType R`, with `S1 + S2` defined as `⟨S1.val + S2.val, IsSumSq (S1.val + S2.val)⟩`, which is perhaps not the most common way to formalise such a statement in mathematics. However, it is perhaps closer to the usual methods of functional programming.
+It seems reasonable to imagine that, when it comes to formalising proofs about sums of squares in `R`, it will be more complicated to work with the subtype `IsSumSqType R` than with the set `IsSumSqSet R`. For example, to say that *the sum of two sums of squares is a sum of squares* boils down to *declaring a function* `SumSqType.Add {R : Type} [Semiring R] : SumSqType R → SumSqType R → SumSqType R`, with `SumSq.Add S1 S2` defined as `⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩`.
 
-We conclude this subsection by showing one advantage of making the type `R` explicit in the definition of `IsSumSqExpl`. Namely that it gives us access to the function [`Subtype`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype), which creates the subtype of sums of squares from the predicate `IsSumSq R : R → Prop`.
-
-This was not necessary earlier, due to the use of the syntax `{S : R // IsSumSq S}`, which is capable of inferring what it needs to construct the required type.
+Evidently, this is not the usual way of formalising such a statement in mathematics. However, it can be probably be said that it is a common method in functional programming. In fact, we can use this to instantiate the class [`Add`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add) on the type `SumSqType`.
 -/
 
-def SumSqType' (R : Type) [Ring R] : Type := Subtype (IsSumSqExpl R)
+def Addition {R : Type} [Semiring R] (S1 S2 : SumSqType R) : SumSqType R := ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩
 
-#check @SumSqType'  -- SumSqType' : (R : Type) → [inst : Ring R] → Type
+instance {R : Type} [Semiring R] : Add (SumSqType R) := ⟨Addition⟩
+
+/-!
+As a consequence, we now have access to the methods of the class `Add`. For example, we can use the notation `+` without declaring it as such for `SumSqType R`.
+-/
+
+def Double {R : Type} [Semiring R] (S : SumSqType R) : SumSqType R := S + S
+
+example {R : Type} [Semiring R] (S : SumSqType R) : Double S = Addition S S := rfl
+
+/-!
+Note that the instantiation can also be done directly, without defining the function `SumSqType.Addition`. And we may give it a name if we want, and/or use a slightly different syntax (`add` is the unique attribute of the class [`Add`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add)).
+-/
+
+instance {R : Type} [Semiring R] : Add (SumSqType R) := ⟨fun S1 S2 => ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩⟩
+
+instance SumSqTypeAddition (R : Type) [Semiring R] : Add (SumSqType R) where add S1 S2 := ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩
+
+/-!
+We conclude this subsection by showing one advantage of making the type `R` explicit in the definition of `IsSumSqExpl`. Namely that it gives us access to the function [`Subtype`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype), which creates the subtype of sums of squares from the predicate `IsSumSq R : R → Prop`.
+
+This was not necessary earlier, due to the use of the syntax `{S : R // IsSumSq S}`, which is capable of inferring what is needed in order to construct the required type.
+-/
+
+def SumSqType' (R : Type) [Semiring R] : Type := Subtype (IsSumSqExpl R)
+
+#check @SumSqType'  -- SumSqType' : (R : Type) → [inst : Semiring R] → Type
 
 #check (⟨0, IsSumSqExpl.zero⟩ : SumSqType' ℤ)
   -- { val := 0, property := (_ : IsSumSqExpl ℤ 0) } : Subtype (IsSumSqExpl ℤ)
@@ -272,7 +307,7 @@ def SumSqType' (R : Type) [Ring R] : Type := Subtype (IsSumSqExpl R)
 Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSumSq S` is equivalent to Proposition `IsSumSq' S`, where `IsSumSq'` is the predicate defined inductively as follows:
 
 ```lean
-inductive IsSumSq' [Semiring R] : R → Prop :=
+inductive IsSumSq' {R : Type} [Semiring R] : R → Prop :=
   | sq (x : R): IsSumSq (x ^ 2 : R)
   | add (S1 S2 : R) (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2)
 ```
@@ -281,7 +316,7 @@ Note that this definition may be more intuitive than the one we gave in [the fir
 
 ### Exercise 2
 
-Let Let `R` be a semiring and let `S` be a term in `R`. Write a (direct) proof of the implication
+Let `R` be a semiring and let `S` be a term in `R`. Write a (direct) proof of the implication
 
 > (∃ L : List R, SumSq L = S) → IsSumSq S
 

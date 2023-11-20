@@ -203,8 +203,6 @@ theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c
 /-!
 ## Exercises
 
-The solutions to some of these exercises are discussed in the file [SumSq.Sols](Sols.md).
-
 ### Exercise 1
 
 Modify the syntax of the `induction` tactic in [`SumSqPermut`](#permuted-lists) to make it look more similar to that of [`SumSqAppend`](#appended-lists). This means: in `SumSqPermut`, replace `induction H` by `induction H with` and make the proof syntactically correct after that (start by changing `⬝ case nil` to `| nil`).

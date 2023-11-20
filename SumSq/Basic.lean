@@ -210,9 +210,9 @@ theorem SumSqSet.Prod [CommSemiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 
 
 -- NEXT IS A COMMENT ON WHAT CHANGES IF THE VARIABLE `R` IS MADE EXPLICIT. Maybe turn this into an exercise instead?
 
-inductive IsSumSq' (R : Type) [Semiring R] : R → Prop :=
-  | zero : IsSumSq' R (0 : R)
-  | add (x S : R) (hS : IsSumSq' R S) : IsSumSq' R (x ^ 2 + S)
+inductive IsSumSqExpl (R : Type) [Semiring R] : R → Prop :=
+  | zero : IsSumSqExpl R (0 : R)
+  | add (x S : R) (hS : IsSumSqExpl R S) : IsSumSqExpl R (x ^ 2 + S)
 
 -- #check (0 : ℤ) ∈ IsSumSq ℤ  -- failed to synthesize instance Membership ℤ Prop
 
@@ -236,7 +236,7 @@ def SumSqType (R : Type) [Semiring R] : Type := {a : R // IsSumSq a}
 
 -- see below for one advantage of making the typ `R` explicit in the definition of `IsSumSq'`
 
-def SumSqType' (R : Type) [Ring R] : Type := Subtype (IsSumSq' R)  -- turn this into an exercise...?
+def SumSqType' (R : Type) [Ring R] : Type := Subtype (IsSumSqExpl R)  -- turn this into an exercise...?
 
 #check SumSqType'
 

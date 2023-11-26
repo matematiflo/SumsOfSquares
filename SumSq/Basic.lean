@@ -281,7 +281,7 @@ By definition of the subtype associated to the predicate `IsSumSq`, a term `S : 
 /-!
 It seems reasonable to imagine that, when it comes to formalising proofs about sums of squares in `R`, it will be less natural for mathematicians to work with the subtype `IsSumSqType R` than with the set `IsSumSqSet R`. For example, when working with subtypes, to say that *the sum of two sums of squares is a sum of squares*, is equivalent to *declaring a function* `SumSqType.Add {R : Type} [Semiring R] : SumSqType R → SumSqType R → SumSqType R`, with `SumSq.Add S1 S2` defined as `⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩`.
 
-As we can see, this is a way of formalising that result that is not so common in mathematics. Instead, it is directly inspired by the methods of functional programming. Exploring those methods further, we can *instantiate a class* on the type `SumSqType`. For example the class [`Add`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add), which will equip the type `SumSqType R` with a function `SumSqType R → SumSqType R → SumSqType R`.
+As we can see, this formalises the desired result, but in a way that is not (yet?) the usual one in mathematics. Instead, it is directly inspired by the methods of functional programming. Exploring those methods further, we can perform other constructions that are common in functional programming and object-oriented programming, such as *instantiating a class* on the type `SumSqType`. For example the class [`Add`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add), which will equip the type `SumSqType R` with a function `SumSqType R → SumSqType R → SumSqType R`.
 -/
 
 def Addition {R : Type} [Semiring R] (S1 S2 : SumSqType R) : SumSqType R := ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩
@@ -313,7 +313,7 @@ Another advantage of defining sums of squares as a subtype is that we can make t
 instance {R : Type} [Semiring R] [Repr R] : Repr (SumSqType R) where
   reprPrec :=
     fun S _ =>
-      repr S.val ++ " is a sum of squares " ++ " because the property IsSumSq " ++ repr S.val ++ " has been proven."
+      repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
 
 def aTermOfSumSqTypeInZ : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
 
@@ -321,7 +321,7 @@ def aTermOfSumSqTypeInZ : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
 #check aTermOfSumSqTypeInZ.2  -- aTermOfSumSqTypeInZ.property : IsSumSq ↑aTermOfSumSqTypeInZ
 
 #eval aTermOfSumSqTypeInZ.1  -- 0
-#eval aTermOfSumSqTypeInZ  -- 0 is a sum of squares  because the property IsSumSq 0 has been proven.
+#eval aTermOfSumSqTypeInZ  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
 
 /-!
 Similarly, we can put a `Decidable` instance on the proposition `IsSumSq (0 : R)`.
@@ -330,13 +330,13 @@ Similarly, we can put a `Decidable` instance on the proposition `IsSumSq (0 : R)
 instance {R : Type} [Semiring R] : Decidable (IsSumSq (0 : R)) :=
   Decidable.isTrue (IsSumSq.zero)
 
-#check IsSumSq (0 : ℤ)
-#eval IsSumSq (0 : ℤ)
+#check IsSumSq (0 : ℤ)  -- IsSumSq 0 : Prop
+#eval IsSumSq (0 : ℤ)  -- true
 
-#eval decide (IsSumSq (0 : ℤ))
+#eval decide (IsSumSq (0 : ℤ))  -- true
 
-#check IsSumSq (0 : R')
-#eval IsSumSq (0 : R')
+#check IsSumSq (0 : R')  -- IsSumSq 0 : Prop
+#eval IsSumSq (0 : R')  -- (kernel) declaration has free variables '_eval'
 
 /-!
 We conclude this subsection by showing one advantage of making the type `R` explicit in the definition of `IsSumSqExpl`. Namely that it gives us access to the function [`Subtype`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype), which creates the subtype of sums of squares from the predicate `IsSumSq R : R → Prop`.

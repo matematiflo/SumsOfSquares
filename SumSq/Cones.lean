@@ -38,7 +38,7 @@ structure Cone' (R : Type) [Ring R] :=
 
 #check @Cone'
 
-def test [Ring R] (P : Cone' R) : P = P := rfl
+def test [Ring R] (P : Cone' R) : P = P := by rfl
 
 -- WE NEED A CLASS!
 
@@ -50,7 +50,7 @@ class Cone (R : Type) [Ring R] : Type :=
 
 #check @Cone
 
-def ConeRefl [Ring R] [P : Cone R] : P = P := rfl
+def ConeRefl [Ring R] [P : Cone R] : P = P := by rfl
 
 -- If I want to prove that the sum of squares is a cone, is it better with structure or with class?
 

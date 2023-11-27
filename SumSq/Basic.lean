@@ -294,7 +294,7 @@ As a consequence, we now have access to the methods of the class `Add`. For exam
 
 def Double {R : Type} [Semiring R] (S : SumSqType R) : SumSqType R := S + S
 
-example {R : Type} [Semiring R] (S : SumSqType R) : Double S = Addition S S := rfl
+example {R : Type} [Semiring R] (S : SumSqType R) : Double S = Addition S S := by rfl
 
 /-!
 Note that the instantiation can also be done directly, without defining the function `Addition`. And we may give it a name if we want, and/or use a slightly different syntax (`add` is the unique attribute of the class [`Add`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add)).

@@ -333,7 +333,7 @@ instance {R : Type} [Semiring R] : Decidable (IsSumSq (0 : R)) :=
 #eval decide (IsSumSq (0 : ℤ))  -- true
 
 #check IsSumSq (0 : R')  -- IsSumSq 0 : Prop
-#eval IsSumSq (0 : R')  -- (kernel) declaration has free variables '_eval'
+-- #eval IsSumSq (0 : R')  -- (kernel) declaration has free variables '_eval'
 ```
 
 We conclude this subsection by showing one advantage of making the type `R` explicit in the definition of `IsSumSqExpl`. Namely that it gives us access to the function [`Subtype`](https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype), which creates the subtype of sums of squares from the predicate `IsSumSq R : R → Prop`.

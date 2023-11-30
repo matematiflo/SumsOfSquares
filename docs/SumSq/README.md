@@ -2,7 +2,7 @@
 
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Florent Schaffhauser
+Authors: Florent Schaffhauser.
 
 We introduce sums of squares and prove some of their basic properties.
 
@@ -17,3 +17,4 @@ For some results, we specialize to rings or fields.
 - [The type of sums of squares](Basic.md)
 - [Precones and cones](Cones.md)
 - Formally real fields
+- [Solutions to the exercises](Sols.md)

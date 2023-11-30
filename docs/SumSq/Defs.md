@@ -99,7 +99,7 @@ We will later prove a theorem that says the following:
 The first function is `L => (L.map (. ^ 2))` and the second function is `L => L.sum`. They can be composed as follows.
 
 ```haskell
-def SumSq2 [Semiring R] (L : List R) : R := (L.map (. ^ 2)).sum
+def SumSq2 {R : Type} [Semiring R] (L : List R) : R := (L.map (. ^ 2)).sum
 ```
 
 As for `SumSq`, this is a computable definition.
@@ -111,7 +111,7 @@ As for `SumSq`, this is a computable definition.
 We now *prove* that the two definitions agree. This means that we define a function that sends a list `L` to a proof that `SumSq2 L = SumSq L`.
 
 ```haskell
-theorem squaring_and_summing [Semiring R] (L : List R) : SumSq2 L = SumSq L := by
+theorem squaring_and_summing {R : Type} [Semiring R] (L : List R) : SumSq2 L = SumSq L := by
   induction L with -- we prove the result by induction on the list L (the type `List R` is an inductive type)
   | nil => rfl -- case when L is the empty list, the two terms are definitionally equal
   | cons a l ih => -- case when L = (a :: l), the two terms reduce to equal ones after some simplifications
@@ -127,7 +127,7 @@ For greater efficiency in computations, we can also give a tail-recursive defini
 As usual for tail-recursive definitions, we start by defining an auxiliary function.
 
 ```haskell
-def SumSqAux [Semiring R] : R → List R → R
+def SumSqAux {R : Type} [Semiring R] : R → List R → R
   | SoFar, [] => SoFar
   | SoFar, (a :: l) => SumSqAux (SoFar + a ^ 2) l
 ```
@@ -135,13 +135,13 @@ def SumSqAux [Semiring R] : R → List R → R
 The following property holds by definition. It will be used in the proof of the equality `SumSqTR L = SumSq L`.
 
 ```haskell
-theorem SumSqAuxZero [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rfl
+theorem SumSqAuxZero {R : Type} [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rfl
 ```
 
 The tail-recursive version of the `SumSq` function is then defined as follows.
 
 ```haskell
-def SumSqTR [Semiring R] : List R → R
+def SumSqTR {R : Type} [Semiring R] : List R → R
   | L => SumSqAux 0 L
 ```
 
@@ -158,7 +158,7 @@ We now want to prove that the two definitions agree, i.e. that
 The idea behind the proof is that, when `S = SumSq L'`, the term  `SumSqAux S L` can be computed in terms of the original function `SumSq`. This idea is formalised in the next result.
 
 ```haskell
-theorem SumSqAuxWithSumSq [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
+theorem SumSqAuxWithSumSq {R : Type} [Semiring R] (L1 : List R) : ∀ L2 : List R, SumSqAux (SumSq L2) L1  = SumSq L2 + SumSq L1 := by
   induction L1 with  -- we prove the result by induction on L1
   | nil => simp [SumSqAux, SumSq]  -- the nil case follows from the definitions of the functions involved
   | cons a l1 ih =>  -- note that the induction hypothesis is for l fixed but for arbitrary L' : List R
@@ -174,10 +174,10 @@ With the help of `SumSqAuxWithSumSq`, we can now prove that the tail-recursive v
 We start with an easy lemma, which is of more general interest.
 
 ```haskell
-lemma SumSqAuxEmptyList [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
+lemma SumSqAuxEmptyList {R : Type} [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
   simp [SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function SumSqAuxGen to get rid of SumSqAux everywhere (on the left, the function SumSqAuxGen is applied to the lists L and [], and on the right it is applied to [] and L)
   simp [SumSq]  -- we finish the proof by computing, using the fact that SumSq [] = 0 (by definition)
 
-theorem def_TR_ok [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
+theorem def_TR_ok {R : Type} [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- the proof is by direct computation
 ```

@@ -7,9 +7,6 @@ Authors: Florent Schaffhauser.
 ```lean
 import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
-import Mathlib.GroupTheory.Submonoid.Basic
-
--- ADD COMMENTS TO PROOFS AND REBUILD GITHUB PAGES, DERIVE MATHLIB VERSION
 ```
 
 Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function `SumSq : List R → R` that computes the sum of squares of the entries of a list:
@@ -150,31 +147,34 @@ We now show that we could also define `IsSumSq S` by asking that it be a return 
 
 > IsSumSq S ↔ (∃ L : List R, SumSq L = S)
 
-We start with the first implication: starting from `S : R` such that `IsSumSq S` has a proof, we want to construct a list `L : List R` such that `SumSq L = S`. Since `IsSumSq S`is defined inductively, we can do this by induction on the proof of the proposition `IsSumSq S`.
+We begin with the first implication: starting from `S : R` such that `IsSumSq S` has a proof, we want to construct a list `L : List R` such that `SumSq L = S`. Since `IsSumSq S`is defined inductively, we can do this by induction on the proof of the proposition `IsSumSq S`.
 
 ```lean
 lemma IsSumSqToExistList {R : Type} [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
-  induction hS with
-  | zero => -- exact ⟨[], rfl⟩
-    use []
-    rfl
-  | add a S' _ ih =>
-    rcases ih with ⟨L', hL'⟩
-    rw [← hL']
-    use (a :: L')
-    rfl
+  induction hS with  -- we prove the result by induction on hS (which is a proof that S is a sum of squares)
+  | zero =>  -- the base case is when S = 0
+    exact ⟨[], rfl⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
+    -- use []  -- instead of exact ⟨[], rfl⟩, we can write use [] followed by rfl
+    -- rfl
+  | add a s _ ih =>  -- the inductive step is when S = a ^2 + s, where s is a sum of squares and the induction hypothesis is that there exists a list L such that SumSq L = s
+    rcases ih with ⟨l, hl⟩  -- we extract from ih a list l such that SumSq l = s
+    rw [← hl]  -- we rewrite the goal using SumSq l = s
+    use (a :: l)  -- We claim that we can use the list L = (a :: l) to show that there exists a list L such thatt SumSq L = a ^ 2 + SumSq l
+    rfl  -- indeed the result is true by definition of the function SumSq
 ```
 
 From this and Lemma `SumSqListIsSumSq` proved in [the first section](#using-an-inductive-predicate), we can prove the equivalence that we wanted.
 
 ```lean
 theorem IsSumSq.Char (R : Type) [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq L = S) := by
-  constructor
-  · apply IsSumSqToExistList
-  · intro h
-    rcases h with ⟨L, hL⟩
-    rw [← hL]
-    exact SumSqListIsSumSq L
+  constructor  -- this tactic splits the equivalence ↔ into two implications
+  · apply IsSumSqToExistList  -- the first implication is proven using the lemma IsSumSqToExistList
+    -- intro hS  -- instead of the apply tactic, we can use intro followed by exact
+    -- exact IsSumSqToExistList S hS
+  · intro h  -- to prove the second implication , let h be a proof of the fact that there exists a list L such that SumSq L = S
+    rcases h with ⟨L, hL⟩  -- we extract from h a list L such that SumSq L = S
+    rw [← hL]  -- we rewrite the goal using SumSq L = S
+    exact SumSqListIsSumSq L  -- we close the goal by applying a lemma that we already proved, which says that SumSq L is of type IsSumSq
 ```
 
 ## As a set

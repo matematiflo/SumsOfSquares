@@ -25,7 +25,7 @@ We now prove that the sum of squares of the list `L1 ++ L2` is equal to the sum 
 > `SumSq (L1 ++ L2) = SumSq L1 + SumSq L2`
 
 ```haskell
-theorem SumSqAppend [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
+theorem SumSqAppend {R : Type} [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
   induction L1 with -- we prove the result by induction on the list L1
   | nil => -- case when L1 is the empty list
     simp [SumSq] -- since [] ++ L2 = L2 by definition of ++, the result follows by definition of SumSq
@@ -114,13 +114,13 @@ Let `L` be a list with entries in a semiring `R`. If `c` is a term of type `R`, 
 Let us define this formally and take a look at a few examples. As we shall see, one has to be precise in the notation, in order for Lean to interpret the command correctly.
 
 ```haskell
-def ListSmul [Semiring R] (c : R) : List R → List R
+def ListSmul {R : Type} [Semiring R] (c : R) : List R → List R
   | [] => []
   | a :: l => (c * a) :: ListSmul c l
 
 infixl:50 " • " => ListSmul
 
-theorem ListSmulMap [Semiring R] (c : R) (L : List R) : (c • L) = L.map (c * .) := by
+theorem ListSmulMap {R : Type} [Semiring R] (c : R) (L : List R) : (c • L) = L.map (c * .) := by
   induction L with
   | nil => simp [ListSmul]  -- the case of the empty list is trivial
   | cons a l ih =>  simp [ListSmul, ih]  -- the case of a list of the form (a :: l) reduces immediately to the induction hypothesis
@@ -187,7 +187,7 @@ Before moving on to the exercises, we give another proof of `theorem SumSqSmul`,
 It is a direct, more computational proof, harder to follow than the original proof (by induction).
 
 ```haskell
-lemma SumSmul2 [Semiring R]  (c : R) (L : List R) : (L.map (c * .)).sum = c * L.sum := by
+lemma SumSmul2 {R : Type} [Semiring R]  (c : R) (L : List R) : (L.map (c * .)).sum = c * L.sum := by
   induction L with
   | nil => simp
   | cons a l ih => simp [mul_add, ih]

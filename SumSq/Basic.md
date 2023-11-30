@@ -34,12 +34,13 @@ By definition of `IsSumSq`, the term `0 : R` is a sum of squares, and if `S : R`
 
 ```lean
 lemma SumSqListIsSumSq {R : Type} [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
-  induction L with
-  | nil =>
-    exact IsSumSq.zero
-  | cons a l ih =>
-    rw [SumSq]
-    exact IsSumSq.add a (SumSq l) ih
+  induction L with  -- by induction on the list L
+  | nil =>  -- the case of the empty list []
+    rw [SumSq]  -- rewrite using SumSq [] = 0
+    exact IsSumSq.zero  -- IsSumSq 0 is a proof that 0 is a sum of squares
+  | cons a l ih =>  -- the case of a list L = (a :: l) where SumSq l is assumed to be a sum of squares
+    rw [SumSq]  -- rewrit using SumSq (a :: l) = a ^2 + SumSq l
+    exact IsSumSq.add a (SumSq l) ih  -- conclude using the induction hypothesis and the property that, if S is a sum of squares, then x ^2 + S is a sum of squares
 ```
 
 Let us give three more examples of simple proofs that a term `S : R` is a sum of squares. Namely, we prove that `0 : R`, `1 : R` and all squares in `R` are sums of squares.
@@ -48,16 +49,15 @@ For more on this, see [Exercise 1](#exercise-1). And for more on Lemma `SumSqLis
 
 ```lean
 lemma zeroIsSumSq {R : Type} [Semiring R] : IsSumSq (0 : R) := by
-  exact IsSumSq.zero
-
-lemma oneIsSumSq {R : Type} [Semiring R] : IsSumSq (1 : R) := by
-  have aux : (1 : R) = (1 ^ 2 + 0) := by simp
-  rw [aux]
-  exact IsSumSq.add 1 0 IsSumSq.zero
+  exact IsSumSq.zero  -- 0 is a sum of squares in R by definition of the type IsSumSq
 
 lemma SquareIsSumSq {R : Type} [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
-  rw [← add_zero (x ^2)]
-  exact IsSumSq.add x 0 IsSumSq.zero
+  rw [← add_zero (x ^2)]  -- rewrite using x ^ 2 = x ^ 2 + 0
+  exact IsSumSq.add x 0 IsSumSq.zero  -- x ^ 2 + 0 is a sum of squares in R by definition of the type IsSumSq (and because we have already proven that 0 is a sum squares)
+
+lemma oneIsSumSq {R : Type} [Semiring R] : IsSumSq (1 : R) := by
+  rw [← one_pow 2]  -- rewrite using 1 = 1 ^ 2
+  exact SquareIsSumSq 1  -- conclude using SquareIsSumSq
 ```
 
 Based on its declaration, the type `IsSumSq` behaves like a `Prop`-valued function on `R`. The only two subtleties are:
@@ -105,26 +105,26 @@ Let us now see how to use induction on the type `IsSumSq` to prove certain prope
 
 ```lean
 theorem IsSumSq.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
-  induction h1 with
-  | zero =>
-    simp
-    exact h2
-  | add a S hS ih =>
-    rw [add_assoc]
-    exact IsSumSq.add a (S + S2) ih
+  induction h1 with  -- we prove that S1 + S2 is a sum of squares in R by induction on h1 (which is a proof that S1 is a sum of squares)
+  | zero =>  -- the first case is S1 = 0, so S1 + S2 = 0
+    simp  -- we simplify 0 + S2 to S2
+    exact h2  -- we conclude using h2
+  | add a S hS ih =>  -- the inductive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S + S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) + S2 is a sum of squares
+    rw [add_assoc]  -- by associativity of addition, the goal is to prove that a ^ 2 + (S + S2) is s sum of squares
+    exact IsSumSq.add a (S + S2) ih  -- since a ^ 2 is a square and (S + S2) is a sum of squares by the induction hypothesis, we conclude using IsSumSq.add
 ```
 
 Likewise, if the semiring `R` is commutative, a product of sums of squares is a sum of squares. As we shall see, the assumption that `R` is commutative is used in our proof when applying [`mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow). We make this apparent via a separate lemma.
 
 ```lean
 lemma IsSumSq.ProdBySumSq {R : Type} [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
-  induction h with
-  | zero =>
-    rw [mul_zero]
-    exact IsSumSq.zero
-  |add a s _ ih =>
-    rw [mul_add, ← mul_pow x a 2]
-    exact IsSumSq.add (x * a) (x ^ 2 * s) ih
+  induction h with  -- we prove that x ^ 2 * S is a sum of squares by induction on h (which is proof that S is a sum of squares)
+  | zero =>  -- the first case is S = 0 so x ^ 2 * S = x ^ 2 * 0
+    rw [mul_zero]  -- we simplify x ^ 2 * 0 to 0
+    exact IsSumSq.zero  -- we conclude using the fact that 0 is a sum of squares
+  |add a s _ ih =>  -- the inducive step is the case S = a ^ 2 + s, where s is a sum of squares and the induction hypothesis is that (x ^ 2 * s) is a sum of squares: the goal is to prove that x ^ 2 * (a ^ 2 + s) is a sum of squares
+    rw [mul_add, ← mul_pow x a 2]  -- rewrite using x ^ 2 * (a ^ 2 + s) = (x * a) ^ 2 + x ^ 2 * s
+    exact IsSumSq.add (x * a) (x ^ 2 * s) ih  -- since (x * a) ^ 2 is a square and (x ^ 2 *  s) is a sum of squares by the induction hypothesis, we conclude using IsSumSq.add
 ```
 
 We can now prove that, indeed, a product of sums of squares is a sum of squares:

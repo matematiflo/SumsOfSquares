@@ -9,7 +9,7 @@ import SumSq.Defs
 import Mathlib.Algebra.GroupPower.Basic
 import Mathlib.GroupTheory.Submonoid.Basic
 
--- ADD COMMENTS TO PROOFS AND REBUILD GITHUB PAGES...
+-- ADD COMMENTS TO PROOFS AND REBUILD GITHUB PAGES, DERIVE MATHLIB VERSION
 ```
 
 Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function `SumSq : List R → R` that computes the sum of squares of the entries of a list:

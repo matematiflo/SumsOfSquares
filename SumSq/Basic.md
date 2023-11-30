@@ -106,20 +106,20 @@ Let us now see how to use induction on the type `IsSumSq` to prove certain prope
 ```lean
 theorem IsSumSq.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
   induction h1 with  -- we prove that S1 + S2 is a sum of squares in R by induction on h1 (which is a proof that S1 is a sum of squares)
-  | zero =>  -- the first case is S1 = 0, so S1 + S2 = 0
+  | zero =>  -- the base step is S1 = 0, so S1 + S2 = 0
     simp  -- we simplify 0 + S2 to S2
     exact h2  -- we conclude using h2
   | add a S hS ih =>  -- the inductive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S + S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) + S2 is a sum of squares
-    rw [add_assoc]  -- by associativity of addition, the goal is to prove that a ^ 2 + (S + S2) is s sum of squares
+    rw [add_assoc]  -- rewrite using (a ^ 2 + S) + S2 = a ^ 2 + (S + S2)
     exact IsSumSq.add a (S + S2) ih  -- since a ^ 2 is a square and (S + S2) is a sum of squares by the induction hypothesis, we conclude using IsSumSq.add
 ```
 
 Likewise, if the semiring `R` is commutative, a product of sums of squares is a sum of squares. As we shall see, the assumption that `R` is commutative is used in our proof when applying [`mul_pow`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow). We make this apparent via a separate lemma.
 
 ```lean
-lemma IsSumSq.ProdBySumSq {R : Type} [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
-  induction h with  -- we prove that x ^ 2 * S is a sum of squares by induction on h (which is proof that S is a sum of squares)
-  | zero =>  -- the first case is S = 0 so x ^ 2 * S = x ^ 2 * 0
+lemma IsSumSq.ProdSqBySumSq {R : Type} [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
+  induction h with  -- we prove that x ^ 2 * S is a sum of squares by induction on h (which is a proof that S is a sum of squares)
+  | zero =>  -- the base step is S = 0 so x ^ 2 * S = x ^ 2 * 0
     rw [mul_zero]  -- we simplify x ^ 2 * 0 to 0
     exact IsSumSq.zero  -- we conclude using the fact that 0 is a sum of squares
   |add a s _ ih =>  -- the inducive step is the case S = a ^ 2 + s, where s is a sum of squares and the induction hypothesis is that (x ^ 2 * s) is a sum of squares: the goal is to prove that x ^ 2 * (a ^ 2 + s) is a sum of squares
@@ -133,15 +133,15 @@ We can now prove that, indeed, a product of sums of squares is a sum of squares:
 
 ```lean
 theorem IsSumSq.Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 * S2) := by
-  induction h1 with
-  | zero =>
-    rw [zero_mul]
-    exact IsSumSq.zero
-  | add a S hS ih =>
-    rw [add_mul]
-    apply IsSumSq.Sum _ _
-    · exact IsSumSq.ProdBySumSq h2
-    · exact ih
+  induction h1 with  -- we prove that S1 * S2 is a sum of squares by induction on h (which is a proof that S1 is a sum of squares)
+  | zero =>  -- -- the base step is S1 = 0 so S1 * S2 = 0 * S2
+    rw [zero_mul]  -- we simplify 0 * S2 to 0
+    exact IsSumSq.zero  -- we conclude using the fact that 0 is a sum of squares
+  | add a S hS ih =>  -- the inducive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S * S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) * S2 is a sum of squares
+    rw [add_mul]  -- rewrite using (a ^ 2 + S) * S2 = a ^ 2 * S2 + S * S2
+    apply IsSumSq.Sum _ _  -- since a sum of sums of squares is a sum of squares, in order to prove that (a ^ 2 * S2) + (S * S2) is a sum of squares, it suffices to prove that (a ^ 2 * S2) and (S * S2) are both sums of squares
+    · exact IsSumSq.ProdSqBySumSq h2  -- the fact that (a ^ 2 * S2) is a sum of squares when S2 is a sum of squares was proved in IsSumSq.ProdSqBySumSq
+    · exact ih  -- the fact that (S * S2) is a sum of squares is the induction hypothesis
 ```
 
 ## Using an existential predicate
@@ -234,8 +234,8 @@ We can now rewrite the theorems above in set-theoretic notation. All of them hav
 theorem SumSqSet.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) : (S1 + S2) ∈ SumSqSet R  := by
   exact IsSumSq.Sum h1 h2
 
-lemma SumSqSet.ProdBySumSq {R : Type} [CommSemiring R] {S : R} (h : S ∈ SumSqSet R) {x : R} : (x ^2 * S) ∈ SumSqSet R := by
-  exact IsSumSq.ProdBySumSq h
+lemma SumSqSet.ProdSqBySumSq {R : Type} [CommSemiring R] {S : R} (h : S ∈ SumSqSet R) {x : R} : (x ^2 * S) ∈ SumSqSet R := by
+  exact IsSumSq.ProdSqBySumSq h
 
 theorem SumSqSet.Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) :(S1 * S2) ∈ SumSqSet R := by
   exact IsSumSq.Prod h1 h2

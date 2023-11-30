@@ -1,5 +1,4 @@
 /build
-/lakefile.olean
-/lake-packages/*
+/.lake
 /MWE.lean
 /WorkInProgress

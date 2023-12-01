@@ -19,3 +19,7 @@ For some results, we specialize to rings or fields.
 - [The type of sums of squares](SumSq/Basic.html)
 - Precones and cones
 - Formally real fields
+
+## GitHub repository
+
+The [SumsOfSquares](https://github.com/matematiflo/SumsOfSquares) repo (Lean package).

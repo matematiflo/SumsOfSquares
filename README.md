@@ -9,7 +9,7 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 - [The type of sums of squares](SumSq/Basic.md)
 - [Precones and cones](SumSq/Cones.md)
 - Formally real fields
-- [Solutions to the exercises](SumSq/Sols.md)
+- [Exercises](SumSq/Exercises.md)
 
 ## Quickstart
 

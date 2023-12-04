@@ -291,7 +291,7 @@ Note that the instantiation can also be done directly, without defining the func
 ```haskell
 instance {R : Type} [Semiring R] : Add (SumSqType R) := ⟨fun S1 S2 => ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩⟩
 
-instance SumSqTypeAddition (R : Type) [Semiring R] : Add (SumSqType R) where add S1 S2 := ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩
+instance SumSqTypeAddition {R : Type} [Semiring R] : Add (SumSqType R) where add S1 S2 := ⟨S1.val + S2.val, IsSumSq.Sum S1.property S2.property⟩
 ```
 
 Another advantage of defining sums of squares as a subtype is that we can make the type `SumSqType R` an instance of the `Repr` class, making it possible to use `#eval` on terms of type `SumSqType ℤ` or `SumSqType ℚ` (all terms of type `SumSqType R` where `R` is a *concrete* type).
@@ -313,7 +313,7 @@ def aTermOfSumSqTypeInZ : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
 #eval aTermOfSumSqTypeInZ  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
 ```
 
-Similarly, we can put a `Decidable` instance on the proposition `IsSumSq (0 : R)`.
+Similarly, we can register a `Decidable` instance on the proposition `IsSumSq (0 : R)`.
 
 ```haskell
 instance {R : Type} [Semiring R] : Decidable (IsSumSq (0 : R)) :=

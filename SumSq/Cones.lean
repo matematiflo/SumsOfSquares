@@ -8,6 +8,8 @@ Authors: Florent Schaffhauser.
 
 import SumSq.Defs
 import SumSq.Basic
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.FieldSimp
 
 /-!
 We defines precones, etc. and show that **in a real field (ring?)** sums of squares form a precone. CAREFUL with pre-existing notions of cone,l positive cone, etc in Mathlib
@@ -29,7 +31,100 @@ in a field: **cones in F ↔ orderings on F**  -- That's until later...
 in a ring: prime cones with support P in R ↔ orderings of Frac(R/P)  -- also later
 -/
 
-class IsCone {R : Type} [Ring R] (P : Set R) : Prop where
+open Set
+
+class Set.IsPreCone {R : Type} [Ring R] (P : Set R) : Prop where
+  add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
+  mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
+  sq : ∀ (x : R), x ^ 2 ∈ P
+  minus : (-1 : R) ∉ P
+
+-- note that the axiom -1 ∉ P does not make sense in a semiring
+
+theorem zero_in_precone {R : Type} [Ring R]  {P : Set R} [IsPreCone P] : 0 ∈ P := by
+  have aux : (0 : R) ^ 2 ∈ P := IsPreCone.sq (0 : R)
+  simp at aux
+  exact aux
+
+theorem one_in_precone {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 1 ∈ P := by
+  have aux : (1 : R) ^ 2 ∈ P := IsPreCone.sq (1 : R)
+  simp at aux
+  exact aux
+
+def supp {R : Type} [Ring R] (P : Set R) [IsPreCone P] : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
+
+lemma zero_in_supp {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 0 ∈ supp P := by
+  constructor
+  · exact zero_in_precone
+  · simp; exact zero_in_precone
+
+lemma PreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] (x : R) : x ∈ P ∧ -x ∈ P → x = 0 := by
+  intro ⟨h1, h2⟩
+  by_contra hx
+  suffices new : -1 ∈ P
+  · exact IsPreCone.minus new
+  · have aux1 : x * (-x) ∈ P := by
+      apply IsPreCone.mul _ _
+      exact ⟨h1, h2⟩
+    ring_nf at aux1
+    have aux2 : (1 / x) ^ 2 ∈ P := by
+      apply IsPreCone.sq
+    ring_nf at aux2
+    have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
+      apply IsPreCone.mul _ _
+      exact ⟨aux1, aux2⟩
+    field_simp at aux3
+    exact aux3
+
+theorem SuppPreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] : supp P = {0} := by
+  ext x; simp
+  constructor
+  · intro h
+    exact PreConeInField P x h
+  · intro h
+    rw [h]
+    exact zero_in_supp
+
+inductive PreConeAddTerm {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
+| comb (x y : R) (hx : x ∈ P) (hy : y ∈ P): PreConeAddTerm P a (x + a * y)
+
+notation:max P"["a"]" => PreConeAddTerm P a
+
+theorem PreConeAddTermIsPreCone {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
+  constructor
+  · intro x y h
+    rcases h with ⟨hx, hy⟩
+    rcases hx with ⟨u, v, hu, hv⟩
+    rcases hy with ⟨p, q, hp, hq⟩
+    have aux : u + a * v + (p + a * q) = (u + p) + a * (v + q) := by
+      rw [add_assoc, ← add_assoc _ p _, add_assoc u _ _, add_comm _ p, mul_add, add_assoc p _ _]
+    rw [aux]
+    apply PreConeAddTerm.comb
+    · apply IsPreCone.add u p ⟨hu, hp⟩
+    · apply IsPreCone.add v q ⟨hv, hq⟩
+  · intro x y h
+    rcases h with ⟨hx, hy⟩
+    rcases hx with ⟨u, v, hu, hv⟩
+    rcases hy with ⟨p, q, hp, hq⟩
+    sorry
+  · intro x
+    have aux1 : x ^ 2 ∈ P := IsPreCone.sq x
+    suffices aux2 : x ^ 2 + a * 0 ∈ P[a]
+    rw [mul_zero, add_zero] at aux2
+    exact aux2
+    exact PreConeAddTerm.comb (x ^ 2) 0 aux1 zero_in_precone
+  · by_contra aux1
+    apply ha
+    have aux2 : ∃ u ∈ P, ∃ v ∈ P, -1 = u + a * v := by
+      sorry
+    rcases aux2 with ⟨u, hu, v, hv, h⟩
+    sorry
+
+class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
+  pre : IsPreCone P
+  tot : ∀ x : R, x ∈ P ∨ -x ∈ P
+
+class Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
   zero : 0 ∈ P
   -- add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
   -- mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
@@ -39,8 +134,11 @@ class IsCone {R : Type} [Ring R] (P : Set R) : Prop where
 
 -- this has the desired behaviour (in particular, `IsCone (SumSqSet ℤ)` is recognized as a term of type Prop)
 
+
 #check @IsCone
 #check IsCone (SumSqSet ℤ)
+#check (SumSqSet ℤ).IsCone
+
 
 -- we put a cone instance on the set of sums of squares in a (semi)ring R; now everything we prove about cones will be true for the set of sums of squares? (which would not be true if we declared a theorem instead of an instance?) -- NEED AN EXAMPLE OF THIS See below :-)
 -- Note: the same procedure but with structure instead of class generates a non-class instance error report in lint
@@ -91,7 +189,7 @@ example : 0 ∈ SumSqSet ℤ := by
 
 -- this suggests that declaring Cone as a type is not absolutely necessary (however, it is convenient; for example in order to register a membership instance, which is in fact used in the statement of the variant lemma... showing that it is useful to define the type of cones and that also that when we instantiate IsCone P in a declaration, then the membership instance registred on P is recognized automatically).
 
--- we could also have incorporated
+-- we could also have incorporated P in the def of the class IsCone. This time, it produces a type of Sort 1 (because Set R is of Sort 1).
 
 class Cone' (R : Type) [Ring R] :=
   P : Set R

@@ -97,7 +97,7 @@ lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a :
   simp
   exact hx
 
-theorem PreConeAddElemIsPreCone {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
+theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
   constructor
   · intro x y h
     rcases h with ⟨hx, hy⟩
@@ -143,9 +143,38 @@ theorem PreConeAddElemIsPreCone {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a
     apply PreConeInPreConeAddElem
     exact aux
   · by_contra aux
-    apply ha
     rcases aux with ⟨x, hx, y, hy, h⟩
-    sorry
+    by_cases hy' : y = 0
+    · suffices aux : (-1 ∈ P) from IsPreCone.minus aux
+      simp [hy'] at h
+      rw [← h] at hx
+      exact hx
+    · apply ha
+      push_neg at hy'
+      have aux : -a = (1 + x) * y * (1 / y) ^ 2 := by
+        field_simp
+        have aux1 : -1 = x + a * y → -y = x * y + a * y ^ 2 := by
+          intro h
+          rw [neg_eq_neg_one_mul, h]
+          ring
+        have aux2 : -y = x * y + a * y ^ 2 → (1 + x) * y = -(a * y ^ 2) := by
+          intro aux'
+          ring_nf at aux'
+          ring_nf
+          rw [neg_eq_neg_one_mul, neg_mul, mul_comm, ← mul_neg] at aux'
+          sorry
+        have aux3 : -y = x * y + a * y ^ 2 := aux1 h
+        have aux4 := aux2 aux3
+        rw [aux4]
+      rw [aux]
+      apply IsPreCone.mul
+      constructor
+      · apply IsPreCone.mul
+        constructor
+        · apply IsPreCone.add
+          exact ⟨one_in_precone, hx⟩
+        · exact hy
+      · apply IsPreCone.sq
 
 class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
   pre : IsPreCone P

@@ -85,44 +85,73 @@ theorem SuppPreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] : supp
     rw [h]
     exact zero_in_supp
 
-inductive PreConeAddTerm {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
-| comb (x y : R) (hx : x ∈ P) (hy : y ∈ P): PreConeAddTerm P a (x + a * y)
+def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
+{z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
-notation:max P"["a"]" => PreConeAddTerm P a
+notation:max P"["a"]" => PreConeAddElem P a
 
-theorem PreConeAddTermIsPreCone {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
+lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) : P ≤ P[a] := by
+  intro x hx
+  use x; constructor; swap
+  use 0; constructor; exact zero_in_precone
+  simp
+  exact hx
+
+theorem PreConeAddElemIsPreCone {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
   constructor
   · intro x y h
     rcases h with ⟨hx, hy⟩
-    rcases hx with ⟨u, v, hu, hv⟩
-    rcases hy with ⟨p, q, hp, hq⟩
+    rcases hx with ⟨u, hu, v, hv, hx⟩
+    rcases hy with ⟨p, hp, q, hq, hy⟩
     have aux : u + a * v + (p + a * q) = (u + p) + a * (v + q) := by
       rw [add_assoc, ← add_assoc _ p _, add_assoc u _ _, add_comm _ p, mul_add, add_assoc p _ _]
-    rw [aux]
-    apply PreConeAddTerm.comb
-    · apply IsPreCone.add u p ⟨hu, hp⟩
-    · apply IsPreCone.add v q ⟨hv, hq⟩
+    rw [hx, hy, aux]
+    have hup : u + p ∈ P := by
+      apply IsPreCone.add
+      exact ⟨hu, hp⟩
+    have hvq : v + q ∈ P := by
+      apply IsPreCone.add
+      exact ⟨hv, hq⟩
+    use u + p
+    constructor
+    swap
+    use v + q
+    assumption
   · intro x y h
     rcases h with ⟨hx, hy⟩
-    rcases hx with ⟨u, v, hu, hv⟩
-    rcases hy with ⟨p, q, hp, hq⟩
-    sorry
+    rcases hx with ⟨u, hu, v, hv, hx⟩
+    rcases hy with ⟨p, hp, q, hq, hy⟩
+    rw [hx, hy]
+    have aux : (u + a * v) * (p + a * q) = (u * p + a ^ 2 * (v * q)) +  a * (u * q + v * p) := sorry
+    rw [aux]
+    use u * p + a ^ 2 * (v * q); constructor; swap
+    use u * q + v * p; constructor; swap
+    · rw [← aux]
+    · apply IsPreCone.add
+      constructor
+      · apply IsPreCone.mul; exact ⟨hu, hq⟩
+      · apply IsPreCone.mul; exact ⟨hv, hp⟩
+    · apply IsPreCone.add
+      constructor
+      · apply IsPreCone.mul; exact ⟨hu, hp⟩
+      · apply IsPreCone.mul
+        constructor
+        · exact IsPreCone.sq a
+        · apply IsPreCone.mul; exact ⟨hv, hq⟩
   · intro x
-    have aux1 : x ^ 2 ∈ P := IsPreCone.sq x
-    suffices aux2 : x ^ 2 + a * 0 ∈ P[a]
-    rw [mul_zero, add_zero] at aux2
-    exact aux2
-    exact PreConeAddTerm.comb (x ^ 2) 0 aux1 zero_in_precone
-  · by_contra aux1
+    have aux : x ^ 2 ∈ P := IsPreCone.sq x
+    apply PreConeInPreConeAddElem
+    exact aux
+  · by_contra aux
     apply ha
-    have aux2 : ∃ u ∈ P, ∃ v ∈ P, -1 = u + a * v := by
-      sorry
-    rcases aux2 with ⟨u, hu, v, hv, h⟩
+    rcases aux with ⟨x, hx, y, hy, h⟩
     sorry
 
 class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
   pre : IsPreCone P
   tot : ∀ x : R, x ∈ P ∨ -x ∈ P
+
+-- need to register a IsPreCone intance on IsCone manually? does it even make sense?
 
 class Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
   zero : 0 ∈ P

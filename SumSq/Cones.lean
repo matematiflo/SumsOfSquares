@@ -151,7 +151,9 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
       exact hx
     · apply ha
       push_neg at hy'
-      have aux : -a = (1 + x) * y * (1 / y) ^ 2 := by
+      have aux : -a = (1 + x) * y * (1 / y) ^ 2 :=
+
+      by
         field_simp
         have aux1 : -1 = x + a * y → -y = x * y + a * y ^ 2 := by
           intro h
@@ -162,6 +164,7 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
           ring_nf at aux'
           ring_nf
           rw [neg_eq_neg_one_mul, neg_mul, mul_comm, ← mul_neg] at aux'
+          simp at aux'
           sorry
         have aux3 : -y = x * y + a * y ^ 2 := aux1 h
         have aux4 := aux2 aux3

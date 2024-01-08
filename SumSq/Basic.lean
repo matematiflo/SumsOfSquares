@@ -37,7 +37,7 @@ lemma SumSqListIsSumSq {R : Type} [Semiring R] (L : List R) : IsSumSq (SumSq L) 
     rw [SumSq]  -- rewrite using SumSq [] = 0
     exact IsSumSq.zero  -- IsSumSq 0 is a proof that 0 is a sum of squares
   | cons a l ih =>  -- the case of a list L = (a :: l) where SumSq l is assumed to be a sum of squares
-    rw [SumSq]  -- rewrit using SumSq (a :: l) = a ^2 + SumSq l
+    rw [SumSq]  -- rewrite using SumSq (a :: l) = a ^2 + SumSq l
     exact IsSumSq.add a (SumSq l) ih  -- conclude using the induction hypothesis and the property that, if S is a sum of squares, then x ^2 + S is a sum of squares
 
 /-!

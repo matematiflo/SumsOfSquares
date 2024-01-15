@@ -33,7 +33,7 @@ in a ring: prime cones with support P in R ↔ orderings of Frac(R/P)  -- also l
 
 -- Declaring `IsPreCone` as `Set.IsPreCone` enables one to use the syntax `P.IsPreCone` for `Set.IsPreCone P` if `P` is a set (i.e. a  predicate on some type `R`).
 
-class Set.IsPreCone {R : Type} [Ring R] (P : Set R) : Prop where
+structure Set.IsPreCone {R : Type} [Ring R] (P : Set R) : Prop where
   add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
   mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
   sq : ∀ (x : R), x ^ 2 ∈ P
@@ -43,21 +43,20 @@ class Set.IsPreCone {R : Type} [Ring R] (P : Set R) : Prop where
 
 #check {x : ℤ | x = 0}.IsPreCone
 
--- The command `open Set` enables one to use just use `IsPreCone` in order to call the function `Set.IsPreCone`
+-- The command `open Set` enables one to use just use `IsPreCone` in order to call the function Set.IsPreCone
 
 open Set
 
 #check IsPreCone
 #check IsPreCone.sq
 
--- Comparing the above with the file were `Set.IsPreCone` is define as a structure, we see that the function `Set.IsPreCone` is of the same typ in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as an instance parameter (overloaded function), while when using structure, it takes it as a variable parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using structure is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
+-- Comparing the above with the file were `Set.IsPreCone` is define as a class, we see that the function `Set.IsPreCone` is of the same type in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as a class instance (overloaded function), while when using structure, it takes it as a parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using `structure` is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
 
 -- On the other hand, the proof that a certain set is a precone can be written in the same way, using the `constructor` tactic, regardless of whether we use the a class or a structure.
 
 -- parameters: we have variable parameters, implicit parameters and instance parameters
 
-
-example : IsPreCone {S : ℤ | IsSumSq S} := by {
+example : {S : ℤ | IsSumSq S}.IsPreCone := by {
   constructor
   pick_goal 3
   · intro x
@@ -68,59 +67,80 @@ example : IsPreCone {S : ℤ | IsSumSq S} := by {
   · sorry
 }
 
-theorem zero_in_precone {R : Type} [Ring R] {P : Set R} [P.IsPreCone] : 0 ∈ P := by
-  have aux : (0 : R) ^ 2 ∈ P := IsPreCone.sq (0 : R)
+theorem zero_in_precone {R : Type} [Ring R] {P : Set R} (hP : IsPreCone P) : 0 ∈ P := by
+  have aux := IsPreCone.sq hP (0 : R)
   simp at aux
   exact aux
 
-theorem one_in_precone {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 1 ∈ P := by
-  have aux : (1 : R) ^ 2 ∈ P := IsPreCone.sq (1 : R)
+theorem one_in_precone {R : Type} [Ring R] {P : Set R} (hP : P.IsPreCone) : 1 ∈ P := by
+  have aux : (1 : R) ^ 2 ∈ P := IsPreCone.sq hP (1 : R)
   simp at aux
   exact aux
 
-def supp {R : Type} [Ring R] (P : Set R) [IsPreCone P] : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
+-- def supp {R : Type} [Ring R] (P : Set R) : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
 
-lemma zero_in_supp {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 0 ∈ supp P := by
+-- The `supp` function above is not constrained enough (we are not restricting ourselves to support of *precones*). There should be a `supp` class and we should instantiate the type of precones (which we have not defined... how should we do it?) by saying what the support *of a precone* is.
+
+
+def PreConeIn (R : Type) [Ring R] : Type := {P : Set R // P.IsPreCone}
+
+instance {R : Type} [Ring R] : Membership R (PreConeIn R) where
+  mem x P := x ∈ P.val
+
+class support (α : Type) (β : Type) : Type where
+  supp (a : α) : Set β
+
+#check support.supp
+
+instance {R : Type} [Ring R] : support (PreConeIn R) R where
+  supp P := {x : R | x ∈ P ∧ (-x) ∈ P}
+
+def supp {α : Type} {β : Type} [support α β] (a : α) : Set β := support.supp a
+
+-- instance (R : Type) [Ring R] : Membership R (support (PreConeIn R) R)where
+--   mem x S := x ∈ supp S
+
+#check @supp
+
+lemma zero_in_supp {R : Type} [Ring R] (P : PreConeIn R) : (0 : R) ∈ supp P := by
   constructor
-  · exact zero_in_precone
-  · simp; exact zero_in_precone
+  · exact zero_in_precone P.prop
+  · simp; exact zero_in_precone P.prop
 
-lemma PreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] (x : R) : x ∈ P ∧ -x ∈ P → x = 0 := by
+lemma PreConeInField {R : Type} [Field R] {P : Set R} (hP : P.IsPreCone) {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by
   intro ⟨h1, h2⟩
   by_contra hx
   suffices new : -1 ∈ P
-  · exact IsPreCone.minus new
+  · exact IsPreCone.minus hP new
   · have aux1 : x * (-x) ∈ P := by
-      apply IsPreCone.mul _ _
-      exact ⟨h1, h2⟩
+      exact IsPreCone.mul hP _ _ ⟨h1, h2⟩
     ring_nf at aux1
     have aux2 : (1 / x) ^ 2 ∈ P := by
-      apply IsPreCone.sq
+      apply IsPreCone.sq hP
     ring_nf at aux2
     have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
-      apply IsPreCone.mul _ _
-      exact ⟨aux1, aux2⟩
+      apply IsPreCone.mul hP _ _ ⟨aux1, aux2⟩
     field_simp at aux3
     exact aux3
 
-theorem SuppPreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] : supp P = {0} := by
+theorem SuppPreConeInField {R : Type} [Field R] (P : PreConeIn R) : supp P = {(0 : R)} := by
   ext x; simp
   constructor
   · intro h
-    exact PreConeInField P x h
+    exact PreConeInField P.prop h
   · intro h
     rw [h]
-    exact zero_in_supp
+    exact zero_in_supp P
 
 def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
 notation:max P"["a"]" => PreConeAddElem P a
 
-lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) : P ≤ P[a] := by
+lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) (hP : P.IsPreCone) (a : R) : P ≤ P[a] := by
   intro x hx
   use x; constructor; swap
-  use 0; constructor; exact zero_in_precone
+  use 0; constructor; exact zero_in_precone hP
   simp
   exact hx
 
@@ -207,12 +227,12 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
       · apply IsPreCone.sq
 
 class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
-  pre : IsPreCone P
+  pre : P.IsPreCone
   tot : ∀ x : R, x ∈ P ∨ -x ∈ P
 
--- need to register a IsPreCone intance on IsCone manually? does it even make sense?
+-- need to register a IsPreCone intance on IsCone manually? is it possible? does it even make sense?
 
-class Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
+structure Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
   zero : 0 ∈ P
   -- add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
   -- mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
@@ -231,7 +251,7 @@ class Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
 -- we put a cone instance on the set of sums of squares in a (semi)ring R; now everything we prove about cones will be true for the set of sums of squares? (which would not be true if we declared a theorem instead of an instance?) -- NEED AN EXAMPLE OF THIS See below :-)
 -- Note: the same procedure but with structure instead of class generates a non-class instance error report in lint
 
-instance SumSqCone {R : Type} [Ring R] : IsCone (SumSqSet R) := ⟨zeroIsSumSq⟩
+instance SumSqCone {R : Type} [Ring R] : (SumSqSet R).IsCone := ⟨zeroIsSumSq⟩
 -- by {constructor; exact zeroIsSumSq}
 
 -- the term defined in SumSqCone is a proof of the fact that SumSqSet R is a cone in R
@@ -260,7 +280,7 @@ lemma zeroInCone {R : Type} [Ring R] (P : Cone R) : 0 ∈ P := P.property.zero
 example : 0 ∈ SumSqSet ℤ := by
   -- let aux : Cone ℤ := ⟨SumSqSet ℤ, inferInstance⟩
   -- exact zeroInCone aux
-  exact zeroInCone ⟨SumSqSet ℤ, inferInstance⟩
+  exact zeroInCone ⟨SumSqSet ℤ, SumSqCone⟩
 
 -- Note that ⟨SumSqSet ℤ, inferInstance⟩ ceases to work (with inferInstance) if we replace SumSqSet ℤ by IsSumSq or IsSumSqExpl ℤ, or setOf IsSumSq (ℤ). This is probably due to the way we have done things, but it is still interesting.
 

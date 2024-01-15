@@ -107,30 +107,29 @@ lemma zero_in_supp {R : Type} [Ring R] (P : PreConeIn R) : (0 : R) ∈ supp P :=
   · exact zero_in_precone P.prop
   · simp; exact zero_in_precone P.prop
 
-lemma PreConeInField {R : Type} [Field R] {P : Set R} (hP : P.IsPreCone) {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by
+lemma PreConeInField {R : Type} [Field R] {P : PreConeIn R} {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by {
   intro ⟨h1, h2⟩
   by_contra hx
-  suffices new : -1 ∈ P
-  · exact IsPreCone.minus hP new
-  · have aux1 : x * (-x) ∈ P := by
-      exact IsPreCone.mul hP _ _ ⟨h1, h2⟩
+  suffices aux : -1 ∈ P
+  · apply IsPreCone.minus P.prop aux
+  · have aux1 : x * (-x) ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨h1, h2⟩}
     ring_nf at aux1
-    have aux2 : (1 / x) ^ 2 ∈ P := by
-      apply IsPreCone.sq hP
+    have aux2 : (1 / x) ^ 2 ∈ P := by {apply IsPreCone.sq P.prop}
     ring_nf at aux2
-    have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
-      apply IsPreCone.mul hP _ _ ⟨aux1, aux2⟩
+    have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨aux1, aux2⟩}
     field_simp at aux3
     exact aux3
+}
 
-theorem SuppPreConeInField {R : Type} [Field R] (P : PreConeIn R) : supp P = {(0 : R)} := by
+theorem SuppPreConeInField {R : Type} [Field R] (P : PreConeIn R) : supp P = {(0 : R)} := by {
   ext x; simp
   constructor
   · intro h
-    exact PreConeInField P.prop h
+    apply PreConeInField h
   · intro h
     rw [h]
-    exact zero_in_supp P
+    apply zero_in_supp P
+}
 
 def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
@@ -144,7 +143,7 @@ lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) (hP : P.IsPreCone)
   simp
   exact hx
 
-theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
+theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : PreConeIn R) (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
   constructor
   · intro x y h
     rcases h with ⟨hx, hy⟩
@@ -199,7 +198,6 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
     · apply ha
       push_neg at hy'
       have aux : -a = (1 + x) * y * (1 / y) ^ 2 :=
-
       by
         field_simp
         have aux1 : -1 = x + a * y → -y = x * y + a * y ^ 2 := by
@@ -226,7 +224,7 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
         · exact hy
       · apply IsPreCone.sq
 
-class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
+structure Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
   pre : P.IsPreCone
   tot : ∀ x : R, x ∈ P ∨ -x ∈ P
 

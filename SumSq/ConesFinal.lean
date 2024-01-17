@@ -139,12 +139,23 @@ theorem SuppPreConeInField {R : Type} [Field R] (P : PreCone R) : supp P = {0} :
     rw [h]
     exact zero_in_supp P
 
-def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
+def AddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
-notation:max P"["a"]" => PreConeAddElem P a
+def PreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : Set R :=
+AddElem P.carrier a
 
--- already need an LE instance on PreCone R?
+notation:max P"["a"]" => AddElem P a  -- introduced too soon? actually, this is just an `AddElem`, sort of...
+
+notation: max P"["a"]" => PreConeAddElem P a  -- introduced too soon? actually, this is just an `AddElem`, sort of...
+
+-- already need an LE instance on PreCone R? would be better in order to state the following result (look for it in the ConesThirdTry file or something...)
+
+variable (P' : PreCone ℚ)
+
+#check P'.carrier[(0:ℚ)]
+#check P'[(0 : ℚ)]
+#check P'[0]  -- if we want to avoid this problem, we need a well-written adjunction class...
 
 lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : P.carrier ≤ P.carrier[a] := by {
   intro x hx

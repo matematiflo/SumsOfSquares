@@ -53,6 +53,7 @@ instance {R : Type} [Ring R] : Membership R (PreConeIn R) where
 #check PreConeIn.sq
 
 -- Comparing the above with the file were `Set.IsPreCone` is define as a class, we see that the function `Set.IsPreCone` is of the same type in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as a class instance (overloaded function), while when using structure, it takes it as a parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using `structure` is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
+-- Subsequent note: in the end, it is not so clear that structure is better than class. So ok, the only relevant question when trying to choose between structure and class is: do we intend to instantiate the notion at hand?
 
 -- On the other hand, the proof that a certain set is a precone can be written in the same way, using the `constructor` tactic, regardless of whether we use the a class or a structure.
 
@@ -113,14 +114,12 @@ theorem SuppPreConeInField {R : Type} [Field R] (P : PreConeIn R) : supp P = {(0
 def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
-notation:max P"["a"]" => PreConeAddElem P a
-
 -- need an LE instance on PreCone?
 
 instance {R : Type} [Ring R] : LE (PreConeIn R) where
   le P1 P2 := P1.carrier ≤ P2.carrier
 
-lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreConeIn R) (a : R) : P.carrier ≤ P.carrier[a] := by
+lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreConeIn R) (a : R) : P.carrier ≤ PreConeAddElem P.carrier a := by
   intro z hz
   use z; constructor; exact hz
   use 0; constructor; exact zero_in_precone P
@@ -130,8 +129,7 @@ lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreConeIn R) (a : R) : P.
 
 def PreCone {R : Type} [Field R] (P : PreConeIn R) (a : R) (ha : -a ∉ P) : PreConeIn R := ⟨{z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}, sorry, sorry, sorry, sorry⟩
 
-
-
+notation:max P"["a"]" => PreCone P a  -- precone spanned by `P` and `a`...
 
 
 
@@ -224,6 +222,13 @@ structure ConeIn (R : Type) [Ring R] : Type where
   tot : ∀ x : R, x ∈ carrier ∨ -x ∈ carrier
 
 #check ConeIn
+
+-- is this the same? better in terms of inheritance?
+
+structure ConeIn' (R : Type) [Ring R] extends PreConeIn R : Type where
+  tot : ∀ x : R, x ∈ carrier ∨ -x ∈ carrier
+
+
 -- we put a precone instance on the set of sums of squares in a (semi)ring R; now everything we prove about cones will be true for the set of sums of squares? (which would not be true if we declared a theorem instead of an instance?) -- NEED AN EXAMPLE OF THIS See below :-)
 -- Note: the following instantatiation procedure, with structure instead of class, generates a non-class instance error report in lint
 
@@ -233,7 +238,12 @@ structure ConeIn (R : Type) [Ring R] : Type where
 
 def SumSqPreCone (R : Type) [Ring R] : PreConeIn R := ⟨SumSqSet R, sorry, sorry, sorry, sorry⟩
 
+#check SumSqPreCone
 #check SumSqPreCone ℤ
+#check (SumSqPreCone ℤ).carrier
+
+def test := (SumSqPreCone ℤ).carrier
+example : test = SumSqSet ℤ := by rfl
 
 -- is this useful? was it better when we were stating a theorem saying that `SumSqSet R` is a precone?
 

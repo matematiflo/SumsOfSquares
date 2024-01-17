@@ -33,22 +33,17 @@ in a ring: prime cones with support P in R ↔ orderings of Frac(R/P)  -- also l
 
 -- Declaring `IsPreCone` as `Set.IsPreCone` enables one to use the syntax `P.IsPreCone` for `Set.IsPreCone P` if `P` is a set (i.e. a  predicate on some type `R`).
 
-class Set.IsPreCone {R : Type} [Ring R] (P : Set R) : Prop where
-  add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
-  mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
-  sq : ∀ (x : R), x ^ 2 ∈ P
-  minus : (-1 : R) ∉ P
+class PreCone (R : Type) [Ring R] : Type where
+  carrier : Set R
+  add : ∀ (x y : R), x ∈ carrier ∧ y ∈ carrier → x + y ∈ carrier
+  mul : ∀ (x y : R), x ∈ carrier ∧ y ∈ carrier → x * y ∈ carrier
+  sq : ∀ (x : R), x ^ 2 ∈ carrier
+  minus : (-1 : R) ∉ carrier
 
 -- note that the axiom -1 ∉ P does not make sense in a semiring
 
-#check {x : ℤ | x = 0}.IsPreCone
-
--- The command `open Set` enables one to use just use `IsPreCone` in order to call the function `Set.IsPreCone`
-
-open Set
-
-#check IsPreCone
-#check IsPreCone.sq
+#check PreCone
+#check PreCone.sq
 
 -- Comparing the above with the file were `Set.IsPreCone` is define as a structure, we see that the function `Set.IsPreCone` is of the same typ in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as an instance parameter (overloaded function), while when using structure, it takes it as a variable parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using structure is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
 
@@ -56,76 +51,111 @@ open Set
 
 -- parameters: we have variable parameters, implicit parameters and instance parameters
 
+instance {R : Type} [Ring R] : Membership R (PreCone R) where
+  mem x P := x ∈ P.carrier
 
-example : IsPreCone {S : ℤ | IsSumSq S} := by {
-  constructor
-  pick_goal 3
-  · intro x
-    simp
-    sorry
-  · sorry
-  · sorry
-  · sorry
-}
-
-theorem zero_in_precone {R : Type} [Ring R] {P : Set R} [P.IsPreCone] : 0 ∈ P := by
-  have aux : (0 : R) ^ 2 ∈ P := IsPreCone.sq (0 : R)
+theorem zero_in_precone {R : Type} [Ring R] (P : PreCone R) : 0 ∈ P := by
+  have aux : 0 ^ 2 ∈ P := PreCone.sq 0
   simp at aux
   exact aux
 
-theorem one_in_precone {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 1 ∈ P := by
-  have aux : (1 : R) ^ 2 ∈ P := IsPreCone.sq (1 : R)
+theorem one_in_precone {R : Type} [Ring R] (P :  PreCone R) : 1 ∈ P := by
+  have aux : 1 ^ 2 ∈ P := PreCone.sq 1
   simp at aux
   exact aux
 
-def supp {R : Type} [Ring R] (P : Set R) [IsPreCone P] : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
+-- In the following class declaration, we have to use Type (l + 1) because we want `param to be a term of type `Type l`, which is itself a term of type `Type (l + 1)`.
 
-lemma zero_in_supp {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 0 ∈ supp P := by
+class support (α : Type l) : Type (l + 1) where
+  param : Type l
+  supp (a : α) : Set param
+
+#check support
+#check support.param
+#check support.supp
+
+instance (R : Type) [Ring R] : support (PreCone R) where
+  param := R
+  supp P := {x : R | x ∈ P ∧ (-x) ∈ P}
+
+def supp {α : Type} [support α] (a : α) : Set (support.param α) := support.supp a
+
+#check @supp
+
+variable (C : PreCone ℤ)
+
+#check supp C
+
+#check support.supp C
+
+--needs a Repr instance?
+#check support.param (PreCone ℤ)
+#reduce support.param (PreCone ℤ)
+#reduce support.supp C
+
+lemma zero_in_supp {R : Type} [Ring R] (P : PreCone R) : 0 ∈ supp P := by
   constructor
-  · exact zero_in_precone
-  · simp; exact zero_in_precone
+  · exact zero_in_precone P
+  · simp; exact zero_in_precone P
 
-lemma PreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] (x : R) : x ∈ P ∧ -x ∈ P → x = 0 := by
+-- Note that if we do not want to use the `support` class, we can just define a function `supp` as follows. The point was to have definitions that enable `0 ∈ supp P` to be interpreted automatically as `(0 : R) ∈ supp P`, or equivalently `0 ∈ (supp P : Set R)`, not `(0 : ℕ) ∈ supp P`.
+
+/-
+def supp' {R : Type} [Ring R] (P : PreCone R) : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
+
+#check (supp' C : Set ℤ)
+#check supp' C
+
+lemma zero_in_supp' {R : Type} [Ring R] (P : PreCone R) : 0 ∈ supp' P := by
+  constructor
+  · exact zero_in_precone P
+  · simp; exact zero_in_precone P
+-/
+
+lemma PreConeInField {R : Type} [Field R] {P : PreCone R} {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by
   intro ⟨h1, h2⟩
   by_contra hx
   suffices new : -1 ∈ P
-  · exact IsPreCone.minus new
+  · exact PreCone.minus new
   · have aux1 : x * (-x) ∈ P := by
-      apply IsPreCone.mul _ _
+      apply PreCone.mul
       exact ⟨h1, h2⟩
     ring_nf at aux1
     have aux2 : (1 / x) ^ 2 ∈ P := by
-      apply IsPreCone.sq
+      apply PreCone.sq
     ring_nf at aux2
     have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
-      apply IsPreCone.mul _ _
+      apply PreCone.mul
       exact ⟨aux1, aux2⟩
     field_simp at aux3
     exact aux3
 
-theorem SuppPreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] : supp P = {0} := by
+theorem SuppPreConeInField {R : Type} [Field R] (P : PreCone R) : supp P = {0} := by
   ext x; simp
   constructor
   · intro h
-    exact PreConeInField P x h
+    exact PreConeInField h
   · intro h
     rw [h]
-    exact zero_in_supp
+    exact zero_in_supp P
 
 def PreConeAddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
 notation:max P"["a"]" => PreConeAddElem P a
 
-lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : Set R) [IsPreCone P] (a : R) : P ≤ P[a] := by
-  intro x hx
-  use x; constructor; swap
-  use 0; constructor; exact zero_in_precone
-  simp
-  exact hx
+-- already need an LE instance on PreCone R?
 
-theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (a : R) (ha : -a ∉ P) : IsPreCone P[a] := by
+lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : P.carrier ≤ P.carrier[a] := by {
+  intro x hx
+  use x; constructor; exact hx
+  use 0; constructor; exact zero_in_precone P; simp
+}
+
+instance PreConeAddElemIsPreCone {R : Type} [Field R] (P : PreCone R) (a : R) (ha : -a ∉ P) : PreCone R := by {
   constructor
+  pick_goal 5
+  · exact P.carrier[a]
   · intro x y h
     rcases h with ⟨hx, hy⟩
     rcases hx with ⟨u, hu, v, hv, hx⟩
@@ -134,16 +164,19 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
       rw [add_assoc, ← add_assoc _ p _, add_assoc u _ _, add_comm _ p, mul_add, add_assoc p _ _]
     rw [hx, hy, aux]
     have hup : u + p ∈ P := by
-      apply IsPreCone.add
+      apply PreCone.add
       exact ⟨hu, hp⟩
     have hvq : v + q ∈ P := by
-      apply IsPreCone.add
+      apply PreCone.add
       exact ⟨hv, hq⟩
     use u + p
     constructor
     swap
     use v + q
+    constructor
     assumption
+    · rfl -- there is something ugly here: fix it
+    · apply PreCone.add; exact ⟨hu, hp⟩
   · intro x y h
     rcases h with ⟨hx, hy⟩
     rcases hx with ⟨u, hu, v, hv, hx⟩
@@ -154,32 +187,31 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
     use u * p + a ^ 2 * (v * q); constructor; swap
     use u * q + v * p; constructor; swap
     · rw [← aux]
-    · apply IsPreCone.add
+    · apply PreCone.add
       constructor
-      · apply IsPreCone.mul; exact ⟨hu, hq⟩
-      · apply IsPreCone.mul; exact ⟨hv, hp⟩
-    · apply IsPreCone.add
+      · apply PreCone.mul; exact ⟨hu, hq⟩
+      · apply PreCone.mul; exact ⟨hv, hp⟩
+    · apply PreCone.add
       constructor
-      · apply IsPreCone.mul; exact ⟨hu, hp⟩
-      · apply IsPreCone.mul
+      · apply PreCone.mul; exact ⟨hu, hp⟩
+      · apply PreCone.mul
         constructor
-        · exact IsPreCone.sq a
-        · apply IsPreCone.mul; exact ⟨hv, hq⟩
+        · exact PreCone.sq a
+        · apply PreCone.mul; exact ⟨hv, hq⟩
   · intro x
-    have aux : x ^ 2 ∈ P := IsPreCone.sq x
+    have aux : x ^ 2 ∈ P := PreCone.sq x
     apply PreConeInPreConeAddElem
     exact aux
   · by_contra aux
     rcases aux with ⟨x, hx, y, hy, h⟩
     by_cases hy' : y = 0
-    · suffices aux : (-1 ∈ P) from IsPreCone.minus aux
+    · suffices aux : (-1 ∈ P) from PreCone.minus aux
       simp [hy'] at h
       rw [← h] at hx
       exact hx
     · apply ha
       push_neg at hy'
       have aux : -a = (1 + x) * y * (1 / y) ^ 2 :=
-
       by
         field_simp
         have aux1 : -1 = x + a * y → -y = x * y + a * y ^ 2 := by
@@ -192,113 +224,53 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
           ring_nf
           rw [neg_eq_neg_one_mul, neg_mul, mul_comm, ← mul_neg] at aux'
           simp at aux'
+
           sorry
+
         have aux3 : -y = x * y + a * y ^ 2 := aux1 h
         have aux4 := aux2 aux3
         rw [aux4]
       rw [aux]
-      apply IsPreCone.mul
+      apply PreCone.mul
       constructor
-      · apply IsPreCone.mul
+      · apply PreCone.mul
         constructor
-        · apply IsPreCone.add
-          exact ⟨one_in_precone, hx⟩
+        · apply PreCone.add
+          exact ⟨one_in_precone P, hx⟩
         · exact hy
-      · apply IsPreCone.sq
+      · apply PreCone.sq
+  }
 
-class Set.IsConeTemp {R : Type} [Ring R] (P : Set R) : Prop where
-  pre : IsPreCone P
-  tot : ∀ x : R, x ∈ P ∨ -x ∈ P
+class Cone (R : Type) [Ring R] extends PreCone R : Type where
+  tot : ∀ x : R, x ∈ carrier ∨ -x ∈ carrier
 
--- need to register a IsPreCone intance on IsCone manually? does it even make sense?
+#check @Cone
+#check Cone ℤ
+#check Cone.tot
 
-class Set.IsCone {R : Type} [Ring R] (P : Set R) : Prop where
-  zero : 0 ∈ P
-  -- add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
-  -- mul : ∀ (x y : R), x ∈ P ∧ y ∈ P → x * y ∈ P
-  -- sq : ∀ (x : R), x ^ 2 ∈ P
-  -- minus : -1 ∉ P
-  -- etc
+#check Cone.toPreCone
 
--- this has the desired behaviour (in particular, `IsCone (SumSqSet ℤ)` is recognized as a term of type Prop)
-
-
-#check @IsCone
-#check IsCone (SumSqSet ℤ)
-#check (SumSqSet ℤ).IsCone
-
+instance {R : Type} [Ring R] : Membership R (Cone R) where
+  mem x P := x ∈ P.carrier
 
 -- we put a cone instance on the set of sums of squares in a (semi)ring R; now everything we prove about cones will be true for the set of sums of squares? (which would not be true if we declared a theorem instead of an instance?) -- NEED AN EXAMPLE OF THIS See below :-)
 -- Note: the same procedure but with structure instead of class generates a non-class instance error report in lint
 
-instance SumSqCone {R : Type} [Ring R] : IsCone (SumSqSet R) := ⟨zeroIsSumSq⟩
--- by {constructor; exact zeroIsSumSq}
+instance SqPreCone (R : Type) [Ring R] : PreCone R := ⟨SumSqSet R, sorry, sorry, sorry, sorry⟩
 
--- the term defined in SumSqCone is a proof of the fact that SumSqSet R is a cone in R
+instance SqCone (R : Type) [Ring R] : Cone R := ⟨sorry⟩
 
-#check SumSqCone
-
--- Can also do the following for the proof of the above:
--- by {constructor; exact IsSumSq.zero}
--- the point is that the constructor tactic works well and should be helpful when there are more properties to prove, or a difficult one
-
--- now we define the type of cones in a (semir)ring R
-
-def Cone (R : Type) [Ring R] : Type := {P : Set R // IsCone P}
-
-#check @Cone
+#check SqCone
 
 -- we define a membership instance for cones (we could have done this for the type of sum of squares! Then the set of sum of squares becomes less useful? we do use it in the example below, though...)
 
-instance (R : Type) [Ring R] : Membership R (Cone R) where
-  mem x P := x ∈ P.val
-
 -- we illustrate how a property true for all cones can be deduced for the cone of sums of squares by instantiation (would be better with a more interesting property...). We say instantiation because we have put an `IsCone` instance on `SumSqSet R` (see above).
 
-lemma zeroInCone {R : Type} [Ring R] (P : Cone R) : 0 ∈ P := P.property.zero
+lemma zeroInCone {R : Type} [Ring R] (P : Cone R) : 0 ∈ P := zero_in_precone P.toPreCone
 
-example : 0 ∈ SumSqSet ℤ := by
-  -- let aux : Cone ℤ := ⟨SumSqSet ℤ, inferInstance⟩
-  -- exact zeroInCone aux
-  -- OR THE FOLLOWING:
-  -- exact zeroInCone ⟨SumSqSet ℤ, ⟨zeroIsSumSq⟩⟩
-  -- OR THE FOLLOWING:
-  exact zeroInCone ⟨SumSqSet ℤ, inferInstance⟩
+-- the following shows that `0 ∈ SumSqSet ℤ` becauses `SumSqSet ℤ` has been given a cone structure and `0` is an element of all cones.
 
--- Note that ⟨SumSqSet ℤ, inferInstance⟩ ceases to work (with inferInstance) if we replace SumSqSet ℤ by IsSumSq or IsSumSqExpl ℤ, or setOf IsSumSq (ℤ). This is probably due to the way we have done things, but it is still interesting.
-
--- A variant of the lemma above (with P instantiated as a cone, as opposed to being of type Cone R)
-
-lemma zeroInCone' {R : Type} [Ring R] (P : Set R) [IsCone P] : 0 ∈ P := IsCone.zero
-
--- then the example still  works, but in a different, maybe better way?
-
-example : 0 ∈ SumSqSet ℤ := by
-  apply zeroInCone'
-  -- exact zeroInCone' (SumSqSet ℤ) -- is a variant of the apply tactic
-  -- Note: exact zeroInCone' ⟨SumSqSet ℤ, inferInstance⟩ does not work
-
--- this suggests that declaring Cone as a type is not absolutely necessary (however, it is convenient; for example in order to register a membership instance, which is in fact used in the statement of the variant lemma... showing that it is useful to define the type of cones and that also that when we instantiate IsCone P in a declaration, then the membership instance registred on P is recognized automatically).
-
--- we could also have incorporated P in the def of the class IsCone. This time, it produces a type of Sort 1 (because Set R is of Sort 1).
-
-class Cone' (R : Type) [Ring R] :=
-  P : Set R
-  zero : 0 ∈ P
-  -- add : ∀ (x y : R), x ∈ P ∧ y ∈ P → x + y ∈ P
-  -- etc
-
-#check @Cone'
-#check Cone'.P
-#check Cone'.zero
-
--- in this case, the instance Cone' R is registered differently, the issue being that there is no reference to sums of squares in the statement... (only in the proof itself)
-
-instance SumSqCone' (R : Type) [Ring R] : Cone' R := ⟨IsSumSq, IsSumSq.zero⟩
-
--- and the term produced in this way is of type Cone' R, which is of type Type
-
-#check SumSqCone'
+example : 0 ∈ SumSqSet ℤ := by {exact zeroInCone (SqCone ℤ)}
 
 #lint
 

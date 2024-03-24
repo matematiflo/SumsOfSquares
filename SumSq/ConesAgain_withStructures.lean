@@ -50,7 +50,7 @@ open Set
 #check IsPreCone
 #check IsPreCone.sq
 
--- Comparing the above with the file were `Set.IsPreCone` is define as a class, we see that the function `Set.IsPreCone` is of the same type in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as a class instance (overloaded function), while when using structure, it takes it as a parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using `structure` is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
+-- Comparing the above with the file were `Set.IsPreCone` is defined as a class, we see that the function `Set.IsPreCone` is of the same type in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as a class instance (overloaded function), while when using structure, it takes it as a parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using `structure` is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
 
 -- On the other hand, the proof that a certain set is a precone can be written in the same way, using the `constructor` tactic, regardless of whether we use the a class or a structure.
 
@@ -110,15 +110,14 @@ lemma zero_in_supp {R : Type} [Ring R] (P : PreConeIn R) : (0 : R) ∈ supp P :=
 lemma PreConeInField {R : Type} [Field R] {P : PreConeIn R} {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by {
   intro ⟨h1, h2⟩
   by_contra hx
-  suffices aux : -1 ∈ P
-  · apply IsPreCone.minus P.prop aux
-  · have aux1 : x * (-x) ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨h1, h2⟩}
-    ring_nf at aux1
-    have aux2 : (1 / x) ^ 2 ∈ P := by {apply IsPreCone.sq P.prop}
-    ring_nf at aux2
-    have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨aux1, aux2⟩}
-    field_simp at aux3
-    exact aux3
+  suffices aux : -1 ∈ P by apply IsPreCone.minus P.prop aux
+  have aux1 : x * (-x) ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨h1, h2⟩}
+  ring_nf at aux1
+  have aux2 : (1 / x) ^ 2 ∈ P := by {apply IsPreCone.sq P.prop}
+  ring_nf at aux2
+  have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by {apply IsPreCone.mul P.prop _ _ ⟨aux1, aux2⟩}
+  field_simp at aux3
+  exact aux3
 }
 
 theorem SuppPreConeInField {R : Type} [Field R] (P : PreConeIn R) : supp P = {(0 : R)} := by {

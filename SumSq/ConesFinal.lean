@@ -29,7 +29,40 @@ in a field: all cones are maximal precones
 in a field: **cones in F ↔ orderings on F**  -- That's until later...
 
 in a ring: prime cones with support P in R ↔ orderings of Frac(R/P)  -- also later
+
+
+-- Complete this, then show that `SumsOfSquares R` is a precone in R... (note that the latter notion of precone should be a class, not a structure, because we want to be able to extend it to cone... NOT CORRECT! One can also extend a structure... the real issue is instantiation, which is something I don't fully understand but I believe it has more to do with implementation than with formalization)
 -/
+
+structure IsCone' {R: Type} [Ring R] : Type where
+P : Set R
+ppty1 : ∀ (x : R), x ^ 2 ∈ P -- (x : R) → (x ^2 ∈ P)
+ppty2 : ∀ x : R, ∃ y ∈ P, x = 2 * y  -- (x : R) → ∃ y : R, (y ∈ P) ∧ (x = 2 * y)
+
+#check IsCone'
+#check @IsCone'.ppty1
+#check @IsCone'.ppty2
+
+structure IsCone'' {R: Type} [Ring R] (P : Set R) : Prop where
+ppty1 : ∀ (x : R), x ^ 2 ∈ P -- (x : R) → (x ^2 ∈ P)
+ppty2 : ∀ x : R, ∃ (y : R), y ∈ P ∧ x = 2 * y --(x : R) → ∃ y ∈ P, x = 2 * y
+
+#check IsCone''
+#check @IsCone''.ppty1
+#check @IsCone''.ppty2
+
+-- Note that, in `ppty2`, `y` depends on `x`, i.e. `y = Y x`, so what we are really saying is that `ppty2` is a dependent function from `R` to a certain type of dependent pairs? Namely `ppty2 : (x : R) → F (Y x) x` where `F : R × R → Type` is given by `F y x : (P y) × (Eq x (2 * y))`.
+
+def β {R: Type} [Ring R] (P Q : R → Type) : R → Type :=
+fun (y : R) => Prod (P y) (Q y)
+
+structure IsCone''' {R: Type} [Ring R] (P Q : (_ : R) → Type) : Type :=
+ppty1 :(x : R) → P (x ^ 2)
+ppty2 : (x : R) → (Sigma (β P Q))
+
+#check IsCone'''
+#check @IsCone'''.ppty1
+#check IsCone'''.ppty2
 
 -- Declaring `IsPreCone` as `Set.IsPreCone` enables one to use the syntax `P.IsPreCone` for `Set.IsPreCone P` if `P` is a set (i.e. a  predicate on some type `R`).
 
@@ -64,33 +97,33 @@ theorem one_in_precone {R : Type} [Ring R] (P :  PreCone R) : 1 ∈ P := by
   simp at aux
   exact aux
 
--- In the following class declaration, we have to use Type (l + 1) because we want `param to be a term of type `Type l`, which is itself a term of type `Type (l + 1)`.
+-- In the following class declaration, we have to use Type (l + 1) because we want `ambient` to be a term of type `Type l`, which is itself a term of type `Type (l + 1)`.
 
 class support (α : Type l) : Type (l + 1) where
-  param : Type l
-  supp (a : α) : Set param
+  ambient : Type l
+  supp (a : α) : Set ambient
 
 #check support
-#check support.param
+#check support.ambient
 #check support.supp
 
-instance (R : Type) [Ring R] : support (PreCone R) where
-  param := R
-  supp P := {x : R | x ∈ P ∧ (-x) ∈ P}
-
-def supp {α : Type} [support α] (a : α) : Set (support.param α) := support.supp a
+def supp {α : Type} [support α] (a : α) : Set (support.ambient α) := support.supp a
 
 #check @supp
 
+instance (R : Type) [Ring R] : support (PreCone R) where
+  ambient := R
+  supp P := {x : R | x ∈ P ∧ (-x) ∈ P}
+
+#check support.ambient (PreCone ℤ)
+
 variable (C : PreCone ℤ)
-
 #check supp C
-
 #check support.supp C
 
---needs a Repr instance?
-#check support.param (PreCone ℤ)
-#reduce support.param (PreCone ℤ)
+--need a Repr instance to ensure the following automatically
+#check support.ambient (PreCone ℤ)
+#reduce support.ambient (PreCone ℤ)
 #reduce support.supp C
 
 lemma zero_in_supp {R : Type} [Ring R] (P : PreCone R) : 0 ∈ supp P := by
@@ -98,7 +131,7 @@ lemma zero_in_supp {R : Type} [Ring R] (P : PreCone R) : 0 ∈ supp P := by
   · exact zero_in_precone P
   · simp; exact zero_in_precone P
 
--- Note that if we do not want to use the `support` class, we can just define a function `supp` as follows. The point was to have definitions that enable `0 ∈ supp P` to be interpreted automatically as `(0 : R) ∈ supp P`, or equivalently `0 ∈ (supp P : Set R)`, not `(0 : ℕ) ∈ supp P`.
+-- Note that if we do not want to use the `support` class, we can just define a function `supp` as follows. The point was to have definitions that enable `0 ∈ supp P` to be interpreted automatically as `(0 : R) ∈ supp P`, or equivalently `0 ∈ (supp P : Set R)`, not `(0 : ℕ) ∈ supp P`, but in fact this is aparrently no longer a problem...
 
 /-
 def supp' {R : Type} [Ring R] (P : PreCone R) : Set R := {x : R | x ∈ P ∧ (-x) ∈ P}
@@ -110,7 +143,7 @@ lemma zero_in_supp' {R : Type} [Ring R] (P : PreCone R) : 0 ∈ supp' P := by
   constructor
   · exact zero_in_precone P
   · simp; exact zero_in_precone P
--/
+ -/
 
 lemma PreConeInField {R : Type} [Field R] {P : PreCone R} {x : R} : x ∈ P ∧ -x ∈ P → x = 0 := by
   intro ⟨h1, h2⟩
@@ -142,20 +175,26 @@ theorem SuppPreConeInField {R : Type} [Field R] (P : PreCone R) : supp P = {0} :
 def AddElem {R : Type} [Ring R] (P : Set R) (a : R) : Set R :=
 {z : R | ∃ x ∈ P, ∃ y ∈ P, z = x + a * y}
 
-def PreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : Set R :=
-AddElem P.carrier a
+def PreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : Set R := AddElem P.carrier a
 
-notation:max P"["a"]" => AddElem P a  -- introduced too soon? actually, this is just an `AddElem`, sort of...
-
-notation: max P"["a"]" => PreConeAddElem P a  -- introduced too soon? actually, this is just an `AddElem`, sort of...
-
--- already need an LE instance on PreCone R? would be better in order to state the following result (look for it in the ConesThirdTry file or something...)
+variable (S : Set ℚ)
+#check AddElem S 0
 
 variable (P' : PreCone ℚ)
+#check PreConeAddElem P' 0
 
-#check P'.carrier[(0:ℚ)]
+notation:max (priority := high) P"["a"]" => AddElem P a
+notation:max (priority := high) P"["a"]" => PreConeAddElem P a
+
+#check S[(0 : ℚ)]
+#check S[0]
+
+#check P'.carrier[(0 : ℚ)]
+#check P'.carrier[0]
 #check P'[(0 : ℚ)]
-#check P'[0]  -- if we want to avoid this problem, we need a well-written adjunction class...
+#check P'[0]
+
+-- already need an LE instance on PreCone R? would be better in order to state the following result (look for it in the ConesThirdTry file or something...)
 
 lemma PreConeInPreConeAddElem {R : Type} [Ring R] (P : PreCone R) (a : R) : P.carrier ≤ P.carrier[a] := by {
   intro x hx
@@ -331,7 +370,7 @@ map to the Zariski spectrum
 
 -- is the following better than with a structure? Well, it depends: are we going to instantiate this? what would it permit?
 
--- More precisely, is it correct to think that classes should be used mostly to overload polymorphic functions?  And then instantiating a class means declaring objects to which said functions will be applied? WOuld make sense! The point is to be able to apply the function to the term without having to provide a proof that we can apply it... THIS MAKES A LOT OF SENSE!!!!!!!!!!!!!!!!!!!!!!! Do we have an example in the present context? I mean, besides the class constructors themselves.
+-- More precisely, is it correct to think that classes should be used mostly to overload polymorphic functions?  And then instantiating a class means declaring objects to which said functions will be applied? WOuld make sense! The point is to be able to apply the function to the term without having to provide a proof that we can apply it... THIS MAKES A LOT OF SENSE!!!!!!!!!!!!!!!!!!!!!!! Do we have an example in the present context? I mean, besides the class constructors themselves?
 
 class precone (R : Type) [Ring R] : Type where
   P : Set R

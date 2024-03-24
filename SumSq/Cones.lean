@@ -50,7 +50,7 @@ open Set
 #check IsPreCone
 #check IsPreCone.sq
 
--- Comparing the above with the file were `Set.IsPreCone` is define as a structure, we see that the function `Set.IsPreCone` is of the same typ in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as an instance parameter (overloaded function), while when using structure, it takes it as a variable parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using structure is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
+-- Comparing the above with the file were `Set.IsPreCone` is defined as a structure, we see that the function `Set.IsPreCone` is of the same typ in both cases. **But** the function `IsPreCone.sq` is **not**. When using a class, it takes `P.IsPreCone` as an instance parameter (overloaded function), while when using structure, it takes it as a variable parameter. This has consequences in the way some proofs are written, even basic ones such as `zero_in_precone`. And there we see that the definition using structure is better, because we can just project our precone to the term `aux := IsPreCone.sq hP (0 : R)` *without having to specify the type of the latter*.
 
 -- On the other hand, the proof that a certain set is a precone can be written in the same way, using the `constructor` tactic, regardless of whether we use the a class or a structure.
 

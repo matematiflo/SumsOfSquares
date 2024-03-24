@@ -1,5 +1,5 @@
 import SumSq
-import Mathlib.Data.Rat.Basic
+
 import Lean
 
 open Lean (Parsec)

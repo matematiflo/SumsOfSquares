@@ -7,6 +7,9 @@ package SumSq where
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
+require mdgen from git
+  "https://github.com/Seasawher/mdgen" @ "main"
+
 lean_lib SumSq where
   -- add library configuration options here
 

@@ -88,20 +88,19 @@ lemma zero_in_supp {R : Type} [Ring R] {P : Set R} [IsPreCone P] : 0 ∈ supp P 
 lemma PreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] (x : R) : x ∈ P ∧ -x ∈ P → x = 0 := by
   intro ⟨h1, h2⟩
   by_contra hx
-  suffices new : -1 ∈ P
-  · exact IsPreCone.minus new
-  · have aux1 : x * (-x) ∈ P := by
-      apply IsPreCone.mul _ _
-      exact ⟨h1, h2⟩
-    ring_nf at aux1
-    have aux2 : (1 / x) ^ 2 ∈ P := by
-      apply IsPreCone.sq
-    ring_nf at aux2
-    have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
-      apply IsPreCone.mul _ _
-      exact ⟨aux1, aux2⟩
-    field_simp at aux3
-    exact aux3
+  suffices new : -1 ∈ P from by exact IsPreCone.minus new
+  have aux1 : x * (-x) ∈ P := by
+    apply IsPreCone.mul _ _
+    exact ⟨h1, h2⟩
+  ring_nf at aux1
+  have aux2 : (1 / x) ^ 2 ∈ P := by
+    apply IsPreCone.sq
+  ring_nf at aux2
+  have aux3 : -x ^ 2 * x⁻¹ ^ 2 ∈ P := by
+    apply IsPreCone.mul _ _
+    exact ⟨aux1, aux2⟩
+  field_simp at aux3
+  exact aux3
 
 theorem SuppPreConeInField {R : Type} [Field R] (P : Set R) [IsPreCone P] : supp P = {0} := by
   ext x; simp
@@ -179,7 +178,6 @@ theorem PreConeAddElemIsPreCone {R : Type} [Field R] (P : Set R) [IsPreCone P] (
     · apply ha
       push_neg at hy'
       have aux : -a = (1 + x) * y * (1 / y) ^ 2 :=
-
       by
         field_simp
         have aux1 : -1 = x + a * y → -y = x * y + a * y ^ 2 := by

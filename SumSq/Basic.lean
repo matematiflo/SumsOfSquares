@@ -308,8 +308,8 @@ instance {R : Type} [Semiring R] [Repr R] : Repr (SumSqType R) where
 
 def zero_is_SOS : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
 
-#check zero_is_SOS.1  -- ↑SOS : ℤ
-#check zero_is_SOS.2  -- SOS.property : IsSumSq ↑SOS
+#check zero_is_SOS.1  -- ↑zero_is_SOS : ℤ
+#check zero_is_SOS.2  -- zero_is_SOS.property : IsSumSq ↑zero_is_SOS
 
 #eval zero_is_SOS.1  -- 0
 #eval zero_is_SOS  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
@@ -393,17 +393,17 @@ so the sums of squares in `R` are exactly the values of the function `SumSq`. Th
 
 def SumSqList {R : Type} [Semiring R] (L : List R) : SumsOfSquares R := SumsOfSquares.mk (SumSq L) (SumSqListIsSumSq L)  -- ⟨SumSq L, SumSqListIsSumSq L⟩ also works
 
-#check SumSqList [1, -2, 3]
+#check SumSqList [1, -2, 3]  -- SumSqList [1, -2, 3] : SumsOfSquares ℤ
 
 /-!
 We can then project a term `S : SumsOfSquares R` to `R` and `IsSumSq S.val`.
 -/
 
-#check SumsOfSquares.val
-#check SumsOfSquares.ppty
+#check SumsOfSquares.val  -- SumsOfSquares.val {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : R
+#check SumsOfSquares.ppty  -- SumsOfSquares.ppty {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : IsSumSq self.val
 
-#check (SumSqList [1, -2, 3]).val
-#check (SumSqList [1, -2, 3]).ppty
+#check (SumSqList [1, -2, 3]).val   -- (SumSqList [1, -2, 3]).val : ℤ
+#check (SumSqList [1, -2, 3]).ppty  -- (SumSqList [1, -2, 3]).ppty : IsSumSq (SumSqList [1, -2, 3]).val
 
 /-!
 As in the first implementation of the type of sums of squares given [above](#-as-a-subtype), we can put a `Repr` instance on the type `SumsOfSquares R`.
@@ -413,6 +413,8 @@ instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares R) where
   reprPrec :=
     fun S _ =>
       repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+-- Below, we use a Type-valued predicate (as opposed to Prop-valued)
 
 inductive IsSumSq' {R : Type} [Semiring R] : R → Type
   | zero : IsSumSq' (0 : R)
@@ -426,7 +428,8 @@ instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares' R) where
     fun S _ =>
       repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
 
-def SumSqListIsSumSq' {R : Type} [Semiring R] (L : List R) : IsSumSq' (SumSq L) := by
+def SumSqListIsSumSq' {R : Type} [Semiring R] : (L : List R) → IsSumSq' (SumSq L) := by
+  intro L  -- let L be a list whose members are terms of type signature R
   induction L with  -- by induction on the list L
   | nil =>  -- the case of the empty list []
     rw [SumSq]  -- rewrite using SumSq [] = 0
@@ -463,12 +466,12 @@ def zero_is_SOS' : SumsOfSquares ℤ := ⟨0, IsSumSq.zero⟩
 #eval zero_is_SOS'  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
 
 /-!
-We can also apply `#eval` to values of the functions `SumSqList`.
+We can also apply `#eval` to values of the functions `SumSqList`. But the last one gives us an error message.
 -/
 
 #check SumSqList [1, -2, 3]
 #eval SumSqList [1, -2, 3]  -- 14 is a sum of squares because the property IsSumSq 14 has been proven.
-#check (SumSqList [1, -2, 3]).val
+#check (SumSqList [1, -2, 3]).val  -- (SumSqList [1, -2, 3]).val : ℤ
 #eval (SumSqList [1, -2, 3]).val  -- 14
 #check (SumSqList [1, -2, 3]).ppty
 -- #eval (SumSqList [1, -2, 3]).ppty  -- invalid universe level, 0 is not greater than 0

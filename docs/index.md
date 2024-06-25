@@ -17,7 +17,7 @@ For some results, we specialize to rings or fields.
 - [Definitions and examples](SumSq/Defs.html)
 - [Basic properties for lists](SumSq/List.html)
 - [The type of sums of squares](SumSq/Basic.html)
-- Some [exercises](SumSq/Exercises.md)
+- Some [exercises](SumSq/Exercises.html)
 
 ## GitHub repository
 

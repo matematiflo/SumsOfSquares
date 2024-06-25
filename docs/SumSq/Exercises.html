@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index</title>
+<title>exercises</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,16 +23,16 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="index_files/libs/clipboard/clipboard.min.js"></script>
-<script src="index_files/libs/quarto-html/quarto.js"></script>
-<script src="index_files/libs/quarto-html/popper.min.js"></script>
-<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="index_files/libs/quarto-html/anchor.min.js"></script>
-<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="index_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Exercises_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Exercises_files/libs/quarto-html/quarto.js"></script>
+<script src="Exercises_files/libs/quarto-html/popper.min.js"></script>
+<script src="Exercises_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Exercises_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Exercises_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Exercises_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Exercises_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Exercises_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Exercises_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -45,24 +45,59 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="sums-of-squares" class="level1">
-<h1>Sums of squares</h1>
+<section id="sums-of-squares---exercises" class="level1">
+<h1>Sums of squares - Exercises</h1>
 <p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
-<p>This site is live at <a href="https://matematiflo.github.io/SumsOfSquares" class="uri">https://matematiflo.github.io/SumsOfSquares</a>.</p>
-<p>We introduce sums of squares and prove some of their basic properties.</p>
-<p>The basic setup is that of a general semiring <code>R</code>. For example, we can consider sums of squares of natural numbers (<code>R = ℕ</code>).</p>
-<p>For some results, we specialize to rings or fields.</p>
-<section id="contents" class="level2">
-<h2 class="anchored" data-anchor-id="contents">Contents</h2>
-<ul>
-<li><a href="SumSq/Defs.html">Definitions and examples</a></li>
-<li><a href="SumSq/List.html">Basic properties for lists</a></li>
-<li><a href="SumSq/Basic.html">The type of sums of squares</a></li>
-</ul>
+<pre class="lean"><code>import SumSq.Defs</code></pre>
+<section id="sumsq.list" class="level2">
+<h2 class="anchored" data-anchor-id="sumsq.list"><a href="List.md#exercises">SumSq.List</a></h2>
+<section id="list.1" class="level3">
+<h3 class="anchored" data-anchor-id="list.1"><a href="List.md#exercise-1">List.1</a></h3>
+<p>Modify the syntax of the <code>induction</code> tactic in <a href="List.md#permuted-lists"><code>SumSqPermut</code></a> to make it look more similar to that of <a href="List.md#appended-lists"><code>SumSqAppend</code></a>. This means: in <code>SumSqPermut</code>, replace <code>induction H</code> by <code>induction H with</code> and make the proof syntactically correct after that (start by changing <code>⬝ case nil</code> to <code>| nil</code>).</p>
 </section>
-<section id="github-repository" class="level2">
-<h2 class="anchored" data-anchor-id="github-repository">GitHub repository</h2>
-<p>The <a href="https://github.com/matematiflo/SumsOfSquares">SumsOfSquares</a> repo (Lean package).</p>
+<section id="list.2" class="level3">
+<h3 class="anchored" data-anchor-id="list.2"><a href="List.md#exercise-2">List.2</a></h3>
+<p>Let <code>R</code> be a type with decidable equality. Let <code>a</code> be a term of type <code>R</code> and let <code>L</code> be a term of type <code>List R</code>. Prove that, if <code>a ∈ L</code>, then the list <code>a :: L.erase a</code> is a permutation of <code>L</code> (we have used this standard result <a href="List.md#erasing-an-entry">here</a>).</p>
+</section>
+<section id="list.3" class="level3">
+<h3 class="anchored" data-anchor-id="list.3"><a href="List.md#exercise-3">List.3</a></h3>
+<p>Prove that the statement of <a href="List.md#more-computations"><code>theorem SumSqSmul2</code></a> is indeed equivalent to the statement of <a href="List.md#multiplication-by-a-scalar"><code>theorem SumSqSmul</code></a>.</p>
+</section>
+</section>
+<section id="sumsq.basic" class="level2">
+<h2 class="anchored" data-anchor-id="sumsq.basic"><a href="Basic.md#exercises">SumSq.Basic</a></h2>
+<section id="basic.1" class="level3">
+<h3 class="anchored" data-anchor-id="basic.1"><a href="Basic.md#exercise-1">Basic.1</a></h3>
+<p>Let <code>R</code> be a semiring and let <code>S</code> be a term in <code>R</code>. Prove that Proposition <code>IsSumSq S</code> is equivalent to Proposition <code>IsSumSq' S</code>, where <code>IsSumSq'</code> is the predicate defined inductively as follows:</p>
+<pre class="lean"><code>inductive IsSumSq' [Semiring R] : R → Prop :=
+  | sq (x : R): IsSumSq (x ^ 2 : R)
+  | add (S1 S2 : R) (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2)</code></pre>
+</section>
+<section id="basic.2" class="level3">
+<h3 class="anchored" data-anchor-id="basic.2"><a href="Basic.md#exercise-2">Basic.2</a></h3>
+<p>Let Let <code>R</code> be a semiring and let <code>S</code> be a term in <code>R</code>. Write a (direct) proof of the implication</p>
+<blockquote class="blockquote">
+<p>(∃ L : List R, SumSq L = S) → IsSumSq S</p>
+</blockquote>
+<p>and ask yourself whether having an existential quantifier in the assumption makes things complicated. Try using instead Lemma <code>SumSqListIsSumSq</code> and the second implication of the equivalence <code>IsSumSq.Char</code> from <a href="Basic.md#using-an-inductive-predicate">SumSq.Basic</a> to prove the result.</p>
+</section>
+<section id="basic.3" class="level3">
+<h3 class="anchored" data-anchor-id="basic.3"><a href="Basic.md#exercise-3">Basic.3</a></h3>
+<p>Let <code>S T</code> be types. Let <code>P : T → Prop</code> be a predicate on <code>T</code> and let <code>f : S → T</code> be a function from <code>S</code> to <code>T</code>. Assume that the proposition <code>∀ x : S, P (f x)</code> has a proof and that the proposition <code>∀ y : T, ∃ x : S, y = f x</code> has a proof. Show that the proposition <code>∀ y : T, P y</code> has a proof.</p>
+<p>Examples of formalisations for this result are provided below.</p>
+<pre class="lean"><code>example {S T : Type} (P : T → Prop) (f : S → T) (hPf : (∀ x : S, P (f x))) (y : T) : (∃ x : S, y = f x) → P y := by
+  intro hy
+  rcases hy with ⟨x, hx⟩
+  rw [hx]
+  apply hPf
+
+example {S T : Type} (P : T → Prop) (f : S → T) (hPf : (∀ x : S, P (f x))) (h : ∀ y : T, ∃ x : S, y = f x) : ∀ y : T, P y := by
+  intro y
+  specialize h y
+  rcases h with ⟨x, hx⟩
+  rw [hx]
+  apply hPf</code></pre>
+</section>
 </section>
 </section>
 

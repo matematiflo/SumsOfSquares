@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>basic</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Basic_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Basic_files/libs/quarto-html/quarto.js"></script>
+<script src="Basic_files/libs/quarto-html/popper.min.js"></script>
+<script src="Basic_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Basic_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Basic_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Basic_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Basic_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Basic_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Basic_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="the-type-of-sums-of-squares" class="level1">
+<h1>The type of sums of squares</h1>
+<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
+<pre class="lean"><code>import SumSq.Defs</code></pre>
+<p>Let <code>R</code>be a semiring. In the file <a href="Defs.md">SumSq.Defs</a>, we declared a function <code>SumSq : List R → R</code> that computes the sum of squares of the entries of a list:</p>
+<blockquote class="blockquote">
+<p>SumSq [a, b, c] = a ^ 2 + b ^ 2 + c ^ 2</p>
+</blockquote>
+<p>In the present file, we declare a predicate <code>IsSumSq : R → Prop</code> that characterizes the elements of <code>R</code> that are return values of the function <code>SumSq</code>. We then discuss how to use such a predicate to declare sums of squares in <code>R</code> either as a subset or as a subtype of <code>R</code>.</p>
+<section id="using-an-inductive-predicate-type" class="level2">
+<h2 class="anchored" data-anchor-id="using-an-inductive-predicate-type">Using an inductive predicate / type</h2>
+<p>Using a predicate on <code>R</code> (i.e.&nbsp;a function <code>IsSumSq : R → Prop</code>) to characterize sums of squares in <code>R</code> means the following: a term <code>S : R</code> will be called a sum of squares if the proposition <code>IsSumSq S</code> has a proof.</p>
+<p>Below, the predicate <code>IsSumSq</code> is defined inductively, but later we will show that we can also define it <a href="#using-an-existential-predicate">existentially</a>.</p>
+<pre class="lean"><code>inductive IsSumSq {R : Type} [Semiring R] : R → Prop
+  | zero : IsSumSq (0 : R)
+  | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)</code></pre>
+<p>By definition of <code>IsSumSq</code>, the term <code>0 : R</code> is a sum of squares, and if <code>S : R</code> is a sum of squares and <code>x : R</code>, then <code>x ^ 2 + S</code> is a sum of squares. We can use this to prove that, for all list <code>L : List R</code>, the term <code>SumSq L : R</code> is a sum of squares.</p>
+<pre class="lean"><code>lemma SumSqListIsSumSq {R : Type} [Semiring R] (L : List R) : IsSumSq (SumSq L) := by
+  induction L with  -- by induction on the list L
+  | nil =&gt;  -- the case of the empty list []
+    rw [SumSq]  -- rewrite using SumSq [] = 0
+    exact IsSumSq.zero  -- IsSumSq 0 is a proof that 0 is a sum of squares
+  | cons a l ih =&gt;  -- the case of a list L = (a :: l) where SumSq l is assumed to be a sum of squares
+    rw [SumSq]  -- rewrite using SumSq (a :: l) = a ^2 + SumSq l
+    exact IsSumSq.add a (SumSq l) ih  -- conclude using the induction hypothesis and the property that, if S is a sum of squares, then x ^2 + S is a sum of squares</code></pre>
+<p>Let us give three more examples of simple proofs that a term <code>S : R</code> is a sum of squares. Namely, we prove that <code>0 : R</code>, <code>1 : R</code> and all squares in <code>R</code> are sums of squares.</p>
+<p>For more on this, see <a href="#exercise-1">Exercise 1</a>. And for more on Lemma <code>SumSqListIsSumSq</code>, see <a href="#exercise-2">Exercise 2</a>.</p>
+<pre class="lean"><code>lemma zeroIsSumSq {R : Type} [Semiring R] : IsSumSq (0 : R) := by
+  exact IsSumSq.zero  -- 0 is a sum of squares in R by definition of the type IsSumSq
+
+lemma SquareIsSumSq {R : Type} [Semiring R] (x : R) : IsSumSq (x ^ 2) := by
+  rw [← add_zero (x ^2)]  -- rewrite using x ^ 2 = x ^ 2 + 0
+  exact IsSumSq.add x 0 IsSumSq.zero  -- x ^ 2 + 0 is a sum of squares in R by definition of the type IsSumSq (and because we have already proven that 0 is a sum squares)
+
+lemma oneIsSumSq {R : Type} [Semiring R] : IsSumSq (1 : R) := by
+  rw [← one_pow 2]  -- rewrite using 1 = 1 ^ 2
+  exact SquareIsSumSq 1  -- conclude using SquareIsSumSq</code></pre>
+<p>Based on its declaration, the type <code>IsSumSq</code> behaves like a <code>Prop</code>-valued function on <code>R</code>. The only two subtleties are:</p>
+<ul>
+<li>the fact that the variable <code>R : Type</code> is implicit (between brackets of the form <code>{}</code>).</li>
+<li>the fact that the assumption that <code>R</code> is a semiring is implemented using a class instance (between brackets of the form <code>[]</code>).</li>
+</ul>
+<p>For example, <code>IsSumSq ℤ 0</code> is the formalized version of the statement <code>0 is a sum of squares in ℤ</code>.</p>
+<pre class="lean"><code>#check @IsSumSq  -- @IsSumSq : {R : Type} → [hR : Semiring R] → R → Prop
+#check IsSumSq (0 : ℤ)  -- IsSumSq 0 : Prop</code></pre>
+<p>Implementing class instance parameters is useful to <em>automatically</em> give meaning to expressions <code>(0 : R)</code> and <code>x ^ 2 + S</code> (since <code>R</code> is a semiring), via a process called <a href="https://lean-lang.org/theorem_proving_in_lean4/type_classes.html"><em>typeclass resolution</em></a>. Note that we could give that instantiation a name if we wanted to, by declaring <code>[hR : Semiring R]</code> instead of just <code>[Semiring R]</code>.</p>
+<p>The fact that <code>IsSumSq</code> behaves like a function with an implicit parameter and a class instance parameter can be used to present the above checks differently.</p>
+<pre class="lean"><code>#check @IsSumSq ℤ _  -- IsSumSq : ℤ → Prop
+#check @IsSumSq ℤ _ 0  -- IsSumSq 0 : Prop</code></pre>
+<p>Since <code>IsSumSq</code> is declared as an inductive type, it automatically generates an induction principle accesible via <code>IsSumSq_rec</code>. This means that if we want to prove a result for all sums of squares in a semiring <code>R'</code>, it suffices to prove it for <code>0 : R'</code> and to prove it for all terms of the form <code>x ^ 2 + S</code> under the assumption that the term <code>S</code> is a sum of squares in <code>R'</code>, for which the result has already been proved.</p>
+<p>To see how it works, we can either use a concrete example of a type with semiring instance, like <code>ℤ</code>, or declare a variable which plays that role (note that we do not call it <code>R</code>, in order to avoid conflicts in future declarations).</p>
+<pre class="lean"><code>variable {R' : Type} [hR' : Semiring R']
+#check @IsSumSq.rec R' _</code></pre>
+<p>Since it is a bit long, the induction principle for <code>IsSumSq</code> is reproduced below. There, the <code>Prop</code>-valued function <code>motive</code> is to be thought of as a property of sums of squares in <code>R</code> that one wants to prove.</p>
+<pre class="lean"><code>@IsSumSq_rec R' hR' : ∀ {motive : (a : R') → IsSumSq a → Prop},
+  motive 0 (_ : IsSumSq 0) →
+    (∀ (x S : R') (hS : IsSumSq S), motive S hS → motive (x ^ 2 + S) (_ : IsSumSq (x ^ 2 + S))) →
+      ∀ {a : R'} (t : IsSumSq a), motive a t</code></pre>
+<p>Let us now see how to use induction on the type <code>IsSumSq</code> to prove certain properties of sums of squares in a semiring <code>R</code>. For example, to say that the sum of two sums of squares is itself a sum of squares, we write:</p>
+<blockquote class="blockquote">
+<p>IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 + S2)</p>
+</blockquote>
+<pre class="lean"><code>theorem IsSumSq_Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
+  induction h1 with  -- we prove that S1 + S2 is a sum of squares in R by induction on h1 (which is a proof that S1 is a sum of squares)
+  | zero =&gt;  -- the base step is S1 = 0, so S1 + S2 = 0
+    simp only [zero_add]  -- we simplify 0 + S2 to S2
+    exact h2  -- we conclude using h2
+  | add a S hS ih =&gt;  -- the inductive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S + S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) + S2 is a sum of squares
+    rw [add_assoc]  -- rewrite using (a ^ 2 + S) + S2 = a ^ 2 + (S + S2)
+    exact IsSumSq.add a (S + S2) ih  -- since a ^ 2 is a square and (S + S2) is a sum of squares by the induction hypothesis, we conclude using IsSumSq.add</code></pre>
+<p>Likewise, if the semiring <code>R</code> is commutative, a product of sums of squares is a sum of squares. As we shall see, the assumption that <code>R</code> is commutative is used in our proof when applying <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow"><code>mul_pow</code></a>. We make this apparent via a separate lemma.</p>
+<pre class="lean"><code>lemma IsSumSq_ProdSqBySumSq {R : Type} [CommSemiring R] {S : R} (h : IsSumSq S) {x : R} : IsSumSq (x ^2 * S) := by
+  induction h with  -- we prove that x ^ 2 * S is a sum of squares by induction on h (which is a proof that S is a sum of squares)
+  | zero =&gt;  -- the base step is S = 0 so x ^ 2 * S = x ^ 2 * 0
+    rw [mul_zero]  -- we simplify x ^ 2 * 0 to 0
+    exact IsSumSq.zero  -- we conclude using the fact that 0 is a sum of squares
+  |add a s _ ih =&gt;  -- the inducive step is the case S = a ^ 2 + s, where s is a sum of squares and the induction hypothesis is that (x ^ 2 * s) is a sum of squares: the goal is to prove that x ^ 2 * (a ^ 2 + s) is a sum of squares
+    rw [mul_add, ← mul_pow x a 2]  -- rewrite using x ^ 2 * (a ^ 2 + s) = (x * a) ^ 2 + x ^ 2 * s
+    exact IsSumSq.add (x * a) (x ^ 2 * s) ih  -- since (x * a) ^ 2 is a square and (x ^ 2 *  s) is a sum of squares by the induction hypothesis, we conclude using IsSumSq.add</code></pre>
+<p>We can now prove that, indeed, a product of sums of squares is a sum of squares:</p>
+<blockquote class="blockquote">
+<p>IsSumSq S1 ∧ IsSumSq S2 → IsSumSq (S1 * S2)</p>
+</blockquote>
+<pre class="lean"><code>theorem IsSumSq_Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 * S2) := by
+  induction h1 with  -- we prove that S1 * S2 is a sum of squares by induction on h (which is a proof that S1 is a sum of squares)
+  | zero =&gt;  -- -- the base step is S1 = 0 so S1 * S2 = 0 * S2
+    rw [zero_mul]  -- we simplify 0 * S2 to 0
+    exact IsSumSq.zero  -- we conclude using the fact that 0 is a sum of squares
+  | add a S hS ih =&gt;  -- the inducive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S * S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) * S2 is a sum of squares
+    rw [add_mul]  -- rewrite using (a ^ 2 + S) * S2 = a ^ 2 * S2 + S * S2
+    apply IsSumSq_Sum _ _  -- since a sum of sums of squares is a sum of squares, in order to prove that (a ^ 2 * S2) + (S * S2) is a sum of squares, it suffices to prove that (a ^ 2 * S2) and (S * S2) are both sums of squares
+    · exact IsSumSq_ProdSqBySumSq h2  -- the fact that (a ^ 2 * S2) is a sum of squares when S2 is a sum of squares was proved in IsSumSq_ProdSqBySumSq
+    · exact ih  -- the fact that (S * S2) is a sum of squares is the induction hypothesis</code></pre>
+</section>
+<section id="using-an-existential-predicate" class="level2">
+<h2 class="anchored" data-anchor-id="using-an-existential-predicate">Using an existential predicate</h2>
+<p>We now show that we could also define <code>IsSumSq S</code> by asking that it be a return value of the function <code>SumSq</code> defined in <a href="Defs.md">SumSq.Defs</a>. More precicely, we prove that, given a term <code>S</code> in a semiring <code>R</code>, the following equivalence holds:</p>
+<blockquote class="blockquote">
+<p>IsSumSq S ↔︎ (∃ L : List R, SumSq L = S)</p>
+</blockquote>
+<p>We begin with the first implication: starting from <code>S : R</code> such that <code>IsSumSq S</code> has a proof, we want to construct a list <code>L : List R</code> such that <code>SumSq L = S</code>. Since <code>IsSumSq S</code>is defined inductively, we can do this by induction on the proof of the proposition <code>IsSumSq S</code>.</p>
+<pre class="lean"><code>lemma IsSumSqToExistList {R : Type} [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
+  induction hS with  -- we prove the result by induction on hS (which is a proof that S is a sum of squares)
+  | zero =&gt;  -- the base case is when S = 0
+    exact ⟨[], by rw [SumSq]⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
+    -- use []  -- instead of exact ⟨[], rfl⟩, we can write use [] followed by rfl
+    -- rfl
+  | add a s _ ih =&gt;  -- the inductive step is when S = a ^2 + s, where s is a sum of squares and the induction hypothesis is that there exists a list L such that SumSq L = s
+    rcases ih with ⟨l, hl⟩  -- we extract from ih a list l such that SumSq l = s
+    rw [← hl]  -- we rewrite the goal using SumSq l = s
+    use (a :: l)  -- We claim that we can use the list L = (a :: l) to show that there exists a list L such thatt SumSq L = a ^ 2 + SumSq l
+    rw [SumSq]  -- indeed the result is true by definition of the function SumSq</code></pre>
+<p>From this and Lemma <code>SumSqListIsSumSq</code> proved in <a href="#using-an-inductive-predicate">the first section</a>, we can prove the equivalence that we wanted. Note that, given a sum of squares <code>S</code> in <code>R</code>, there may exist more than one list such that <code>SumSq L = S</code>.</p>
+<pre class="lean"><code>theorem IsSumSq_Char (R : Type) [Semiring R] (S : R) : IsSumSq S ↔ (∃ L : List R, SumSq L = S) := by
+  constructor  -- this tactic splits the equivalence ↔ into two implications
+  · apply IsSumSqToExistList  -- the first implication is proven using the lemma IsSumSqToExistList
+    -- intro hS  -- instead of the apply tactic, we can use intro followed by exact
+    -- exact IsSumSqToExistList S hS
+  · intro h  -- to prove the second implication , let h be a proof of the fact that there exists a list L such that SumSq L = S
+    rcases h with ⟨L, hL⟩  -- we extract from h a list L such that SumSq L = S
+    rw [← hL]  -- we rewrite the goal using SumSq L = S
+    exact SumSqListIsSumSq L  -- we close the goal by applying a lemma that we already proved, which says that SumSq L is of type IsSumSq</code></pre>
+</section>
+<section id="as-a-set" class="level2">
+<h2 class="anchored" data-anchor-id="as-a-set">As a set</h2>
+<p>Recall that, given a type <code>R</code>, a term of type <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html"><code>Set R</code></a> is by definition a predicate <code>R → Prop</code>. But it comes with a series of extra functions, such as <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html#Set.Mem"><code>Set.Mem</code></a> to define membership in a set. And Lean provides a way to define sets from predicates, with a syntax that is familiar to mathematicians.</p>
+<p>For example, to the predicate <code>IsSumSq : R → Prop</code>, there is associated the set <code>{S : R | IsSumSq S}</code>, which we can think of as <em>consisting of terms</em> <code>S : R</code> <em>such that</em> <code>IsSumSq S</code> <em>has a proof</em>. More concretely, <code>(0 : R) ∈ {S : R | IsSumSq S}</code> is definitionally equal to the proposition <code>IsSumSq 0</code> (see example below).</p>
+<p>The upshot of using the type <code>Set R</code> is that it gives access to type-theoretic notation (the symbols <code>∈</code>, <code>∩</code>, <code>∪</code> <em>etc</em>). Note that it is now convenient, in the definition of the function <code>SumSqSet : R → Set R</code>, to make the parameter <code>R</code> explicit.</p>
+<pre class="lean"><code>def SumSqSet (R : Type) [Semiring R] : Set R := {S : R | IsSumSq S}
+
+#check @SumSqSet  -- SumSqSet : (R : Type) → [inst : Semiring R] → Set R
+#check @SumSqSet ℤ  -- @SumSqSet ℤ : [inst : Semiring ℤ] → Set ℤ
+#check @SumSqSet ℤ _  -- SumSqSet ℤ : Set ℤ
+
+#check SumSqSet ℤ  -- SumSqSet ℤ : Set ℤ
+#check 0 ∈ SumSqSet ℤ  -- 0 ∈ SumSqSet ℤ : Prop</code></pre>
+<p>Alternately, the set of sums of squares can be obtained from the predicate <code>IsSumSq</code> using the function <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Init/Set.html#setOf"><code>setOf</code></a>.</p>
+<pre class="lean"><code>def SumSqSet' (R : Type) [Semiring R] : Set R := setOf IsSumSq
+
+#check @SumSqSet' -- SumSqSet' : (R : Type) → [inst : Semiring R] → Set R
+#check @SumSqSet' ℤ  -- @SumSqSet' ℤ : [inst : Semiring ℤ] → Set ℤ
+#check @SumSqSet' ℤ _  -- SumSqSet' ℤ : Set ℤ
+
+#check SumSqSet' ℤ  -- SumSqSet' ℤ : Set ℤ
+#check 0 ∈ SumSqSet' ℤ  -- 0 ∈ SumSqSet' ℤ : Prop</code></pre>
+<p>We could have used the set-theoretic notation earlier if we had declared <code>IsSumSq</code> in the following way, replacing <code>R → Prop</code> with <code>Set R</code>:</p>
+<pre class="lean"><code>inductive IsSumSq {R : Type} [Semiring R] : Set R :=
+  | zero : IsSumSq (0 : R)
+  | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)</code></pre>
+<p>However, it is not clear that this is a better option. Indeed, if we do that, then <code>(0 : R) ∈ IsSumSq</code> type-checks, but it does not read very naturally compared to <code>(0 : R) ∈ SumSq R</code>. By definition, the latter means <code>(0 : R) ∈ {S : R | IsSumSq S}</code>, and this means that <code>IsSumSq (0 : R)</code> has a proof.</p>
+<p>Here is a proof that <code>(0 : R) ∈ SumSq R</code>. As we can see, it uses the fact that this is definitionally equal to the proposition <code>IsSumSq (0 : R)</code>.</p>
+<pre class="lean"><code>example {R : Type} [Semiring R] : 0 ∈ SumSqSet R := by  -- the goal is 0 ∈ SumSqSet R (note that Lean identifies the term 0 as being of type R)
+  dsimp [SumSqSet]  -- simplifies the goal to 0 ∈ {a | IsSumSq a}, using the definition of SumSqSet
+  change IsSumSq 0  -- changes the goal to IsSumSq 0, which is definitionally equal to 0 ∈ {a | IsSumSq a}
+  exact IsSumSq.zero  -- this closes the goal because IsSumSq.zero is the proof that 0 is a sum of squares in R</code></pre>
+<p>We can now rewrite the theorems above in set-theoretic notation. All of them have already been proved, so we close the goal with an <code>exact</code> tactic every time.</p>
+<pre class="lean"><code>theorem SumSqSet.Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) : (S1 + S2) ∈ SumSqSet R  := by
+  exact IsSumSq_Sum h1 h2
+
+lemma SumSqSet.ProdSqBySumSq {R : Type} [CommSemiring R] {S : R} (h : S ∈ SumSqSet R) {x : R} : (x ^2 * S) ∈ SumSqSet R := by
+  exact IsSumSq_ProdSqBySumSq h
+
+theorem SumSqSet.Prod {R : Type} [CommSemiring R] {S1 S2 : R} (h1 : S1 ∈ SumSqSet R) (h2 : S2 ∈ SumSqSet R) :(S1 * S2) ∈ SumSqSet R := by
+  exact IsSumSq_Prod h1 h2</code></pre>
+<p>To conclude this subsection, we point out that we could have made the variable <code>R</code> explicit in the declaration <code>IsSumSq</code>. It makes the notation a little bit heavier, but it can be useful when declaring subtypes (see <a href="#as-a-subtype">below</a>).</p>
+<pre class="lean"><code>inductive IsSumSqExpl (R : Type) [Semiring R] : R → Prop :=
+  | zero : IsSumSqExpl R (0 : R)
+  | add (x S : R) (hS : IsSumSqExpl R S) : IsSumSqExpl R (x ^ 2 + S)</code></pre>
+</section>
+<section id="as-a-subtype" class="level2">
+<h2 class="anchored" data-anchor-id="as-a-subtype">As a subtype</h2>
+<p>Similarly to the way the set <code>SumSqSet R</code> is defined (using the syntax <code>{S : R | IsSumSq S}</code>), Lean provides a way to define sums of squares as a <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype">subtype</a> of <code>R</code>, using the predicate <code>IsSumSq : R → Prop</code> and a syntax similar to the one seen <a href="#as-a-set">earlier</a> for <code>SumSqSet R</code> (namely <code>{S : R | IsSumSq S}</code>).</p>
+<p>The first difference is that the return type is now <code>Type</code>, as opposed to <code>Set R</code>. Note that we are still making the variable <code>R</code> explicit here.</p>
+<pre class="lean"><code>def SumSqType (R : Type) [Semiring R] : Type := {S : R // IsSumSq S}
+
+#check @SumSqType  -- SumSqType : (R : Type) → [inst : Semiring R] → Type</code></pre>
+<p>By definition of the subtype associated to the predicate <code>IsSumSq</code>, a term <code>S : SumSqType R</code> is a pair <code>⟨S.val, S.property⟩</code> consisting of a term <code>S.val : R</code> and a term <code>S.property : IsSumSq S</code> (meaning a proof of the proposition <code>IsSumSq S</code>). In particular, to declare such a term <code>S</code>, we need to specify both <code>S.val</code> and <code>S.property</code>.</p>
+<pre class="lean"><code>#check (⟨0, IsSumSq.zero⟩ : SumSqType ℤ)
+  -- { val := 0, property := (_ : IsSumSq 0) } : { S // IsSumSq S }</code></pre>
+<p>It seems reasonable to imagine that, when it comes to formalising proofs about sums of squares in <code>R</code>, it will be less natural for mathematicians to work with the subtype <code>IsSumSqType R</code> than with the set <code>IsSumSqSet R</code>. For example, when working with subtypes, to say that <em>the sum of two sums of squares is a sum of squares</em>, is equivalent to <em>declaring a function</em> <code>SumSqType.Add {R : Type} [Semiring R] : SumSqType R → SumSqType R → SumSqType R</code>, with <code>SumSq.Add S1 S2</code> defined as <code>⟨S1.val + S2.val, IsSumSq_Sum S1.property S2.property⟩</code>.</p>
+<p>As we can see, this formalises the desired result, but in a way that is not (yet?) the usual one in mathematics. Instead, it is directly inspired by the methods of functional programming. Exploring those methods further, we can perform other constructions that are common in functional programming and object-oriented programming, such as <em>instantiating a class</em> on the type <code>SumSqType</code>. For example the class <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add"><code>Add</code></a>, which will equip the type <code>SumSqType R</code> with a function <code>SumSqType R → SumSqType R → SumSqType R</code>.</p>
+<pre class="lean"><code>def Addition {R : Type} [Semiring R] (S1 S2 : SumSqType R) : SumSqType R := ⟨S1.val + S2.val, IsSumSq_Sum S1.property S2.property⟩
+
+instance {R : Type} [Semiring R] : Add (SumSqType R) := ⟨Addition⟩</code></pre>
+<p>As a consequence, we now have access to the methods of the class <code>Add</code>. For example, we can use the notation <code>+</code> without declaring it as such for the function <code>Addition</code>.</p>
+<pre class="lean"><code>def Double {R : Type} [Semiring R] (S : SumSqType R) : SumSqType R := S + S
+
+example {R : Type} [Semiring R] (S : SumSqType R) : Double S = Addition S S := by rfl</code></pre>
+<p>Note that the instantiation can also be done directly, without defining the function <code>Addition</code> first. And we may give it a name if we want, and/or use a slightly different syntax (<code>add</code> is the unique attribute of the class <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Add"><code>Add</code></a>).</p>
+<pre class="lean"><code>instance {R : Type} [Semiring R] : Add (SumSqType R) := ⟨fun S1 S2 =&gt; ⟨S1.val + S2.val, IsSumSq_Sum S1.property S2.property⟩⟩
+
+instance SumSqTypeAddition {R : Type} [Semiring R] : Add (SumSqType R) where add S1 S2 := ⟨S1.val + S2.val, IsSumSq_Sum S1.property S2.property⟩</code></pre>
+<p>Another advantage of defining sums of squares as a subtype is that we can make the type <code>SumSqType R</code> an instance of the <code>Repr</code> class, making it possible to use <code>#eval</code> on terms of type <code>SumSqType ℤ</code> or <code>SumSqType ℚ</code> (all terms of type <code>SumSqType R</code> where <code>R</code> is a <em>concrete</em> type).</p>
+<pre class="lean"><code>#check SumSqType ℤ
+
+instance {R : Type} [Semiring R] [Repr R] : Repr (SumSqType R) where
+  reprPrec :=
+    fun S _ =&gt;
+      repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+def zero_is_SOS : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
+
+#check zero_is_SOS.1  -- ↑zero_is_SOS : ℤ
+#check zero_is_SOS.2  -- zero_is_SOS.property : IsSumSq ↑zero_is_SOS
+
+#eval zero_is_SOS.1  -- 0
+#eval zero_is_SOS  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.</code></pre>
+<p>Similarly, we can register a <code>Decidable</code> instance on the proposition <code>IsSumSq (0 : R)</code>.</p>
+<pre class="lean"><code>instance {R : Type} [Semiring R] : Decidable (IsSumSq (0 : R)) :=
+  Decidable.isTrue (IsSumSq.zero)
+
+#check IsSumSq (0 : ℤ)  -- IsSumSq 0 : Prop
+#eval IsSumSq (0 : ℤ)  -- true
+
+#eval decide (IsSumSq (0 : ℤ))  -- true
+
+#check IsSumSq (0 : R')  -- IsSumSq 0 : Prop
+-- #eval IsSumSq (0 : R')  -- (kernel) declaration has free variables '_eval'</code></pre>
+<p>We conclude this subsection by showing one advantage of making the type <code>R</code> explicit in the definition of <code>IsSumSqExpl</code>. Namely that it gives us access to the function <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype"><code>Subtype</code></a>, which creates the subtype of sums of squares from the predicate <code>IsSumSq R : R → Prop</code>.</p>
+<p>This was not necessary earlier, due to the use of the syntax <code>{S : R // IsSumSq S}</code>, which is capable of inferring what is needed in order to construct the required type.</p>
+<pre class="lean"><code>def SumSqType' (R : Type) [Semiring R] : Type := Subtype (IsSumSqExpl R)
+
+#check @SumSqType'  -- SumSqType' : (R : Type) → [inst : Semiring R] → Type
+
+#check (⟨0, IsSumSqExpl.zero⟩ : SumSqType' ℤ)
+  -- { val := 0, property := (_ : IsSumSqExpl ℤ 0) } : Subtype (IsSumSqExpl ℤ)</code></pre>
+</section>
+<section id="as-a-structure" class="level2">
+<h2 class="anchored" data-anchor-id="as-a-structure">As a structure</h2>
+<p>One can also define the type of sums of squares in a semiring <code>R</code> directly, using the <code>structure</code> keyword, which creates a type. A structure is similar to an inductive type with only one constructor, but the way in which the resulting terms can be used is a bit different: a term in a structure can be projected to its various “components” (we will clarify this in the example below).</p>
+<p>Note that the notion of [subtype]((https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype) that we used <a href="#as-a-subtype">earlier</a> is indeed a special kind of structure. The difference is that, for a subtype, Lean inserts a so-called <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Coe.html#Coercion"><em>coercion</em></a>. Namely, a term <code>S</code> of type <code>{x : R // IsSumSq x}</code> will coerce to <code>R</code> (the resulting term is then denoted by <code>↑S</code>).</p>
+<p>This coercion is an optional design choice. It is inserted explicitly in the library at <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Coe.html#subtypeCoe">subtypeCoe</a>. By definition (in this case), the term <code>↑S</code> is the projection of <code>S</code> to <code>R</code>, which can also be accessed using <code>S.val</code> or <code>S.1</code> (while <code>S.property</code> or <code>S.2</code> will access a proof of the proposition <code>IsSumSq S.val</code>).</p>
+<p>Getting back to our context, given a semiring <code>R</code>, we define the type <code>SumsOfSquares R</code> to be the type whose terms consists of:</p>
+<ul>
+<li>a term <code>val</code> in <code>R</code> (a <em>value</em>) and</li>
+<li>a certain <em>property</em> (called <code>ppty</code>) and satisfied by this term <code>val</code>.</li>
+</ul>
+<p>More precisely, the term <code>ppty</code> is of type <code>IsSumSq val</code>, i.e.&nbsp;it is a proof that <code>val : R</code> is a sum of squares in <code>R</code>.</p>
+<p>Below, we essentially define by hand the same type <code>SumSqType R</code> introduced <a href="#as-a-subtype">above</a> as a subtype of <code>R</code>.</p>
+<pre class="lean"><code>structure SumsOfSquares (R : Type) [Semiring R] where
+mk :: (val : R) (ppty : IsSumSq val)</code></pre>
+<p>This could be written with a <code>:=</code> instead of a <code>where</code>. Also, the <code>mk ::</code> part is optional (<code>mk</code> stands for <code>make</code>). Indeed, the following syntax also works fine:</p>
+<pre class="lean"><code>structure SumsOfSquares (R : Type) [Semiring R]
+(val : R) (ppty : IsSumSq val)</code></pre>
+<p>As a result, we have a type <code>SumsOfSquares ℕ</code> or <code>SumsOfSquares ℤ</code>.</p>
+<pre class="lean"><code>#check SumsOfSquares
+#check SumsOfSquares ℤ</code></pre>
+<p>We also have new functions, created automatically, namely the constructor <code>SumsOfSquares.mk</code> (which is there even if <code>mk ::</code> is not used in the declaration of the structure, but would be called <code>SumsOfSquares.cons</code> if <code>cons</code> had been used in place of <code>mk</code>.)</p>
+<pre class="lean"><code>#check SumsOfSquares.mk</code></pre>
+<p>To give examples of terms of type <code>SumsOfSquares R</code>, we use the function <code>SumSq</code> introduced in the <a href="Defs.md">Defs</a> file. By Theorem <code>IsSumSq_Char</code> (proved <a href="#-using-an-existential-predicate">here</a>), this function indeed characterizes sums of squares in <code>R</code>, in the sense that we have an equivalence:</p>
+<blockquote class="blockquote">
+<p>IsSumSq S ↔︎ (∃ L : List R, SumSq L = S)</p>
+</blockquote>
+<p>so the sums of squares in <code>R</code> are exactly the values of the function <code>SumSq</code>. This observation leads to the declaration of a function <code>SumSqList: List R → SumsOfSquares R</code>.</p>
+<pre class="lean"><code>def SumSqList {R : Type} [Semiring R] (L : List R) : SumsOfSquares R := SumsOfSquares.mk (SumSq L) (SumSqListIsSumSq L)  -- ⟨SumSq L, SumSqListIsSumSq L⟩ also works
+
+#check SumSqList [1, -2, 3]  -- SumSqList [1, -2, 3] : SumsOfSquares ℤ</code></pre>
+<p>We can then project a term <code>S : SumsOfSquares R</code> to <code>R</code> and <code>IsSumSq S.val</code>.</p>
+<pre class="lean"><code>#check SumsOfSquares.val  -- SumsOfSquares.val {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : R
+#check SumsOfSquares.ppty  -- SumsOfSquares.ppty {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : IsSumSq self.val
+
+#check (SumSqList [1, -2, 3]).val   -- (SumSqList [1, -2, 3]).val : ℤ
+#check (SumSqList [1, -2, 3]).ppty  -- (SumSqList [1, -2, 3]).ppty : IsSumSq (SumSqList [1, -2, 3]).val</code></pre>
+<p>As in the first implementation of the type of sums of squares given <a href="#-as-a-subtype">above</a>, we can put a <code>Repr</code> instance on the type <code>SumsOfSquares R</code>.</p>
+<pre class="lean"><code>instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares R) where
+  reprPrec :=
+    fun S _ =&gt;
+      repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+-- Below, we use a Type-valued predicate (as opposed to Prop-valued)
+
+inductive IsSumSq' {R : Type} [Semiring R] : R → Type
+  | zero : IsSumSq' (0 : R)
+  | add (x S : R) (hS : IsSumSq' S) : IsSumSq' (x ^ 2 + S)
+
+structure SumsOfSquares' (R : Type) [Semiring R] where
+(val : R) (ppty : IsSumSq' val)
+
+instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares' R) where
+  reprPrec :=
+    fun S _ =&gt;
+      repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+def SumSqListIsSumSq' {R : Type} [Semiring R] : (L : List R) → IsSumSq' (SumSq L) := by
+  intro L  -- let L be a list whose members are terms of type signature R
+  induction L with  -- by induction on the list L
+  | nil =&gt;  -- the case of the empty list []
+    rw [SumSq]  -- rewrite using SumSq [] = 0
+    exact IsSumSq'.zero  -- IsSumSq' 0 is a proof that 0 is a sum of squares
+  | cons a l ih =&gt;  -- the case of a list L = (a :: l) where SumSq l is assumed to be a sum of squares
+    rw [SumSq]  -- rewrite using SumSq (a :: l) = a ^2 + SumSq l
+    exact IsSumSq'.add a (SumSq l) ih  -- conclude using the induction hypothesis and the property that, if S is a sum of squares, then x ^2 + S is a sum of squares
+
+def SumSqList' {R : Type} [Semiring R] (L : List R) : SumsOfSquares' R :=
+  ⟨SumSq L, SumSqListIsSumSq' L⟩  -- SumsOfSquares'.mk (SumSq L) (SumSqListIsSumSq' L)
+
+instance {R : Type} [Semiring R] [Repr R] {L : List R} : Repr (IsSumSq' (SumSqList' L).val) where
+ reprPrec :=
+    fun _ _ =&gt;
+    "A proof of the fact that " ++ repr (SumSqList' L).val ++ " is a sum of squares is provided by applying the function SumSqListIsSumSq to the list " ++ repr L ++ ", because SumSq " ++ repr L ++ " = " ++ repr (SumSqList L).val  -- to re-examine
+
+#check SumSqList' [1, -2, 3]
+#eval SumSqList' [1, -2, 3]
+#check (SumSqList' [1, -2, 3]).val
+#eval (SumSqList' [1, -2, 3]).val
+#check (SumSqList' [1, -2, 3]).ppty
+#eval (SumSqList' [1, -2, 3]).ppty</code></pre>
+<p>We can then define terms of type <code>SumsOfSquares ℤ</code> as we did before. But note that no coercion has been inserted here (we would have to do it ourselves).</p>
+<pre class="lean"><code>def zero_is_SOS' : SumsOfSquares ℤ := ⟨0, IsSumSq.zero⟩
+
+#check zero_is_SOS'.1  -- zero_is_SOS'.val : ℤ
+#check zero_is_SOS'.2  -- zero_is_SOS'.property : IsSumSq zero_is_SOS'.val
+
+#eval zero_is_SOS'.1  -- 0
+#eval zero_is_SOS'  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.</code></pre>
+<p>We can also apply <code>#eval</code> to values of the functions <code>SumSqList</code>. But the last one gives us an error message.</p>
+<pre class="lean"><code>#check SumSqList [1, -2, 3]
+#eval SumSqList [1, -2, 3]  -- 14 is a sum of squares because the property IsSumSq 14 has been proven.
+#check (SumSqList [1, -2, 3]).val  -- (SumSqList [1, -2, 3]).val : ℤ
+#eval (SumSqList [1, -2, 3]).val  -- 14
+#check (SumSqList [1, -2, 3]).ppty
+-- #eval (SumSqList [1, -2, 3]).ppty  -- invalid universe level, 0 is not greater than 0
+
+#reduce (SumSqList [1, -2, 3])
+#reduce (SumSqList [1, -2, 3]).val
+#reduce (SumSqList [1, -2, 3]).ppty
+-- try to put a `Repr` instance on the type `IsSumSq (SumSq L)`?</code></pre>
+<p>Of course, this would have worked just as well with the type <code>SumSqType R</code> in place of <code>SumsOfSquares R</code>.</p>
+<pre class="lean"><code>def SumSqListType {R : Type} [Semiring R] (L : List R) : SumSqType R := ⟨SumSq L, SumSqListIsSumSq L⟩
+
+#check SumSqListType [1, -2, 3]
+#eval SumSqListType [1, -2, 3]
+#eval (SumSqListType [1, -2, 3]).val</code></pre>
+<p>Finally, we note that, if we use an inductive type with just one constructor (as opposed to a structure), the resulting data type can be used in a similar manner, but the way the terms are accessed and used is a bit different. In particular, they cannot be projected to their various components (unless one defines the projections “by hand”).</p>
+<pre class="lean"><code>inductive SumsOfSquares'' (R : Type) [Semiring R]
+| mk (val : R) (ppty : IsSumSq val)
+
+#check SumsOfSquares''
+#check SumsOfSquares''.mk
+#check SumsOfSquares'' ℤ
+
+def SumSqList'' {R : Type} [Semiring R] (L : List R) : SumsOfSquares'' R := SumsOfSquares''.mk (SumSq L) (SumSqListIsSumSq L)
+
+#check SumSqList'' [1, -2, 3]</code></pre>
+<p>The above works fine but the following command do not work (we would have to define the projections by hand):</p>
+<pre class="lean"><code>#check (SumSqList'' [1, -2, 3]).val
+#check (SumSqList'' [1, -2, 3]).ppty</code></pre>
+<p>We can still put a <code>Repr</code> instance on the type <code>SumsOfSquares' R</code>. But note that the syntax used to access the various pieces of data contained in a term <code>S</code> is different (using pattern matching instead of projecting).</p>
+<pre class="lean"><code>instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares' R) where
+  reprPrec :=
+    fun (SumsOfSquares'.mk val _) _ =&gt;
+      repr val ++ " is a sum of squares because the property IsSumSq " ++ repr val ++ " has been proven."
+
+#eval SumSqList' [1, -2, 3]</code></pre>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="exercise-1" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1">Exercise 1</h3>
+<p>Let <code>R</code> be a semiring and let <code>S</code> be a term in <code>R</code>. Prove that Proposition <code>IsSumSq S</code> is equivalent to Proposition <code>IsSumSq' S</code>, where <code>IsSumSq'</code> is the predicate defined inductively as follows:</p>
+<pre class="lean"><code>inductive IsSumSq' {R : Type} [Semiring R] : R → Prop :=
+  | sq (x : R) : IsSumSq (x ^ 2 : R)
+  | add (S1 S2 : R) (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2)</code></pre>
+<p>Note that this definition may be more intuitive than the one we gave in <a href="#using-an-inductive-predicate">the first section</a>. But it might be less convenient to work with. Indeed, when proving a statement by induction on the proof of <code>IsSumSq' S</code>, then in the first case, we would have to prove it not only for <code>S = 0</code>, but in all cases <code>S = x ^ 2</code> for some <code>x : R</code>.</p>
+</section>
+<section id="exercise-2" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2">Exercise 2</h3>
+<p>Let <code>R</code> be a semiring and let <code>S</code> be a term in <code>R</code>. Write a (direct) proof of the implication</p>
+<blockquote class="blockquote">
+<p>(∃ L : List R, SumSq L = S) → IsSumSq S</p>
+</blockquote>
+<p>and ask yourself whether having an existential quantifier in the assumption makes things complicated. Try using Lemma <code>SumSqListIsSumSq</code> and the second implication of the equivalence <code>IsSumSq_Char</code> to prove the result. You can then see that the approach there is to first prove <code>IsSumSq (SumSq L)</code> and from this deduce a proof of the implication. A formalisation of this last statement is suggested in <a href="#exercise-3">Exercise 3</a>.</p>
+</section>
+<section id="exercise-3" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3">Exercise 3</h3>
+<p>Let <code>S T</code> be types. Let <code>P : T → Prop</code> be a predicate on <code>T</code> and let <code>f : S → T</code> be a function from <code>S</code> to <code>T</code>. Assume that the proposition <code>∀ x : S, P (f x)</code> has a proof and that the proposition <code>∀ y : T, ∃ x : S, y = f x</code> has a proof. Show that the proposition <code>∀ y : T, P y</code> has a proof.</p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

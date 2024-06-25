@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>list</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="List_files/libs/clipboard/clipboard.min.js"></script>
+<script src="List_files/libs/quarto-html/quarto.js"></script>
+<script src="List_files/libs/quarto-html/popper.min.js"></script>
+<script src="List_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="List_files/libs/quarto-html/anchor.min.js"></script>
+<link href="List_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="List_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="List_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="List_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="List_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="sums-of-squares---basic-properties" class="level1">
+<h1>Sums of squares - Basic properties</h1>
+<p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
+<pre class="lean"><code>import SumSq.Defs
+import Std.Data.List.Basic
+import Mathlib.Data.List.Perm
+import Mathlib.Tactic.FieldSimp
+
+import Mathlib.Data.Multiset.Basic
+
+#check Multiset
+
+#check List.Perm</code></pre>
+<section id="appended-lists" class="level2">
+<h2 class="anchored" data-anchor-id="appended-lists">Appended lists</h2>
+<p>Recall from <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.append">#List.append</a> that <code>L1 ++ L2</code> (which is notation for <code>List.append L1 L2</code>) is defined as follows, by pattern matching on <code>L1</code> (see Init.Data.List.Basic for details).</p>
+<pre class="lean"><code>def List.append : (L1 L2 : List R) → List R
+  | [], L2 =&gt; L2
+  | a::l1, L2 =&gt; a :: List.append l1 L2</code></pre>
+<p>We now prove that the sum of squares of the list <code>L1 ++ L2</code> is equal to the sum of squares of <code>L1</code> plus the sum of squares of <code>L2</code>.</p>
+<blockquote class="blockquote">
+<p><code>SumSq (L1 ++ L2) = SumSq L1 + SumSq L2</code></p>
+</blockquote>
+<pre class="lean"><code>theorem SumSqAppend {R : Type} [Semiring R] (L1 L2 : List R) : SumSq (L1 ++ L2) = SumSq L1 + SumSq L2 := by
+  induction L1 with -- we prove the result by induction on the list L1
+  | nil =&gt; -- case when L1 is the empty list
+    simp only [SumSq, zero_add, List.nil_append L2] -- since [] ++ L2 = L2 by definition of ++, the result follows by definition of SumSq
+  | cons a l1 ih =&gt; -- case when L1 = (a :: L)
+    simp [SumSq] -- by [`List.cons_append](https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.cons_append) (a :: L) ++ L2 = a :: (L ++ L2), so SumSq (a :: (L ++ L2)) = a ^ 2  + SumSq (L ++ L2)
+    rw [ih] -- recall that ih : SumSq (L ++ L2) = SumSq L + SumSq L2
+    rw [add_assoc] -- the two terms are now equal up to associativity of addition</code></pre>
+</section>
+<section id="permuted-lists" class="level2">
+<h2 class="anchored" data-anchor-id="permuted-lists">Permuted lists</h2>
+<p>Recall from <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.Perm">#List.Perm</a> that the relation <code>L1 ~ L2</code> (which is notation for <code>List.Perm L1 L2</code>) is defined inductively using pairwise swaps.</p>
+<pre class="lean"><code>inductive Perm : List R → List R → Prop
+  | nil : Perm [] []
+  | cons (a : R) {l₁ l₂ : List R} : Perm l₁ l₂ → Perm (a :: l₁) (a :: l₂)
+  | swap (a₁ a₂ : R) (l : List R) : Perm (a₂ :: a₁ :: l) (a₁ :: a₂ :: l)
+  | trans {L₁ L₂ L₃ : List R} : Perm L₁ L₂ → Perm L₂ L₃ → Perm L₁ L₃</code></pre>
+<p>So we wee that <code>List.Perm</code> is an inductive type: a list <code>L2</code> is a permutation of the list <code>L1</code> if and only if one of four cases occurs.</p>
+<p>We can now prove that a sum of squares is invariant under permutations:</p>
+<blockquote class="blockquote">
+<p><code>L1 ~ L2 → SumSq L1 = SumSq L2</code></p>
+</blockquote>
+<p>Note that, since <code>List.Perm</code> uses implicit variables for the constructors <code>cons</code> and <code>trans</code>, we choose to write the proof by indution with a slighty different syntax (using <code>case</code>), to make the Lean infoview rendering more readable (for more on this, see Exercise 1 <a href="#exercises">below</a>).</p>
+<pre class="lean"><code>theorem SumSqPermut {R : Type} [Semiring R] {L1 L2 : List R} (H : L1.Perm L2) : SumSq L1 = SumSq L2 := by
+  induction H -- we prove the result by induction on `H`, which is a term of type `L1 ~ L2` (and the latter is indeed inductively defined)
+  · case nil =&gt; -- case when L1 L2 are both empty
+    rfl -- equality holds by definition
+  · case cons x l1 l2 Hl Sum12 =&gt; -- case when L1 = (x :: l1) and L2 = (x :: l2) with l1 ~ l2
+    simp only [SumSq] -- by definition, SumSq (x :: lj) = x ^ 2  + SumSq lj for j = 1, 2
+    rw [Sum12] -- by induction, SumSq l1 = SumSq l2
+  · case swap a b L =&gt; -- case when L1 = (b :: (a :: L)) and L2 = (a :: (b :: L))
+    simp only [SumSq] -- by definition, SumSq (b :: (a :: L)) = b ^ 2  + (a ^ 2  + SumSq L)
+    rw [← add_assoc, ← add_assoc, add_comm (b ^ 2) (a ^ 2)] -- the two expressions are equal in R
+  · case trans L1 L L2 H1 H2 Sum1 Sum2 =&gt; -- case when L1 ~ L and L ~ L2
+    rw [Sum1, Sum2] -- by induction SumSq L1 = SumSq L and SumSq L = SumSq L2</code></pre>
+</section>
+<section id="erasing-an-entry" class="level2">
+<h2 class="anchored" data-anchor-id="erasing-an-entry">Erasing an entry</h2>
+<p>The function <code>List.erase</code> can erase an entry of a list. It is defined as follows in <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.erase">#List.erase</a>.</p>
+<pre class="lean"><code>def List.erase {R : Type} [BEq R] : List R → R → List R
+  | [], _ =&gt; []
+  | a::l, b =&gt; match a == b with
+    | true  =&gt; l
+    | false =&gt; a :: List.erase l b</code></pre>
+<p>Note that this declaration uses Boolean equality. It could be written using decidable equality, in the following way.</p>
+<pre class="lean"><code>def List.erase' {R : Type} [DecidableEq R] : List R → R → List R
+  | [], _ =&gt; []
+  | a::l, b =&gt; if a = b then l else List.erase' l b</code></pre>
+<p>Whichever definition of <code>erase</code> we choose, we need to assume that the type <code>R</code> has decidable equality in order to be able to use it (and the same goes for the function <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/List/Perm.html#List.perm_cons_erase"><code>#List.perm_cons_erase</code></a>, also used below).</p>
+<p>We now prove that, if a term <code>a : R</code> is an entry of a list <code>L : List R</code>, then we can compute <code>SumSq L</code> from <code>a</code> and <code>SumSq (L.erase a)</code>. More precisely:</p>
+<blockquote class="blockquote">
+<p><code>a ∈ L → SumSq L = a ^ 2 + SumSq (L.erase a)</code></p>
+</blockquote>
+<p>The type <code>a ∈ L</code> is defined in <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem">#List.Mem</a>. It is an inductive type: a term <code>a : R</code> belongs to a list <code>L : List R</code> if and only if <code>L = (a :: l)</code> or <code>L = (b :: l)</code> with <code>b ∈ l</code>.</p>
+<pre class="lean"><code>theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
+  change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
+  have H : L.Perm (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a)), see also the exercises section below
+  rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal</code></pre>
+</section>
+<section id="multiplication-by-a-scalar" class="level2">
+<h2 class="anchored" data-anchor-id="multiplication-by-a-scalar">Multiplication by a scalar</h2>
+<p>Let <code>L</code> be a list with entries in a semiring <code>R</code>. If <code>c</code> is a term of type <code>R</code>, we can multiply each entry of <code>L</code> by <code>c</code> to define a new list, that we shall denote <code>c • L</code>. For instance, if <code>L = [x, y, z]</code>, we should have:</p>
+<blockquote class="blockquote">
+<p><code>c • [x, y, z] = [c * x, c * y, c * z]</code></p>
+</blockquote>
+<p>Let us define this formally and take a look at a few examples. As we shall see, one has to be precise in the notation, in order for Lean to interpret the command correctly.</p>
+<pre class="lean"><code>def ListSmul {R : Type} [Semiring R] (c : R) : List R → List R
+  | [] =&gt; []
+  | a :: l =&gt; (c * a) :: ListSmul c l
+
+infixl:50 " • " =&gt; ListSmul
+
+theorem ListSmulMap {R : Type} [Semiring R] (c : R) (L : List R) : (c • L) = L.map (c * .) := by
+  induction L with
+  | nil =&gt; simp [ListSmul]  -- the case of the empty list is trivial
+  | cons a l ih =&gt;  simp [ListSmul, ih]  -- the case of a list of the form (a :: l) reduces immediately to the induction hypothesis
+
+#eval ListSmul 2 [1, -2, 3]  --[2, -4, 6]
+#eval ((2 : ℤ) • [1, -2, 3])
+
+example : ListSmul 2 [1, -2, 3] = [2, -4, 6] := by rfl
+
+#eval SumSq (ListSmul 2 [1, -2, 3])  -- 56
+#eval SumSq ((2 : ℤ) • [1, -2, 3])  -- 56
+
+example : SumSq (ListSmul 2 [1, -2, 3]) = 4 * SumSq [1, -2, 3] := by rfl
+
+#eval SumSq [2, -4, 6]
+#eval 4 * SumSq [1, -2, 3]  -- 56
+
+example (a x y : ℚ) : (ListSmul a [x, y]) = [a * x, a * y] := by rfl
+example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add]</code></pre>
+<p>The result we expect is then the following:</p>
+<blockquote class="blockquote">
+<p><code>SumSq (c • L) = c ^ 2 * SumSq L</code></p>
+</blockquote>
+<p>We will see below that this result holds when <code>R</code> is a <em>commutative</em> semiring.</p>
+<p>Indeed, in order to be able to apply lemmas such as <a href="https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/GroupPower/Basic.html#mul_pow"><code>#mul_pow</code></a> in the proof, we need to assume that the semiring <code>R</code> is commutative.</p>
+<p>Before proving the result that is relevant result, we prove an easier one, of possibly greater general interest, with <code>SumSq</code> replaced by <code>List.sum</code>.</p>
+<pre class="lean"><code>theorem SumSmul {R : Type} [Semiring R] (c : R) (L : List R) : List.sum (c • L) = c * (List.sum L) := by
+  induction L with
+  | nil =&gt; simp only [ListSmul, List.sum_nil, mul_zero]
+  | cons a l ih =&gt; simp [ListSmul, mul_add, ih]
+
+theorem SumSqSmul {R : Type} [CommSemiring R] (c : R) (L : List R) : SumSq (c • L) = c ^ 2 * SumSq L := by
+    induction L with -- we prove the result by induction on L
+    | nil =&gt; simp only [SumSq, mul_zero] -- the case of the empty list is trivial
+    | cons a _ ih =&gt; simp only [SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis</code></pre>
+<p>If we assume that the semiring <code>R</code> is in fact a semifield, then we can also consider the list from <code>L</code> obtained by dividing each entry by a term <code>c</code> such that `c ≠ 0’.</p>
+<pre class="lean"><code>theorem SumSqDiv {F : Type} [Semifield F]
+  (L : List F) (c : F) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L := by
+    -- this will be an application of mul_sum_sq2, using the fact that . / c = . * c⁻¹
+    have aux : (fun x =&gt; x / c) = (fun x =&gt; c⁻¹ * x) := by field_simp
+    simp only [aux, ← ListSmulMap, SumSqSmul]
+    field_simp</code></pre>
+<p>Note that no assumption <code>(hc : c ≠ 0)</code> has been used because Lean gives a value to division by <code>c</code> in <code>F</code> even if <code>c = 0</code> and that the equality remains true in this case.</p>
+<pre class="lean"><code>example [Semifield F] (x : F) : x / 0 = 0 := by field_simp</code></pre>
+</section>
+<section id="more-computations" class="level2">
+<h2 class="anchored" data-anchor-id="more-computations">More computations</h2>
+<p>Before moving on to the exercises, we give another proof of <code>theorem SumSqSmul</code>, seen in the section on <a href="#multiplication-by-a-scalar">Multiplication by a scalar</a>.</p>
+<p>It is a direct, more computational proof, harder to follow than the original proof (by induction).</p>
+<pre class="lean"><code>lemma SumSmul2 {R : Type} [Semiring R]  (c : R) (L : List R) : (L.map (c * .)).sum = c * L.sum := by
+  induction L with
+  | nil =&gt; simp
+  | cons a l ih =&gt; simp [mul_add, ih]
+
+theorem SumSqSmul2 {R : Type} [CommSemiring R] (L : List R) (c : R) : ((L.map (c * .)).map (. ^2)).sum = c ^ 2 * (L.map (. ^ 2)).sum := by
+    simp [mul_add, mul_pow, ← SumSmul2]  -- we simplify the statement
+    have aux : ((fun x =&gt; x ^ 2) ∘ fun x =&gt; c * x) = ((fun x =&gt; c ^ 2 * x) ∘ fun x =&gt; x ^ 2)
+      := by simp [Function.funext_iff, mul_pow]  -- we prove an auxiliary result in order to incorporate it in the goal
+    rw [aux]</code></pre>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<section id="exercise-1" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1">Exercise 1</h3>
+<p>Modify the syntax of the <code>induction</code> tactic in <a href="#permuted-lists"><code>SumSqPermut</code></a> to make it look more similar to that of <a href="#appended-lists"><code>SumSqAppend</code></a>. This means: in <code>SumSqPermut</code>, replace <code>induction H</code> by <code>induction H with</code> and make the proof syntactically correct after that (start by changing <code>⬝ case nil</code> to <code>| nil</code>).</p>
+</section>
+<section id="exercise-2" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2">Exercise 2</h3>
+<p>Let <code>R</code> be a type with decidable equality. Let <code>a</code> be a term of type <code>R</code> and let <code>L</code> be a term of type <code>List R</code>. Prove that, if <code>a ∈ L</code>, then the list <code>a :: L.erase a</code> is a permutation of <code>L</code> (we have used this standard result <a href="#erasing-an-entry">here</a>).</p>
+</section>
+<section id="exercise-3" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3">Exercise 3</h3>
+<p>Prove that the statement of <a href="#more-computations"><code>theorem SumSqSmul2</code></a> is indeed equivalent to the statement of <a href="#multiplication-by-a-scalar"><code>theorem SumSqSmul</code></a>.</p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

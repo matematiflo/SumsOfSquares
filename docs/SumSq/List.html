@@ -45,11 +45,11 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="sums-of-squares---basic-properties" class="level1">
-<h1>Sums of squares - Basic properties</h1>
+<section id="sums-of-squares---basic-properties-of-lists" class="level1">
+<h1>Sums of squares - Basic properties of lists</h1>
 <p>Copyright (c) 2023 Matematiflo. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Florent Schaffhauser.</p>
 <pre class="lean"><code>import SumSq.Defs
-import Std.Data.List.Basic
+import Batteries.Data.List.Basic
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
 
@@ -123,9 +123,9 @@ import Mathlib.Data.Multiset.Basic
 </blockquote>
 <p>The type <code>a ∈ L</code> is defined in <a href="https://leanprover-community.github.io/mathlib4_docs/Init/Data/List/Basic.html#List.Mem">#List.Mem</a>. It is an inductive type: a term <code>a : R</code> belongs to a list <code>L : List R</code> if and only if <code>L = (a :: l)</code> or <code>L = (b :: l)</code> with <code>b ∈ l</code>.</p>
 <pre class="lean"><code>theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
-  change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
   have H : L.Perm (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a)), see also the exercises section below
-  rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal</code></pre>
+  rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+  rw [SumSq]  -- the last simplification follows by definition of `SumSq`</code></pre>
 </section>
 <section id="multiplication-by-a-scalar" class="level2">
 <h2 class="anchored" data-anchor-id="multiplication-by-a-scalar">Multiplication by a scalar</h2>
@@ -159,7 +159,7 @@ example : SumSq (ListSmul 2 [1, -2, 3]) = 4 * SumSq [1, -2, 3] := by rfl
 #eval 4 * SumSq [1, -2, 3]  -- 56
 
 example (a x y : ℚ) : (ListSmul a [x, y]) = [a * x, a * y] := by rfl
-example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add]</code></pre>
+example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add, ListSmul]</code></pre>
 <p>The result we expect is then the following:</p>
 <blockquote class="blockquote">
 <p><code>SumSq (c • L) = c ^ 2 * SumSq L</code></p>
@@ -174,8 +174,8 @@ example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by s
 
 theorem SumSqSmul {R : Type} [CommSemiring R] (c : R) (L : List R) : SumSq (c • L) = c ^ 2 * SumSq L := by
     induction L with -- we prove the result by induction on L
-    | nil =&gt; simp only [SumSq, mul_zero] -- the case of the empty list is trivial
-    | cons a _ ih =&gt; simp only [SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis</code></pre>
+    | nil =&gt; simp only [SumSq, mul_zero, ListSmul]  -- the case of the empty list is trivial
+    | cons a l ih =&gt; simp only [ListSmul, SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis</code></pre>
 <p>If we assume that the semiring <code>R</code> is in fact a semifield, then we can also consider the list from <code>L</code> obtained by dividing each entry by a term <code>c</code> such that `c ≠ 0’.</p>
 <pre class="lean"><code>theorem SumSqDiv {F : Type} [Semifield F]
   (L : List F) (c : F) : SumSq (L.map (. / c)) = (1 / c ^ 2) * SumSq L := by

@@ -1,5 +1,5 @@
 /-
-# Sums of squares - Basic properties
+# Sums of squares - Basic properties of lists
 
 Copyright (c) 2023 Matematiflo. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.

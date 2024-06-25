@@ -35,9 +35,12 @@ def SumSq {R : Type} [Semiring R] (L : List R) : R :=
   match L with
   | [] => 0
   | a :: l => a ^ 2 + SumSq l
-termination_by
-  L.length
+  termination_by List.length L
+```
 
+The `termination_by` expression  at the end of the declaration of `SumSq` is used to show that the recursion terminates at some point. It takes a function of `L` as an argument, in this case the length of the list `L`. And indeed this is the quantity that decreases along the computation, which stops just after `List.length L` becomes `0`.
+
+```lean
 example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := by rewrite [SumSq]; rfl
 ```
 

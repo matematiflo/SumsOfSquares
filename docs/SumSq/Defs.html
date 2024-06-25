@@ -69,10 +69,9 @@ import Mathlib.Algebra.Field.Rat</code></pre>
   match L with
   | [] =&gt; 0
   | a :: l =&gt; a ^ 2 + SumSq l
-termination_by
-  L.length
-
-example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := by rewrite [SumSq]; rfl</code></pre>
+  termination_by List.length L</code></pre>
+<p>The <code>termination_by</code> expression at the end of the declaration of <code>SumSq</code> is used to show that the recursion terminates at some point. It takes a function of <code>L</code> as an argument, in this case the length of the list <code>L</code>. And indeed this is the quantity that decreases along the computation, which stops just after <code>List.length L</code> becomes <code>0</code>.</p>
+<pre class="lean"><code>example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := by rewrite [SumSq]; rfl</code></pre>
 <p>Alternate syntax, without pattern matching:</p>
 <pre class="lean"><code>def SumSq {R : Type} [Semiring R] : (List R → R)
   | [] =&gt; 0

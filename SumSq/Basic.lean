@@ -7,7 +7,6 @@ Authors: Florent Schaffhauser.
 -/
 
 import SumSq.Defs
-import Mathlib.Algebra.GroupPower.Basic
 
 /-!
 Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function `SumSq : List R → R` that computes the sum of squares of the entries of a list:
@@ -155,14 +154,14 @@ We begin with the first implication: starting from `S : R` such that `IsSumSq S`
 lemma IsSumSqToExistList {R : Type} [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
   induction hS with  -- we prove the result by induction on hS (which is a proof that S is a sum of squares)
   | zero =>  -- the base case is when S = 0
-    exact ⟨[], rfl⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
+    exact ⟨[], by rw [SumSq]⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
     -- use []  -- instead of exact ⟨[], rfl⟩, we can write use [] followed by rfl
     -- rfl
   | add a s _ ih =>  -- the inductive step is when S = a ^2 + s, where s is a sum of squares and the induction hypothesis is that there exists a list L such that SumSq L = s
     rcases ih with ⟨l, hl⟩  -- we extract from ih a list l such that SumSq l = s
     rw [← hl]  -- we rewrite the goal using SumSq l = s
     use (a :: l)  -- We claim that we can use the list L = (a :: l) to show that there exists a list L such thatt SumSq L = a ^ 2 + SumSq l
-    rfl  -- indeed the result is true by definition of the function SumSq
+    rw [SumSq]  -- indeed the result is true by definition of the function SumSq
 
 /-!
 From this and Lemma `SumSqListIsSumSq` proved in [the first section](#using-an-inductive-predicate), we can prove the equivalence that we wanted. Note that, given a sum of squares `S` in `R`, there may exist more than one list such that `SumSq L = S`.

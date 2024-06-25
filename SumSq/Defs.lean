@@ -7,8 +7,10 @@ Authors: Florent Schaffhauser.
 -/
 
 import Mathlib.Algebra.Ring.Defs
-import Mathlib.Data.List.BigOperators.Basic
+import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.Data.Rat.Defs
+import Mathlib.Algebra.Ring.Int
+import Mathlib.Algebra.Field.Rat
 
 /-!
 > **Convention.** In proofs by induction, the notation `ih` is meant to signify *induction hypothesis*.
@@ -34,6 +36,10 @@ def SumSq {R : Type} [Semiring R] (L : List R) : R :=
   match L with
   | [] => 0
   | a :: l => a ^ 2 + SumSq l
+termination_by
+  L.length
+
+example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := by rewrite [SumSq]; rfl
 
 /-!
 Alternate syntax, without pattern matching:
@@ -58,7 +64,7 @@ By construction, the function `SumSq` is computable. In particular, simple equal
 In these examples, note that Lean is capable of recognizing that `[1, -2, 3]` is a list of integers, i.e. a term of type `List ℤ`.
 -/
 
-#eval SumSq [1, -2, 3]  -- 14
+#eval SumSq [1, -2, 3] -- 14
 #eval SumSq ([] : List ℕ)  -- 0
 #eval SumSq ([1, -2, 3/4] : List ℚ)  -- (89 / 16 : ℚ)
 
@@ -103,12 +109,12 @@ We now *prove* that the two definitions agree. This means that we define a funct
 
 theorem squaring_and_summing {R : Type} [Semiring R] (L : List R) : SumSq2 L = SumSq L := by
   induction L with -- we prove the result by induction on the list L (the type `List R` is an inductive type)
-  | nil => rfl -- case when L is the empty list, the two terms are definitionally equal
+  | nil => rewrite [SumSq]; rfl -- case when L is the empty list, the two terms are definitionally equal
   | cons a l ih => -- case when L = (a :: l), the two terms reduce to equal ones after some simplifications
     dsimp [SumSq2, SumSq] -- we simplify using the definitions of SumSq2 and SumSq
     dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of SumSq2
-    rw [← ih]  -- we use the induction hypothesis
-    simp only [List.sum_cons]
+    rewrite [SumSq, ←ih]  -- we use the induction hypothesis
+    rw [List.sum_cons]
 
 /-!
 ## Tail-recursive definition
@@ -126,7 +132,7 @@ def SumSqAux {R : Type} [Semiring R] : R → List R → R
 The following property holds by definition. It will be used in the proof of the equality `SumSqTR L = SumSq L`.
 -/
 
-theorem SumSqAuxZero {R : Type} [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rfl
+theorem SumSqAuxZero {R : Type} [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rewrite [SumSq]; rfl
 
 /-!
 The tail-recursive version of the `SumSq` function is then defined as follows.
@@ -158,7 +164,7 @@ theorem SumSqAuxWithSumSq {R : Type} [Semiring R] (L1 : List R) : ∀ L2 : List 
     dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of SumSq and SumSqAux
     rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of SumSq
     rw [ih (a :: L)]  -- we apply the induction hypothesis with L' = (a :: L'')
-    rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
+    rw [SumSq, add_comm (a ^ 2) _, add_assoc, SumSq]  -- we compute to finish the proof
 
 /-!
 With the help of `SumSqAuxWithSumSq`, we can now prove that the tail-recursive version of the sum-of-squares function indeed returns the same value as the original function.

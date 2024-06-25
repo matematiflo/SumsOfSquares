@@ -10,6 +10,10 @@ import Std.Data.List.Basic
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
 
+import Mathlib.Data.Multiset.Basic
+
+#check Multiset
+
 #check List.Perm
 ```
 

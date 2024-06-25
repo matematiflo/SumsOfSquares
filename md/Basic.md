@@ -6,7 +6,6 @@ Authors: Florent Schaffhauser.
 
 ```lean
 import SumSq.Defs
-import Mathlib.Algebra.GroupPower.Basic
 ```
 
 Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function `SumSq : List R → R` that computes the sum of squares of the entries of a list:
@@ -15,14 +14,14 @@ Let `R`be a semiring. In the file [SumSq.Defs](Defs.md), we declared a function 
 
 In the present file, we declare a predicate `IsSumSq : R → Prop` that characterizes the elements of `R` that are return values of the function `SumSq`. We then discuss how to use such a predicate to declare sums of squares in `R` either as a subset or as a subtype of `R`.
 
-## Using an inductive predicate
+## Using an inductive predicate / type
 
 Using a predicate on `R` (i.e. a function `IsSumSq : R → Prop`) to characterize sums of squares in `R` means the following: a term `S : R` will be called a sum of squares if the proposition `IsSumSq S` has a proof.
 
 Below, the predicate `IsSumSq` is defined inductively, but later we will show that we can also define it [existentially](#using-an-existential-predicate).
 
 ```lean
-inductive IsSumSq {R : Type} [Semiring R] : R → Prop :=
+inductive IsSumSq {R : Type} [Semiring R] : R → Prop
   | zero : IsSumSq (0 : R)
   | add (x S : R) (hS : IsSumSq S) : IsSumSq (x ^ 2 + S)
 ```
@@ -104,7 +103,7 @@ Let us now see how to use induction on the type `IsSumSq` to prove certain prope
 theorem IsSumSq_Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
   induction h1 with  -- we prove that S1 + S2 is a sum of squares in R by induction on h1 (which is a proof that S1 is a sum of squares)
   | zero =>  -- the base step is S1 = 0, so S1 + S2 = 0
-    simp  -- we simplify 0 + S2 to S2
+    simp only [zero_add]  -- we simplify 0 + S2 to S2
     exact h2  -- we conclude using h2
   | add a S hS ih =>  -- the inductive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S + S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) + S2 is a sum of squares
     rw [add_assoc]  -- rewrite using (a ^ 2 + S) + S2 = a ^ 2 + (S + S2)
@@ -153,14 +152,14 @@ We begin with the first implication: starting from `S : R` such that `IsSumSq S`
 lemma IsSumSqToExistList {R : Type} [Semiring R] (S : R) (hS : IsSumSq S) : (∃ L : List R, SumSq L = S) := by
   induction hS with  -- we prove the result by induction on hS (which is a proof that S is a sum of squares)
   | zero =>  -- the base case is when S = 0
-    exact ⟨[], rfl⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
+    exact ⟨[], by rw [SumSq]⟩  -- we can use L = [] to prove that ∃ L, SumSq L = 0
     -- use []  -- instead of exact ⟨[], rfl⟩, we can write use [] followed by rfl
     -- rfl
   | add a s _ ih =>  -- the inductive step is when S = a ^2 + s, where s is a sum of squares and the induction hypothesis is that there exists a list L such that SumSq L = s
     rcases ih with ⟨l, hl⟩  -- we extract from ih a list l such that SumSq l = s
     rw [← hl]  -- we rewrite the goal using SumSq l = s
     use (a :: l)  -- We claim that we can use the list L = (a :: l) to show that there exists a list L such thatt SumSq L = a ^ 2 + SumSq l
-    rfl  -- indeed the result is true by definition of the function SumSq
+    rw [SumSq]  -- indeed the result is true by definition of the function SumSq
 ```
 
 From this and Lemma `SumSqListIsSumSq` proved in [the first section](#using-an-inductive-predicate), we can prove the equivalence that we wanted. Note that, given a sum of squares `S` in `R`, there may exist more than one list such that `SumSq L = S`.
@@ -304,13 +303,13 @@ instance {R : Type} [Semiring R] [Repr R] : Repr (SumSqType R) where
     fun S _ =>
       repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
 
-def SOS : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
+def zero_is_SOS : SumSqType ℤ := ⟨0, IsSumSq.zero⟩
 
-#check SOS.1  -- ↑SOS : ℤ
-#check SOS.2  -- SOS.property : IsSumSq ↑SOS
+#check zero_is_SOS.1  -- ↑zero_is_SOS : ℤ
+#check zero_is_SOS.2  -- zero_is_SOS.property : IsSumSq ↑zero_is_SOS
 
-#eval SOS.1  -- 0
-#eval SOS  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
+#eval zero_is_SOS.1  -- 0
+#eval zero_is_SOS  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
 ```
 
 Similarly, we can register a `Decidable` instance on the proposition `IsSumSq (0 : R)`.
@@ -345,7 +344,7 @@ def SumSqType' (R : Type) [Semiring R] : Type := Subtype (IsSumSqExpl R)
 
 One can also define the type of sums of squares in a semiring `R` directly, using the `structure` keyword, which creates a type. A structure is similar to an inductive type with only one constructor, but the way in which the resulting terms can be used is a bit different: a term in a structure can be projected to its various "components" (we will clarify this in the example below).
 
-Note that the notion of [subtype]((https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype) that we used [earlier](#as-a-subtype) is indeed a special kind of structure. The differnce is that, for a subtype, Lean inserts a so-called [*coercion*](https://leanprover-community.github.io/mathlib4_docs/Init/Coe.html#Coercion). Namely, a term `S` of type `{x : R // IsSumSq x}` will coerce to `R` (the resulting term is then denoted by `↑S`).
+Note that the notion of [subtype]((https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Subtype) that we used [earlier](#as-a-subtype) is indeed a special kind of structure. The difference is that, for a subtype, Lean inserts a so-called [*coercion*](https://leanprover-community.github.io/mathlib4_docs/Init/Coe.html#Coercion). Namely, a term `S` of type `{x : R // IsSumSq x}` will coerce to `R` (the resulting term is then denoted by `↑S`).
 
 This coercion is an optional design choice. It is inserted explicitly in the library at [subtypeCoe](https://leanprover-community.github.io/mathlib4_docs/Init/Coe.html#subtypeCoe). By definition (in this case), the term `↑S` is the projection of `S` to `R`, which can also be accessed using `S.val` or `S.1` (while `S.property` or `S.2` will access a proof of the proposition `IsSumSq S.val`).
 
@@ -363,7 +362,7 @@ structure SumsOfSquares (R : Type) [Semiring R] where
 mk :: (val : R) (ppty : IsSumSq val)
 ```
 
-This could be written with a `:=` instead of a `where`. Also, the `mk :: ` part is optional (`mk` stands for `make`). The following syntax works fine.
+This could be written with a `:=` instead of a `where`. Also, the `mk :: ` part is optional (`mk` stands for `make`). Indeed, the following syntax also works fine:
 
 ```lean
 structure SumsOfSquares (R : Type) [Semiring R]
@@ -391,17 +390,17 @@ so the sums of squares in `R` are exactly the values of the function `SumSq`. Th
 ```lean
 def SumSqList {R : Type} [Semiring R] (L : List R) : SumsOfSquares R := SumsOfSquares.mk (SumSq L) (SumSqListIsSumSq L)  -- ⟨SumSq L, SumSqListIsSumSq L⟩ also works
 
-#check SumSqList [1, -2, 3]
+#check SumSqList [1, -2, 3]  -- SumSqList [1, -2, 3] : SumsOfSquares ℤ
 ```
 
 We can then project a term `S : SumsOfSquares R` to `R` and `IsSumSq S.val`.
 
 ```lean
-#check SumsOfSquares.val
-#check SumsOfSquares.ppty
+#check SumsOfSquares.val  -- SumsOfSquares.val {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : R
+#check SumsOfSquares.ppty  -- SumsOfSquares.ppty {R : Type} [inst✝ : Semiring R] (self : SumsOfSquares R) : IsSumSq self.val
 
-#check (SumSqList [1, -2, 3]).val
-#check (SumSqList [1, -2, 3]).ppty
+#check (SumSqList [1, -2, 3]).val   -- (SumSqList [1, -2, 3]).val : ℤ
+#check (SumSqList [1, -2, 3]).ppty  -- (SumSqList [1, -2, 3]).ppty : IsSumSq (SumSqList [1, -2, 3]).val
 ```
 
 As in the first implementation of the type of sums of squares given [above](#-as-a-subtype), we can put a `Repr` instance on the type `SumsOfSquares R`.
@@ -411,25 +410,73 @@ instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares R) where
   reprPrec :=
     fun S _ =>
       repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+-- Below, we use a Type-valued predicate (as opposed to Prop-valued)
+
+inductive IsSumSq' {R : Type} [Semiring R] : R → Type
+  | zero : IsSumSq' (0 : R)
+  | add (x S : R) (hS : IsSumSq' S) : IsSumSq' (x ^ 2 + S)
+
+structure SumsOfSquares' (R : Type) [Semiring R] where
+(val : R) (ppty : IsSumSq' val)
+
+instance {R : Type} [Semiring R] [Repr R] : Repr (SumsOfSquares' R) where
+  reprPrec :=
+    fun S _ =>
+      repr S.val ++ " is a sum of squares because the property IsSumSq " ++ repr S.val ++ " has been proven."
+
+def SumSqListIsSumSq' {R : Type} [Semiring R] : (L : List R) → IsSumSq' (SumSq L) := by
+  intro L  -- let L be a list whose members are terms of type signature R
+  induction L with  -- by induction on the list L
+  | nil =>  -- the case of the empty list []
+    rw [SumSq]  -- rewrite using SumSq [] = 0
+    exact IsSumSq'.zero  -- IsSumSq' 0 is a proof that 0 is a sum of squares
+  | cons a l ih =>  -- the case of a list L = (a :: l) where SumSq l is assumed to be a sum of squares
+    rw [SumSq]  -- rewrite using SumSq (a :: l) = a ^2 + SumSq l
+    exact IsSumSq'.add a (SumSq l) ih  -- conclude using the induction hypothesis and the property that, if S is a sum of squares, then x ^2 + S is a sum of squares
+
+def SumSqList' {R : Type} [Semiring R] (L : List R) : SumsOfSquares' R :=
+  ⟨SumSq L, SumSqListIsSumSq' L⟩  -- SumsOfSquares'.mk (SumSq L) (SumSqListIsSumSq' L)
+
+instance {R : Type} [Semiring R] [Repr R] {L : List R} : Repr (IsSumSq' (SumSqList' L).val) where
+ reprPrec :=
+    fun _ _ =>
+    "A proof of the fact that " ++ repr (SumSqList' L).val ++ " is a sum of squares is provided by applying the function SumSqListIsSumSq to the list " ++ repr L ++ ", because SumSq " ++ repr L ++ " = " ++ repr (SumSqList L).val  -- to re-examine
+
+#check SumSqList' [1, -2, 3]
+#eval SumSqList' [1, -2, 3]
+#check (SumSqList' [1, -2, 3]).val
+#eval (SumSqList' [1, -2, 3]).val
+#check (SumSqList' [1, -2, 3]).ppty
+#eval (SumSqList' [1, -2, 3]).ppty
 ```
 
 We can then define terms of type `SumsOfSquares ℤ` as we did before. But note that no coercion has been inserted here (we would have to do it ourselves).
 
 ```lean
-def SOS' : SumsOfSquares ℤ := ⟨0, IsSumSq.zero⟩
+def zero_is_SOS' : SumsOfSquares ℤ := ⟨0, IsSumSq.zero⟩
 
-#check SOS'.1  -- SOS.val : ℤ
-#check SOS'.2  -- SOS.property : IsSumSq SOS'.val
+#check zero_is_SOS'.1  -- zero_is_SOS'.val : ℤ
+#check zero_is_SOS'.2  -- zero_is_SOS'.property : IsSumSq zero_is_SOS'.val
 
-#eval SOS.1  -- 0
-#eval SOS  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
+#eval zero_is_SOS'.1  -- 0
+#eval zero_is_SOS'  -- 0 is a sum of squares because the property IsSumSq 0 has been proven.
 ```
 
-We can also apply `#eval` to values of the functions `SumSqList`.
+We can also apply `#eval` to values of the functions `SumSqList`. But the last one gives us an error message.
 
 ```lean
-#eval SumSqList [1, -2, 3]
-#eval (SumSqList [1, -2, 3]).val
+#check SumSqList [1, -2, 3]
+#eval SumSqList [1, -2, 3]  -- 14 is a sum of squares because the property IsSumSq 14 has been proven.
+#check (SumSqList [1, -2, 3]).val  -- (SumSqList [1, -2, 3]).val : ℤ
+#eval (SumSqList [1, -2, 3]).val  -- 14
+#check (SumSqList [1, -2, 3]).ppty
+-- #eval (SumSqList [1, -2, 3]).ppty  -- invalid universe level, 0 is not greater than 0
+
+#reduce (SumSqList [1, -2, 3])
+#reduce (SumSqList [1, -2, 3]).val
+#reduce (SumSqList [1, -2, 3]).ppty
+-- try to put a `Repr` instance on the type `IsSumSq (SumSq L)`?
 ```
 
 Of course, this would have worked just as well with the type `SumSqType R` in place of `SumsOfSquares R`.
@@ -442,22 +489,22 @@ def SumSqListType {R : Type} [Semiring R] (L : List R) : SumSqType R := ⟨SumSq
 #eval (SumSqListType [1, -2, 3]).val
 ```
 
-Finally, we note that, if we use an inductive type with just one constructor (as opposed to a structure), the resulting data type can be used in a similar manner, but the way the terms are accessed and used is a bit different. In particular, they cannot be projected to their various components.
+Finally, we note that, if we use an inductive type with just one constructor (as opposed to a structure), the resulting data type can be used in a similar manner, but the way the terms are accessed and used is a bit different. In particular, they cannot be projected to their various components (unless one defines the projections "by hand").
 
 ```lean
-inductive SumsOfSquares' (R : Type) [Semiring R]
+inductive SumsOfSquares'' (R : Type) [Semiring R]
 | mk (val : R) (ppty : IsSumSq val)
 
-#check SumsOfSquares'
-#check SumsOfSquares'.mk
-#check SumsOfSquares' ℤ
+#check SumsOfSquares''
+#check SumsOfSquares''.mk
+#check SumsOfSquares'' ℤ
 
-def SumSqList' {R : Type} [Semiring R] (L : List R) : SumsOfSquares' R := SumsOfSquares'.mk (SumSq L) (SumSqListIsSumSq L)
+def SumSqList'' {R : Type} [Semiring R] (L : List R) : SumsOfSquares'' R := SumsOfSquares''.mk (SumSq L) (SumSqListIsSumSq L)
 
-#check SumSqList' [1, -2, 3]
+#check SumSqList'' [1, -2, 3]
 ```
 
-The above works fine but the following command do not work
+The above works fine but the following command do not work (we would have to define the projections by hand):
 
 ```lean
 #check (SumSqList'' [1, -2, 3]).val
@@ -483,7 +530,7 @@ Let `R` be a semiring and let `S` be a term in `R`. Prove that Proposition `IsSu
 
 ```lean
 inductive IsSumSq' {R : Type} [Semiring R] : R → Prop :=
-  | sq (x : R): IsSumSq (x ^ 2 : R)
+  | sq (x : R) : IsSumSq (x ^ 2 : R)
   | add (S1 S2 : R) (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2)
 ```
 

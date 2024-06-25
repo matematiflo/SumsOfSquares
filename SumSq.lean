@@ -3,4 +3,3 @@
 import SumSq.Defs
 import SumSq.List
 import SumSq.Basic
-import MathlibVersions.Defs

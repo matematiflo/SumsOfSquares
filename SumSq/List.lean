@@ -7,7 +7,7 @@ Authors: Florent Schaffhauser.
 -/
 
 import SumSq.Defs
-import Std.Data.List.Basic
+import Batteries.Data.List.Basic
 import Mathlib.Data.List.Perm
 import Mathlib.Tactic.FieldSimp
 
@@ -109,9 +109,9 @@ The type `a ∈ L` is defined in [#List.Mem](https://leanprover-community.github
 -/
 
 theorem SumSqErase {R : Type} [Semiring R] [DecidableEq R] (L : List R) (a : R) (h : a ∈ L) : SumSq L = a ^ 2 + SumSq (L.erase a) := by
-  change SumSq L = SumSq (a :: (L.erase a)) -- we can replace the goal with a *definitionally equal* one
   have H : L.Perm (a :: (L.erase a)) := L.perm_cons_erase h -- this is the Mathlib proof that, if a ∈ L, then L ~ (a :: (L.erase a)), see also the exercises section below
   rw [SumSqPermut H] -- since we have a proof that L ~ (a :: (L.erase a)), we can use the SumSq_permut function that we defined earlier to conclude that the two sums of squares are equal
+  rw [SumSq]  -- the last simplification follows by definition of `SumSq`
 
 /-!
 ## Multiplication by a scalar
@@ -148,7 +148,7 @@ example : SumSq (ListSmul 2 [1, -2, 3]) = 4 * SumSq [1, -2, 3] := by rfl
 #eval 4 * SumSq [1, -2, 3]  -- 56
 
 example (a x y : ℚ) : (ListSmul a [x, y]) = [a * x, a * y] := by rfl
-example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add]
+example (a x y : ℚ) : SumSq (ListSmul a [x, y]) = a ^ 2 * SumSq [x, y] := by simp [SumSq, mul_pow, mul_add, ListSmul]
 
 /-!
 The result we expect is then the following:
@@ -169,8 +169,8 @@ theorem SumSmul {R : Type} [Semiring R] (c : R) (L : List R) : List.sum (c • L
 
 theorem SumSqSmul {R : Type} [CommSemiring R] (c : R) (L : List R) : SumSq (c • L) = c ^ 2 * SumSq L := by
     induction L with -- we prove the result by induction on L
-    | nil => simp only [SumSq, mul_zero] -- the case of the empty list is trivial
-    | cons a _ ih => simp only [SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis
+    | nil => simp only [SumSq, mul_zero, ListSmul]  -- the case of the empty list is trivial
+    | cons a l ih => simp only [ListSmul, SumSq, mul_add, ih, mul_pow] -- the case of a list of the form (a :: l) follows from simplifications and the use of the induction hypothesis
 
 /-!
 If we assume that the semiring `R` is in fact a semifield, then we can also consider the list from `L` obtained by dividing each entry by a term `c` such that `c ≠ 0'.

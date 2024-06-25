@@ -15,3 +15,4 @@ For some results, we specialize to rings or fields.
 - [Definitions and examples](Defs.md)
 - [Basic properties for lists](List.md)
 - [The type of sums of squares](Basic.md)
+- Some [exercises](Exercises.md)

@@ -4,9 +4,10 @@ A Lean package that develops the basic theory of sums of squares in rings and fi
 
 ## Libraries
 
-- [Definitions and examples](SumSq/Defs.md)
-- [Basic properties for lists](SumSq/List.md)
-- [The type of sums of squares](SumSq/Basic.md)
+- [Definitions and examples](md/Defs.md)
+- [Basic properties for lists](md/List.md)
+- [The type of sums of squares](md/Basic.md)
+- Some [exercises](md/Exercises.md)
 
 ## Quickstart
 

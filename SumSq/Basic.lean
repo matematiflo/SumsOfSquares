@@ -104,7 +104,7 @@ Let us now see how to use induction on the type `IsSumSq` to prove certain prope
 
 theorem IsSumSq_Sum {R : Type} [Semiring R] {S1 S2 : R} (h1 : IsSumSq S1) (h2 : IsSumSq S2) : IsSumSq (S1 + S2) := by
   induction h1 with  -- we prove that S1 + S2 is a sum of squares in R by induction on h1 (which is a proof that S1 is a sum of squares)
-  | zero =>  -- the base step is S1 = 0, so S1 + S2 = 0
+  | zero =>  -- the base step is S1 = 0, so S1 + S2 = S2
     simp only [zero_add]  -- we simplify 0 + S2 to S2
     exact h2  -- we conclude using h2
   | add a S hS ih =>  -- the inductive step is the case S1 = a ^ 2 + S, where S is a sum of squares and the induction hypothesis is that (S + S2) is a sum of squares: the goal is to prove that (a ^ 2 + S) + S2 is a sum of squares

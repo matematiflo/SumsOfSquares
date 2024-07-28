@@ -34,15 +34,15 @@ Sums of squares can thus be defined by pattern matching, with respect to terms o
 
 def SumSq {R : Type} [Semiring R] (L : List R) : R :=
   match L with
-  | [] => 0
+  | []     => 0
   | a :: l => a ^ 2 + SumSq l
-  termination_by List.length L
+ -- termination_by List.length L
 
 /-
-The `termination_by` expression  at the end of the declaration of `SumSq` is used to show that the recursion terminates at some point. It takes a function of `L` as an argument, in this case the length of the list `L`. And indeed this is the quantity that decreases along the computation, which stops just after `List.length L` becomes `0`.
+The `termination_by` expression  at the end of the declaration of `SumSq` is used to show that the recursion terminates. It takes a function of `L` as an argument, in this case the length of the list `L`. And indeed this is the quantity that decreases along the computation, which stops just after `List.length L` becomes `0`.
 -/
 
-example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := by rewrite [SumSq]; rfl
+example {R : Type} [Semiring R] : SumSq ([] : List R) = 0 := rfl
 
 /-!
 Alternate syntax, without pattern matching:
@@ -71,15 +71,15 @@ In these examples, note that Lean is capable of recognizing that `[1, -2, 3]` is
 #eval SumSq ([] : List ℕ)  -- 0
 #eval SumSq ([1, -2, 3/4] : List ℚ)  -- (89 / 16 : ℚ)
 
-example : SumSq [1, -2, 3] = 14 := by rfl
-example : SumSq ([1, -2, 3/4] : List ℚ) = 89 / 16 := by rfl
+example : SumSq [1, -2, 3] = 14 := rfl
+example : SumSq ([1, -2, 3/4] : List ℚ) = 89 / 16 := by rfl  -- just `rfl` does not seem to work here
 
 /-!
 If `L1` and `L2` are lists, there is a concatenated list `L1 ++ L2`, and `SumSq (L1 ++ L2)` can be computed directly.
 -/
 
 #eval SumSq ([1, -2, 3] ++ [1, 1, -2, 3])  -- 29
-example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := by rfl
+example : SumSq ([1, -2, 3] ++ (0 :: [1, -2, 3])) = 28 := rfl
 
 #eval SumSq (0 :: [1, -2, 3])  -- 14
 #eval SumSq (1 :: [1, -2, 3])  -- 15
@@ -111,13 +111,13 @@ We now *prove* that the two definitions agree. This means that we define a funct
 -/
 
 theorem squaring_and_summing {R : Type} [Semiring R] (L : List R) : SumSq2 L = SumSq L := by
-  induction L with -- we prove the result by induction on the list L (the type `List R` is an inductive type)
-  | nil => rewrite [SumSq]; rfl -- case when L is the empty list, the two terms are definitionally equal
-  | cons a l ih => -- case when L = (a :: l), the two terms reduce to equal ones after some simplifications
-    dsimp [SumSq2, SumSq] -- we simplify using the definitions of SumSq2 and SumSq
-    dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of SumSq2
-    rewrite [SumSq, ←ih]  -- we use the induction hypothesis
-    rw [List.sum_cons]
+  induction L with -- we prove the result by induction on the list `L` (the type `List R` is an inductive type)
+  | nil => rewrite [SumSq]; rfl -- case when `L` is the empty list, the two terms are definitionally equal
+  | cons a l ih => -- case when `L = (a :: l)`, the two terms reduce to equal ones after some simplifications
+    --dsimp [SumSq2, SumSq] -- we simplify using the definitions of `SumSq2` and `SumSq`
+    --dsimp [SumSq2] at ih  -- we simplify in the induction hypothesis, using the definition of `SumSq2`
+    rewrite [SumSq, ←ih, SumSq2]  -- we use the induction hypothesis
+    rw [List.map_cons, List.sum_cons, SumSq2]
 
 /-!
 ## Tail-recursive definition
@@ -135,7 +135,7 @@ def SumSqAux {R : Type} [Semiring R] : R → List R → R
 The following property holds by definition. It will be used in the proof of the equality `SumSqTR L = SumSq L`.
 -/
 
-theorem SumSqAuxZero {R : Type} [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := by rewrite [SumSq]; rfl
+theorem SumSqAuxZero {R : Type} [Semiring R] (L : List R) : SumSqAux 0 L = SumSqAux (SumSq []) L := rfl
 
 /-!
 The tail-recursive version of the `SumSq` function is then defined as follows.
@@ -162,12 +162,12 @@ theorem SumSqAuxWithSumSq {R : Type} [Semiring R] (L1 : List R) : ∀ L2 : List 
   | nil =>
     simp only [SumSqAux, SumSq]  -- the nil case follows almost immediately from the definitions of the functions involved
     intro L2; simp only [add_zero]
-  | cons a l1 ih =>  -- note that the induction hypothesis is for l fixed but for arbitrary L' : List R
-    intro L  -- we introduce a new variable L
-    dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of SumSq and SumSqAux
-    rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of SumSq
-    rw [ih (a :: L)]  -- we apply the induction hypothesis with L' = (a :: L'')
-    rw [SumSq, add_comm (a ^ 2) _, add_assoc, SumSq]  -- we compute to finish the proof
+  | cons a l1 ih =>  -- note that the induction hypothesis is for `l` fixed but for arbitrary `L' : List R`
+    intro L  -- let `L` be a list
+    dsimp [SumSq, SumSqAux]  -- we simplify, using the definitions of `SumSq` and `SumSqAux`
+    rw [add_comm _ (a ^2), ← SumSq]  -- we use the commutativity of addition, then compute backwards using the definition of `SumSq`
+    rw [ih (a :: L)]  -- we apply the induction hypothesis with `L' = (a :: L'')`
+    rw [SumSq, add_comm (a ^ 2) _, add_assoc]  -- we compute to finish the proof
 
 /-!
 With the help of `SumSqAuxWithSumSq`, we can now prove that the tail-recursive version of the sum-of-squares function indeed returns the same value as the original function.
@@ -176,8 +176,37 @@ We start with an easy lemma, which is of more general interest.
 -/
 
 lemma SumSqAuxEmptyList {R : Type} [Semiring R] (L : List R) : SumSqAux (SumSq []) L= SumSqAux (SumSq L) [] := by
-  simp only [SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function SumSqAuxGen to get rid of SumSqAux everywhere (on the left, the function SumSqAuxGen is applied to the lists L and [], and on the right it is applied to [] and L)
-  simp only [SumSq, zero_add, add_zero]  -- we finish the proof by computing, using the fact that SumSq [] = 0 (by definition)
+  rewrite [SumSqAuxWithSumSq, SumSqAuxWithSumSq]  -- both terms of the equation can be modified, using the function `SumSqAuxWithSumSq` to get rid of `SumSqAux` everywhere (on the left, the function `SumSqAuxWithSumSq` is applied to the lists `L` and `[]`, and on the right it is applied to `[]` and `L`)
+  simp only [SumSq, zero_add, add_zero]  -- we finish the proof by computing, using the fact that `SumSq [] = 0` (by definition)
 
 theorem def_TR_ok {R : Type} [Semiring R] (L : List R) : SumSqTR L = SumSq L := by
   simp only [SumSqTR, SumSqAuxZero, SumSqAuxEmptyList, SumSqAux]  -- the proof is by direct computation
+
+inductive foo where
+| bar₀   : foo
+| bar₁   : Nat → foo
+| bar₂   : foo → Int → foo
+| bar₂'  : foo → foo → foo
+| bar₃   : foo → foo → Int → foo
+| bar₃'  : foo → foo → foo → foo
+| bar₃'' : foo → Int → Int → foo
+
+variable (X' : Type)
+#check foo.rec (motive := fun _ => X')
+
+#check List.rec
+
+-- {R : Type} -> {F : List R -> Type} -> F nil -> (a : R) -> (l : List R) -> F l -> F (a :: l)`
+
+#check List.nil
+example : (L : List Int) → Fin (L.length + 1) := by
+  intro L
+  apply List.rec (motive := fun L => Fin (L.length +1))
+  sorry
+  sorry
+
+example : 1 ≠ 0 := by exact Nat.one_ne_zero
+
+example : 1 ≠ 0 := by
+  intro h
+  cases h
